@@ -17,7 +17,7 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | Ruta | Contenido |
 |---|---|
 | `app.py` | Tablero Dash multipágina (`use_pages=True`); lee solo `data/` y no entrena nada. Producción: `gunicorn app:server`. |
-| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (predicción en vivo con XGBoost, las 112 combinaciones con sus pruebas, el mejor modelo en 2026 con SHAP y la 2 × 2, y el modelo base). |
+| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (predicción en vivo con XGBoost, las 112 combinaciones con sus pruebas, el modelo óptimo en 2026 con SHAP, el modelo original con la 2 × 2 y los conjuntos públicos, y la línea base). |
 | `src/` | Código del proyecto, compartido por el libro y el tablero. |
 | `src/datos.py` | Ruta del dataset, semilla, partición cronológica, tipos de variable y preprocesamiento. |
 | `src/data.py` | Carga y caché de lo que lee el tablero (`data/`); no importa scikit-learn. |

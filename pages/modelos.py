@@ -4,6 +4,7 @@ prueba 2026 con SHAP y la comparación 2 × 2 con la propuesta original, y el mo
 Todo se lee de ``data/modelos`` (lo escribe ``src.preparar`` a partir de ``src.modelo_base``): aquí no se entrena."""
 import dash
 import dash_bootstrap_components as dbc
+import pandas as pd
 from dash import Input, Output, callback, dash_table, dcc, html
 
 from src import plots
@@ -95,8 +96,17 @@ def pestana_2026():
     d = DIF.iloc[0]
     m = P26.reset_index()[["modelo", "ROC-AUC", "ROC-AUC inf", "ROC-AUC sup", "PR-AUC", "F1", "precisión",
                            "sensibilidad", "ECE", "umbral"]]
-    cr = modelo("p26_criticas")[["cifra", "total", "BCa inf", "BCa sup", "por mes"]]
-    k = modelo("p26_contrastes")[["contraste", "ΔROC-AUC", "inf", "sup"]]
+    c = modelo("p26_criticas").set_index("cifra")
+    ent = lambda v: f"{v:,.0f}".replace(",", ".")
+    dif = lambda f: f"{ent(c.loc[f, 'total'])} [{ent(c.loc[f, 'BCa inf'])}; {ent(c.loc[f, 'BCa sup'])}]"
+    cr = pd.DataFrame({
+        "": ["Tardías atrapadas", "De ellas, con stock en cero"],
+        "XGBoost": [ent(c.loc["XGBoost: tardías atrapadas", "total"]), ent(c.loc["XGBoost: críticas atrapadas", "total"])],
+        "Logística": [ent(c.loc["logística: tardías atrapadas", "total"]),
+                      ent(c.loc["logística: críticas atrapadas", "total"])],
+        "Diferencia [BCa 95 %]": [dif("N: tardías de más"), dif("M: de ellas, con stock en cero")],
+        "Diferencia por mes": [ent(c.loc["N: tardías de más", "por mes"]),
+                               ent(c.loc["M: de ellas, con stock en cero", "por mes"])]})
     return html.Div([
         html.H3("XGBoost en la prueba 2026"),
         html.P("El ganador de las 112 (sin balanceo, Optuna), con Platt y el umbral de máximo F1 fijados en la validación "
@@ -126,12 +136,70 @@ def pestana_2026():
                "mes anterior no tenía existencias. Intervalos BCa por órdenes; el de las críticas roza el cero. Entrenar "
                "tarda minutos: se puede reentrenar cada mes. En los 8 bloques gana los 8 (Wilcoxon-Holm 0,047, Cliff "
                "0,34).", className="small text-muted"),
-        tabla_simple(cr, 1),
-        html.H4("La propuesta original: modelo × información", className="mt-4"),
-        html.P("La propuesta del Entregable 3 (efectos aleatorios por entidad, plazo log-normal y 32 variables de plazo "
-               "real) frente al ganador de las 112, con y sin la información nueva. Diferencias de ROC-AUC en pareja.",
+        tabla_simple(cr),
+    ])
+
+
+PUB = {"airlines": "Vuelos (Airlines)", "amazon": "Acceso de empleados (Amazon)", "click": "Publicidad (Click)",
+       "nyc_bus": "Buses escolares de Nueva York", "zurich": "Transporte de Zúrich",
+       "diabetes": "Reingreso hospitalario (Diabetes130US)", "noshow": "Citas médicas no asistidas"}
+
+
+def pestana_original():
+    pr = P26.loc["Propuesta (K3 + log-normal + nuevas)"]
+    k0 = modelo("p26_contrastes").iloc[0]
+    m = P26.loc[["XGBoost (las 112)", "Propuesta (K3 + log-normal + nuevas)"]].reset_index()[
+        ["modelo", "ROC-AUC", "ROC-AUC inf", "ROC-AUC sup", "PR-AUC", "F1", "precisión", "sensibilidad", "ECE"]]
+    dd = modelo("p26_dos_por_dos")
+    dd = dd.assign(**{"ROC-AUC [IC 95 %]": [f"{_n(a)} [{_n(b)}; {_n(c)}]" for a, b, c in zip(dd["ROC-AUC"], dd.inf, dd.sup)]})[
+        ["celda", "ROC-AUC [IC 95 %]"]]
+    k = modelo("p26_contrastes")
+    k = k.assign(**{"ΔROC-AUC [IC 95 %]": [f"{_n(a, 4)} [{_n(b, 4)}; {_n(c, 4)}]"
+                                           for a, b, c in zip(k["ΔROC-AUC"], k.inf, k.sup)]})[["contraste", "ΔROC-AUC [IC 95 %]"]]
+    p = modelo("publicos")
+    gana, emp, pierde = ((p.veredicto == v).sum() for v in ("K3 gana", "empate", "K3 pierde"))
+    pub = pd.DataFrame({
+        "ronda": p.ronda, "conjunto": p.conjunto.map(PUB), "posiciones": [f"{v:,}".replace(",", ".") for v in p.n],
+        "AUC XGBoost": [_n(v) for v in p.auc_xgb], "AUC K3": [_n(v) for v in p.auc_k3],
+        "ΔAUC [IC 95 %]": [f"{_n(a)} [{_n(b)}; {_n(c)}]" for a, b, c in zip(p.dif, p.ic_lo, p.ic_hi)],
+        "p (Holm)": ["< 0,001" if v < 0.001 else _n(v) for v in p.p_holm], "veredicto": p.veredicto,
+        "F1 XGBoost": [_n(v) for v in p.f1_xgb], "F1 K3": [_n(v) for v in p.f1_k3]})
+    return html.Div([
+        html.H3("Modelo original: efectos por entidad, plazo log-normal y plazo real"),
+        html.P("La propuesta del Entregable 3 tiene tres piezas: K3, un boosting de árboles con efectos aleatorios por "
+               "proveedor, material, creador de la solicitud y comprador, sobre los días de retraso en cortes ordenados; "
+               "un modelo log-normal del plazo, que da la probabilidad de que el plazo prometido no alcance; y 32 "
+               "variables nuevas de plazo real del proveedor y holgura. Se eligió con validación y se congeló (Platt y "
+               "umbral ajustados en 2025) antes de medir 2026. Intervalos por remuestreo de órdenes."),
+        dbc.Row([cifra(_n(pr["ROC-AUC"]), f"ROC-AUC en 2026 [{_n(pr['ROC-AUC inf'])}; {_n(pr['ROC-AUC sup'])}]"),
+                 cifra(_n(pr.F1), f"F1 al umbral {_n(pr.umbral)}"),
+                 cifra(f"+{_n(k0['ΔROC-AUC'])}", f"de AUC sobre el ganador de las 112 [{_n(k0.inf)}; {_n(k0.sup)}]"),
+                 cifra(_n(pr.ECE), "error de calibración esperado (ECE)")]),
+        tabla_simple(m),
+        html.H4("Modelo × información: la comparación 2 × 2", className="mt-4"),
+        html.P("Separa lo que aporta el modelo de lo que aporta la información: cada modelo con las 136 variables del "
+               "proyecto y con las 136 más las 32 nuevas. La ablación quita a K3 el plazo log-normal.",
                className="small text-muted"),
-        tabla_simple(k, 4),
+        dbc.Row([dbc.Col(tabla_simple(dd), lg=5), dbc.Col(tabla_simple(k), lg=7)]),
+        html.P("Cómo leer: la información nueva le suma a XGBoost casi una centésima de AUC; el modelo, con las mismas 136 "
+               "variables, otro tanto. Con las dos juntas, lo que agrega cada pieza por separado ya no es significativo: "
+               "se solapan, porque las dos capturan la historia de cada proveedor y material.",
+               className="small text-muted"),
+        html.H4("La propuesta en otros datos", className="mt-4"),
+        html.P("K3 contra el XGBoost de las 112 en siete conjuntos públicos de OpenML, con el mismo protocolo: Optuna con "
+               "20 evaluaciones sobre la validación, una sola medida en la prueba y DeLong pareado con Holm sobre los "
+               "siete. El criterio de la segunda ronda (al menos dos de tres rasgos: entidades que se repiten, orden en el "
+               "tiempo, desenlace continuo) se fijó antes de correrla. El plazo log-normal y las variables nuevas no "
+               "aplican fuera de OTIF.", className="small text-muted"),
+        tabla_simple(pub),
+        html.P(f"K3 gana en {gana}, empata en {emp} y pierde en {pierde}; F1 mayor en {(p.f1_k3 > p.f1_xgb).sum()} de "
+               f"{len(p)}. Wilcoxon sobre las siete diferencias: p = 0,81, sin superioridad general. Gana donde una entidad "
+               "tiene historia propia en el tiempo (el paciente que vuelve), como el proveedor en OTIF; empata en "
+               "transporte, con entidades pocas y estables; pierde sin tiempo ni desenlace continuo. Cuidado: esa "
+               "separación se vio después de la segunda ronda; confirmarla pide una tercera fijada antes de correr.",
+               className="small text-muted mt-2"),
+        html.P("La predicción en vivo sirve XGBoost: la propuesta necesita la historia de entregas de cada proveedor y "
+               "material, que lleva códigos de entidad y no se publica.", className="small text-muted"),
     ])
 
 
@@ -143,7 +211,48 @@ def cifra(valor, texto):
 layout = html.Div([
     html.H2("Modelos"),
     dbc.Tabs([
-        dbc.Tab(vista(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
+        dbc.Tab(html.Div([
+            html.H3("Modelo base: regresión logística"),
+            html.P("El modelo base es una regresión logística con penalización L2, con el mismo preprocesamiento que usarán los "
+                   "demás modelos: logaritmo con signo, imputación y estandarización en las numéricas, codificación one-hot en "
+                   "las categóricas y codificación jerárquica por objetivo en las entidades, todo dentro del pipeline. Se compara "
+                   "con dos líneas base: un clasificador que predice la tasa del entrenamiento y la regla de negocio de mirar la "
+                   "tasa previa de retraso del proveedor."),
+            dbc.Row([cifra(_n(LOG["ROC-AUC"]), "ROC-AUC de la logística en la prueba 2026"),
+                     cifra(_n(PRU.loc["Regla del proveedor", "ROC-AUC"]), "ROC-AUC de la regla del proveedor"),
+                     cifra(_n(LOG.F1), f"F1 al umbral {_n(LOG.umbral)}, fijado en la validación 2025"),
+                     cifra(_n(LOG.ECE), "error de calibración esperado (ECE)")]),
+            html.H4("Métricas en la prueba 2026"),
+            html.P(f"Intervalos al 95 % por bootstrap de órdenes ({RES['bootstrap']} remuestras): las posiciones de una misma "
+                   "orden no son independientes, así que se remuestrean órdenes completas. El umbral de cada modelo es el que "
+                   "maximiza el F1 en la validación 2025; la prueba se usó una sola vez.", className="small text-muted"),
+            tabla_metricas(),
+            html.H4("Discriminación", className="mt-4"),
+            dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "ROC", PRU.reset_index()), config=CONFIG),
+                             lg=6),
+                     dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "PR", PRU.reset_index()), config=CONFIG),
+                             lg=6)]),
+            html.P("Cómo leer: la curva ROC sube más rápido cuanto mejor ordena el modelo (la diagonal es el azar). La curva de precisión y sensibilidad dice, para cada fracción de las tardías que se quiera encontrar, qué fracción de las alertas acierta; su referencia es la prevalencia, no 0,5.", className="small text-muted"),
+            html.H4("Umbral y calibración"),
+            dbc.Row([dbc.Col(dcc.Graph(figure=plots.matriz_confusion(modelo("confusion"), LOG.umbral), config=CONFIG), lg=6),
+                     dbc.Col(dcc.Graph(figure=plots.calibracion(modelo("calibracion")), config=CONFIG), lg=6)]),
+            html.P("Cómo leer: la matriz cuenta las posiciones de 2026 según lo que pasó (filas) y lo que dijo el modelo (columnas), con el porcentaje de cada fila. En la calibración, cada punto es un decil de probabilidad: si cae sobre la diagonal, «30 % de riesgo» quiere decir que llega tarde el 30 % de esas posiciones.", className="small text-muted"),
+            html.H4("Qué pesa en el modelo"),
+            html.P("Coeficientes del modelo final (entrenado con 2021-2025). Las numéricas están estandarizadas, así que el "
+                   "coeficiente es el cambio en log-odds por una desviación estándar; en las categóricas, frente a la media de "
+                   "las demás. El bloque de plazo es colineal (VIF de más de 300): sus coeficientes por separado no se leen como "
+                   "efectos, solo su suma.", className="small text-muted"),
+            html.Div([dbc.Label("Coeficientes a mostrar"),
+                      dcc.Slider(id="m-n-coef", min=10, max=40, step=10, value=20, marks={k: str(k) for k in (10, 20, 30, 40)})],
+                     style={"maxWidth": 360}),
+            dcc.Graph(id="m-coef", config=CONFIG),
+            html.H4("Hiperparámetro y tamaño de muestra"),
+            dbc.Row([dbc.Col(dcc.Graph(figure=plots.validacion_c(modelo("cv_C")), config=CONFIG), lg=6),
+                     dbc.Col(dcc.Graph(figure=plots.curva_aprendizaje(modelo("curva_aprendizaje")), config=CONFIG), lg=6)]),
+            html.P(f"C = {RES['C']:g}, elegido con validación cruzada temporal dentro de 2021-2024 (entrena con los años "
+                   "anteriores y valida con el siguiente). La curva de aprendizaje mide el AUC en la validación 2025 con 10 %, "
+                   "25 %, 50 % y 100 % de las órdenes de entrenamiento.", className="small text-muted"),
+        ]), label="Línea base (logística)", tab_id="t-base", className="pt-3"),
         dbc.Tab(html.Div([
             html.H3("Las 112 combinaciones"),
             html.P("Siete modelos × cuatro balanceos (ninguno, SMOTE, ADASYN, pesos de clase) × cuatro optimizadores (Grid, "
@@ -191,52 +300,12 @@ layout = html.Div([
                    "0,012 de AUC, y entre modelos la diferencia llega a 0,12. Optuna y el genético se acercan antes al mejor "
                    "valor conocido; con 20 evaluaciones los cuatro quedan a menos de 0,004.", className="small text-muted"),
         ]), label="Las 112 combinaciones", tab_id="t-112", className="pt-3"),
-        dbc.Tab(pestana_2026(), label="Mejor modelo (2026)", tab_id="t-2026", className="pt-3"),
-        dbc.Tab(html.Div([
-            html.H3("Modelo base: regresión logística"),
-            html.P("El modelo base es una regresión logística con penalización L2, con el mismo preprocesamiento que usarán los "
-                   "demás modelos: logaritmo con signo, imputación y estandarización en las numéricas, codificación one-hot en "
-                   "las categóricas y codificación jerárquica por objetivo en las entidades, todo dentro del pipeline. Se compara "
-                   "con dos líneas base: un clasificador que predice la tasa del entrenamiento y la regla de negocio de mirar la "
-                   "tasa previa de retraso del proveedor."),
-            dbc.Row([cifra(_n(LOG["ROC-AUC"]), "ROC-AUC de la logística en la prueba 2026"),
-                     cifra(_n(PRU.loc["Regla del proveedor", "ROC-AUC"]), "ROC-AUC de la regla del proveedor"),
-                     cifra(_n(LOG.F1), f"F1 al umbral {_n(LOG.umbral)}, fijado en la validación 2025"),
-                     cifra(_n(LOG.ECE), "error de calibración esperado (ECE)")]),
-            html.H4("Métricas en la prueba 2026"),
-            html.P(f"Intervalos al 95 % por bootstrap de órdenes ({RES['bootstrap']} remuestras): las posiciones de una misma "
-                   "orden no son independientes, así que se remuestrean órdenes completas. El umbral de cada modelo es el que "
-                   "maximiza el F1 en la validación 2025; la prueba se usó una sola vez.", className="small text-muted"),
-            tabla_metricas(),
-            html.H4("Discriminación", className="mt-4"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "ROC", PRU.reset_index()), config=CONFIG),
-                             lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "PR", PRU.reset_index()), config=CONFIG),
-                             lg=6)]),
-            html.P("Cómo leer: la curva ROC sube más rápido cuanto mejor ordena el modelo (la diagonal es el azar). La curva de precisión y sensibilidad dice, para cada fracción de las tardías que se quiera encontrar, qué fracción de las alertas acierta; su referencia es la prevalencia, no 0,5.", className="small text-muted"),
-            html.H4("Umbral y calibración"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.matriz_confusion(modelo("confusion"), LOG.umbral), config=CONFIG), lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.calibracion(modelo("calibracion")), config=CONFIG), lg=6)]),
-            html.P("Cómo leer: la matriz cuenta las posiciones de 2026 según lo que pasó (filas) y lo que dijo el modelo (columnas), con el porcentaje de cada fila. En la calibración, cada punto es un decil de probabilidad: si cae sobre la diagonal, «30 % de riesgo» quiere decir que llega tarde el 30 % de esas posiciones.", className="small text-muted"),
-            html.H4("Qué pesa en el modelo"),
-            html.P("Coeficientes del modelo final (entrenado con 2021-2025). Las numéricas están estandarizadas, así que el "
-                   "coeficiente es el cambio en log-odds por una desviación estándar; en las categóricas, frente a la media de "
-                   "las demás. El bloque de plazo es colineal (VIF de más de 300): sus coeficientes por separado no se leen como "
-                   "efectos, solo su suma.", className="small text-muted"),
-            html.Div([dbc.Label("Coeficientes a mostrar"),
-                      dcc.Slider(id="m-n-coef", min=10, max=40, step=10, value=20, marks={k: str(k) for k in (10, 20, 30, 40)})],
-                     style={"maxWidth": 360}),
-            dcc.Graph(id="m-coef", config=CONFIG),
-            html.H4("Hiperparámetro y tamaño de muestra"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.validacion_c(modelo("cv_C")), config=CONFIG), lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.curva_aprendizaje(modelo("curva_aprendizaje")), config=CONFIG), lg=6)]),
-            html.P(f"C = {RES['C']:g}, elegido con validación cruzada temporal dentro de 2021-2024 (entrena con los años "
-                   "anteriores y valida con el siguiente). La curva de aprendizaje mide el AUC en la validación 2025 con 10 %, "
-                   "25 %, 50 % y 100 % de las órdenes de entrenamiento.", className="small text-muted"),
-        ]), label="Modelo base", tab_id="t-base", className="pt-3"),
-    ], active_tab="t-prediccion"),
-    dbc.Alert("La predicción en vivo sirve XGBoost (el ganador de las 112) con Platt. La propuesta original, que le gana "
-              "por 0,012 de AUC en 2026, se describe en el libro (capítulo del modelo original).", color="light",
+        dbc.Tab(pestana_2026(), label="Modelo óptimo", tab_id="t-2026", className="pt-3"),
+        dbc.Tab(pestana_original(), label="Modelo original", tab_id="t-original", className="pt-3"),
+        dbc.Tab(vista(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
+    ], active_tab="t-base"),
+    dbc.Alert("La predicción en vivo sirve XGBoost (el modelo óptimo de las 112) con Platt. El modelo original le gana "
+              "por 0,012 de AUC en 2026, pero necesita la historia de entregas de cada entidad, que no se publica.", color="light",
               className="mt-3"),
 ])
 
