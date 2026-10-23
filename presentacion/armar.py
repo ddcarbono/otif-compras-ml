@@ -167,7 +167,7 @@ L.append(lamina(1, 'Clasificador binario para la predicción del incumplimiento 
     '<p style="font-size:30px;margin-top:70px">Un grupo agroindustrial colombiano de la palma de aceite: 406.126 posiciones de orden de compra, 2021-2026</p>'
     '<table style="margin-top:60px;font-size:30px"><tr><th>Repositorio</th><td style="text-align:left">https://github.com/ddcarbono/otif-compras-ml</td></tr>'
     '<tr><th>Libro</th><td style="text-align:left">https://ddcarbono.github.io/otif-compras-ml/</td></tr>'
-    '<tr><th>Tablero</th><td style="text-align:left;color:#888">pendiente</td></tr></table></div>',
+    '<tr><th>Tablero</th><td style="text-align:left">https://otif-compras-ml.onrender.com</td></tr></table></div>',
     'repositorio del proyecto', 'Presentarse y dar las tres direcciones: repositorio, libro y tablero (este último aún sin publicar). Una frase: predecir, el día en que sale la orden, si la posición llegará tarde.',
     '0:30'))
 

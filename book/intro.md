@@ -3,7 +3,7 @@
 **Autores:** Daniel Carbonó y Luis Pérez. Maestría en Estadística Aplicada, curso de Machine Learning, Universidad del
 Norte, 2026.
 
-**Tablero:** *(URL de Render, pendiente de publicar)* · **Repositorio:** https://github.com/ddcarbono/otif-compras-ml
+**Tablero:** https://otif-compras-ml.onrender.com · **Repositorio:** https://github.com/ddcarbono/otif-compras-ml
 
 ## Resumen
 

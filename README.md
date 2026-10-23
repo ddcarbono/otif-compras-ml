@@ -3,7 +3,7 @@
 **Autores:** Daniel Carbonó y Luis Pérez.
 Curso de Machine Learning, Maestría en Estadística Aplicada, Universidad del Norte, 2026.
 
-- **Tablero:** pendiente de publicar (Render).
+- **Tablero:** https://otif-compras-ml.onrender.com (Render, plan gratuito: la primera visita tras un rato sin uso tarda unos 30 a 60 s).
 - **Libro:** <https://ddcarbono.github.io/otif-compras-ml/>
 
 ## Qué es
