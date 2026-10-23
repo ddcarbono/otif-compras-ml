@@ -31,6 +31,7 @@ partes del otro. Primero las cifras, luego los criterios, y al final las pregunt
 | mejor | XGBoost sin balanceo con Optuna: AUC 0,852 ± 0,020, F1 0,676 ± 0,048, PR-AUC 0,778 (media de los 8 bloques) |
 | modelos | AUC por mejor combinación: XGBoost 0,8517, Random Forest 0,8427, logística 0,8394, SVM 0,8385, árbol 0,8100, KNN 0,7814, Naive Bayes 0,7347 |
 | comparación | Friedman χ² = 45,6 (p = 3,5·10⁻⁸); diferencia crítica de Nemenyi 3,19; Wilcoxon con Holm: p = 0,047 contra cada uno de los seis |
+| dentro de cada bloque | DeLong (validado contra pROC hasta 1e-10), Holm sobre 48: XGBoost supera al bosque en 6 de 8 bloques, a la logística y al SVM en 7, y a los otros tres en 8; ningún rival le gana en ninguno. Diferencia media con BCa 95 % por órdenes: bosque 0,009 [0,006; 0,012], logística 0,012 [0,007; 0,016], SVM 0,013 [0,008; 0,017]. δ de Cliff: 0,25 (pequeño), 0,34 y 0,38 (medianos), 0,88-1,00 (grandes) |
 | balanceo | AUC medio de las 112: ninguno 0,8111, pesos 0,8110, SMOTE 0,8112, ADASYN 0,8086 |
 | optimizadores | arrepentimiento en la evaluación 5: Optuna 0,006, genético 0,013, aleatoria 0,015, rejilla 0,042 |
 
@@ -172,7 +173,9 @@ base; por eso no se compara su cifra con la del base. E = 20 es un presupuesto d
 - Línea base y alternativos: Dummy (AUC 0,5; F1 0,479), regla del proveedor (0,670), logística (0,825 en 2026) y los
   siete modelos de las 112. La logística le saca 0,155 de AUC a la regla.
 - XGBoost sin balanceo queda primero en los ocho bloques (rango medio 1,00). Con Nemenyi se separa del árbol, KNN y Naive
-  Bayes, pero no de la logística, el bosque ni el SVM; con Wilcoxon y Holm le gana a los seis (p = 0,047).
+  Bayes, pero no de la logística, el bosque ni el SVM; con Wilcoxon y Holm le gana a los seis (p = 0,047). Dentro de
+  cada bloque, con DeLong, supera a los tres más cercanos en seis o siete de los ocho y empata en el resto; la
+  diferencia media (0,009 a 0,013) tiene un intervalo BCa por órdenes que no toca el cero.
 - Lo que pesa es el modelo, no el balanceo ni el optimizador: dentro de un modelo, sus 16 combinaciones no se separan
   más de 0,012 de AUC.
 - Error y sobreajuste. Lo que ya hay: con la logística en 2026, de 16.374 tardías marcó 11.672 (71,3 %) y dio 7.929 falsas
@@ -330,7 +333,9 @@ $2/2^8 = 0{,}0078$, que con Holm por seis comparaciones queda en 0,047, apenas b
 
 **¿Ocho bloques son suficientes?** Para decir que XGBoost lidera, alcanzan; para decir más, no. Además los bloques no son
 independientes: las ventanas crecientes comparten entrenamiento, y las pruebas suponen independencia. Es una limitación.
-La ventaja se contrasta de nuevo en la prueba 2026 con DeLong (pendiente: evaluación 2026).
+Por eso se miró también dentro de cada bloque, con las predicciones: DeLong en cada uno y un intervalo BCa que remuestrea
+órdenes. La ventaja se sostiene ahí (seis o siete bloques significativos frente a los más cercanos, ninguno en contra).
+Si se sostiene en un año que nadie vio se mide en la prueba 2026 (pendiente: evaluación 2026).
 
 **¿Por qué comparar los modelos con la combinación de mayor AUC interno y no con la de mayor AUC externo?** Elegir por el
 AUC externo sería escoger con el mismo dato que se quiere comparar; el AUC interno es donde se eligió y no sesga la
@@ -344,17 +349,37 @@ comparación no pareada se ahogaría en esa variación.
 contrasta si los rangos medios difieren más de lo esperable por azar, sin suponer normalidad. Iman y Davenport la convierten
 en una $F$, menos conservadora: aquí $\chi^2 = 45{,}6$ ($p = 3{,}5 \cdot 10^{-8}$) y $F = 135{,}5$.
 
+## Preguntas difíciles: pruebas sobre las predicciones (DeLong, Cliff, BCa)
+
 **¿Por qué DeLong y por qué entra la covarianza?** Compara dos AUC sobre las mismas posiciones. Los dos modelos puntúan los
 mismos casos y sus AUC están correlacionados: la varianza de la diferencia es $\mathrm{Var}_1 + \mathrm{Var}_2 - 2\,\mathrm{Cov}$,
 y ignorar la covarianza subestima la potencia. El empate cuenta 0,5 porque el AUC es $P(s^{+} > s^{-}) + \tfrac{1}{2} P(s^{+} = s^{-})$.
-Se aplica sobre la prueba 2026 (pendiente: evaluación 2026).
+Se aplicó en cada uno de los 8 bloques, XGBoost contra los otros seis (48 pruebas, Holm): supera al bosque en 6, a la
+logística y al SVM en 7, y al árbol, KNN y Naive Bayes en 8 (z de 19 a 32 en el peor bloque). Donde no es significativo
+es empate (diferencias de ±0,001), nunca un rival por encima. La implementación es propia (Sun y Xu, 2014) y coincide con
+`pROC::roc.test` de R hasta la décima cifra, en seis casos sintéticos y en el bloque 2025-S2. Falta hacerlo en la prueba
+2026 (pendiente: evaluación 2026).
+
+**¿DeLong no supone filas independientes?** Sí, y las posiciones de una orden no lo son: su error estándar queda corto y
+sus p, demasiado pequeños. Por eso no se lee solo: va junto al intervalo BCa, que remuestrea órdenes completas y sí
+recoge esa dependencia. Los dos dicen lo mismo aquí.
 
 **¿Para qué el delta de Cliff si ya hay p?** Con muchas filas todo p sale significativo; el delta da el tamaño del efecto
-(va de −1 a 1; 0,147, 0,33 y 0,474 separan despreciable, pequeño, mediano y grande). (pendiente: evaluación 2026).
+(va de −1 a 1; 0,147, 0,33 y 0,474 separan despreciable, pequeño, mediano y grande). Sobre los ocho AUC por bloque:
+frente al bosque 0,25 (pequeño), a la logística 0,34 y al SVM 0,38 (medianos), al árbol, KNN y Naive Bayes de 0,88 a 1
+(grandes). Es pequeño con el bosque aunque XGBoost gane 7 de 8 pareados, porque Cliff no parea: compara las dos
+colecciones, y la variación entre semestres es mayor que la ventaja.
 
 **¿Por qué el bootstrap es por órdenes?** Remuestrear filas trataría como independientes posiciones que comparten
-proveedor, fechas y comprador, y los intervalos saldrían demasiado estrechos. Se remuestrean órdenes completas (200
-réplicas).
+proveedor, fechas y comprador, y los intervalos saldrían demasiado estrechos. Se remuestrean órdenes completas: 200
+réplicas en la prueba 2026 de la logística, 1.000 (dentro de cada bloque) para las 112.
+
+**¿Por qué BCa y no el intervalo de percentiles?** El de percentiles supone que la distribución bootstrap está centrada
+en la estimación y que su forma no cambia con el valor del parámetro. BCa corrige las dos cosas: el sesgo $z_0$ (qué
+fracción de réplicas cae bajo la estimación) y la aceleración $a$ (estimada con jackknife, cuánto cambia el error
+estándar con el parámetro). Con un AUC cerca de 0,85, acotado por 1, la distribución es asimétrica y BCa importa.
+
+## Preguntas difíciles: optimizadores y presupuesto
 
 **¿Por qué el mismo presupuesto de 20 evaluaciones y por qué 20?** Para que la comparación entre optimizadores sea justa:
 cuentan evaluaciones, no horas. El 20 fue una decisión de costo (con un piloto, para que cupiera en una noche), no un
@@ -393,9 +418,11 @@ la brecha entre entrenamiento y validación: la curva de convergencia y la brech
 (con su historial) y la aprobación interna (días de liberación, estrategia). Con la logística, el coeficiente mayor es el del
 proveedor codificado (1,87). La explicación de XGBoost con SHAP: (pendiente: evaluación 2026).
 
-**¿La diferencia entre XGBoost y el bosque es real?** Gana en los ocho bloques por 0,011 de AUC (Wilcoxon, p Holm 0,047),
-pero Nemenyi no los separa y la diferencia es mucho menor que la variación entre bloques (0,02). Se dice «lidera de forma
-consistente, con una ventaja pequeña».
+**¿La diferencia entre XGBoost y el bosque es real?** Sí, y pequeña. Con las combinaciones de mayor AUC interno gana en
+los ocho bloques (Wilcoxon, p Holm 0,047); con las de la tabla de líderes, en siete, y DeLong la da por significativa en
+seis (en 2024-S1 y 2025-S2 empatan). La diferencia media es 0,009 con BCa 95 % [0,006; 0,012]: no toca el cero. El delta
+de Cliff, 0,25, es pequeño, porque la ventaja es menor que la variación entre bloques (0,02). Nemenyi no los separa. Se
+dice «lidera de forma consistente, con una ventaja pequeña».
 
 **¿Se puede usar para decidir hoy?** Con límites. La tasa de 2026 puede estar subestimada por censura; hay deriva de
 covariables en la tasa previa del comprador; los maestros son la foto actual; los resultados valen para una sola empresa; y
@@ -416,5 +443,5 @@ Se rellena con la evaluación de XGBoost en la prueba 2026, que se usa una sola 
 - matriz de confusión, ROC, PR y calibración (y Platt si hace falta);
 - errores por línea y por entidad nueva o conocida, y un falso negativo típico;
 - brecha entre entrenamiento y validación por iteración (curva de convergencia);
-- DeLong, Cliff, la tabla con el modelo en la prueba, y SHAP global y local;
+- DeLong en la prueba (en los 8 bloques ya está), la tabla con el modelo en la prueba, y SHAP global y local;
 - con eso, reescribir las respuestas marcadas «(pendiente: evaluación 2026)».

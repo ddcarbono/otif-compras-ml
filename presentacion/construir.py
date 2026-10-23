@@ -58,6 +58,7 @@ mejor = lid.sort_values('AUC', ascending=False).groupby('modelo').head(1)
 top = mejor.iloc[0]
 fri = leer(MOD, 'friedman.csv').iloc[0]
 wil = leer(MOD, 'wilcoxon.csv')
+pru = leer(R, 'pruebas', 'resumen.csv')
 cur = leer(MOD, 'curvas_optimizador.csv').pivot(index='eval', columns='optimizador', values='mean')
 met = leer(MOD, 'metricas.csv').set_index(['modelo', 'partición'])
 lb = met.loc[('Regresión logística', 'prueba 2026')]
@@ -500,20 +501,26 @@ notas(s, '1:00', 'B', 'criterio 5', 'Por qué cada métrica. La ganancia de XGBo
 # ============================================================== 17 TABLERO: PREDICCION + CD
 s = nueva()
 wl = wil[wil.contra == 'logistica'].iloc[0]
+rb, rl = (pru.set_index('rival').loc[m] for m in ('random_forest', 'logistica'))
 cabecera(s, 'Tablero: una predicción en vivo, y la prueba de diferencias', 'CRITERIO 5  ·  PANTALLA EN VIVO')
 captura(s, 'tablero_modelos.png', 1.3, 3.6, 10.8)
 banda(s, 1.3, 11.0, 11.4, 2.1, [('En vivo:  ', True, ORO_CL), ('cargar una posición real, cambiar el plazo hábil al liberar '
                                  'y ver cómo se mueven el riesgo y sus contribuciones.', False, BLANCO)], VERDE, tam=10.5)
-figura(s, 'rangos_cd.png', 13.4, 3.2, w=10.8)
-texto(s, 13.4, 10.6, 10.8, 2.6, [(f'Friedman: χ² = {n(fri.chi2, 1)}, p < 0,001: los 7 modelos no rinden igual.',
+figura(s, 'rangos_cd.png', 13.6, 2.7, w=10.4)
+texto(s, 13.4, 9.9, 10.8, 3.4, [(f'Friedman: χ² = {n(fri.chi2, 1)}, p < 0,001: los 7 modelos no rinden igual.',
                                   {'negrita': True}),
                                  (f'Nemenyi no separa a XGBoost de la logística ni del bosque (diferencia crítica '
                                   f'{n(fri.CD, 2)}); Wilcoxon por pares sí: gana los 8 bloques, p de Holm = '
-                                  f'{n(wl.p_holm, 3)}.', {})], tam=10.5, espacio=4)
-pie(s, f'tablero, página Modelos; data/modelos/friedman.csv, wilcoxon.csv, rangos.csv')
+                                  f'{n(wl.p_holm, 3)}.', {}),
+                                 (f'Dentro de cada bloque, DeLong con Holm: supera al bosque en {rb.bloques_delong_holm} '
+                                  f'de 8 y a la logística en {rl.bloques_delong_holm}, sin perder en ninguno. Ventaja '
+                                  f'{n(rb.dif_AUC, 3)}-{n(rl.dif_AUC, 3)} de AUC, con BCa por órdenes lejos de cero.',
+                                  {})], tam=10, espacio=3)
+pie(s, f'tablero, página Modelos; data/modelos/friedman.csv, wilcoxon.csv; resultados/pruebas/resumen.csv')
 notas(s, '1:00', 'A', 'criterio 5', 'En vivo: la predicción la sirve hoy el modelo base (logística), con sus '
       'contribuciones. Pruebas: Friedman rechaza la igualdad; Nemenyi es conservador con 8 bloques; el Wilcoxon pareado '
-      'con Holm separa porque XGBoost gana en cada bloque.')
+      'con Holm separa porque XGBoost gana en cada bloque. DeLong mira dentro de cada bloque (validado contra pROC); como '
+      'supone filas independientes, se lee con el BCa que remuestrea órdenes. Cliff con el bosque: pequeño (0,25).')
 
 # ============================================================== 18 ERRORES Y SOBREAJUSTE
 s = nueva()
