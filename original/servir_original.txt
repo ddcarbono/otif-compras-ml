@@ -1,0 +1,14 @@
+2021-2025 354185 -> 2026 51941 | 164 columnas | 0.5 min
+log-normal: s = 0.881 | 2.8 min
+   efectos ordenados 2021-S2 | 3.2 min
+   efectos ordenados 2022-S1 | 4.0 min
+   efectos ordenados 2022-S2 | 4.8 min
+   efectos ordenados 2023-S1 | 5.8 min
+   efectos ordenados 2023-S2 | 7.1 min
+   efectos ordenados 2024-S1 | 8.7 min
+   efectos ordenados 2024-S2 | 10.2 min
+   efectos ordenados 2025-S1 | 12.0 min
+   efectos ordenados 2025-S2 | 13.9 min
+K3: 881 árboles | 18.8 min
+reproducción: {'filas': 51941, 'dif_max': 1.1102230246251565e-16, 'correlacion': 1.0, 'misma_decision': 1.0}
+escrito artifacts/original_servido.joblib, 300 ejemplos y 6 rangos | 18.9 min

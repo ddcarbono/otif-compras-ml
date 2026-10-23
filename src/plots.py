@@ -412,3 +412,21 @@ def forma_plazo(t, col, grupos):
                       xaxis_title="días hábiles de plazo al liberar", yaxis_title="efecto sobre el logit", height=560,
                       legend=dict(orientation="h", y=-0.22, x=0, xanchor="left", yanchor="top"))
     return fig
+
+
+def log_perdida(p):
+    """Log-pérdida de una posición según la probabilidad predicha: −ln p si llegó tarde y −ln(1 − p) si llegó a tiempo,
+    con el punto de ``p`` marcado en las dos curvas."""
+    x = np.linspace(0.005, 0.995, 199)
+    fig = go.Figure()
+    for nombre, y, yp, color, linea in [("llegó tarde: −ln p", -np.log(x), -np.log(p), ORO, "solid"),
+                                        ("llegó a tiempo: −ln(1 − p)", -np.log(1 - x), -np.log(1 - p), VERDE, "dash")]:
+        fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name=nombre, line=dict(color=color, dash=linea),
+                                 hovertemplate="p %{x:.2f}<br>pérdida %{y:.2f}<extra></extra>"))
+        fig.add_trace(go.Scatter(x=[p], y=[yp], mode="markers+text", text=[f"{yp:.2f}".replace(".", ",")],
+                                 textposition="top right", marker=dict(color=color, size=10), showlegend=False,
+                                 hoverinfo="skip"))
+    fig.update_layout(title=f"Log-pérdida con p = {p:.2f}".replace(".", ","), xaxis_title="probabilidad predicha de tarde, p",
+                      yaxis_title="pérdida", yaxis_range=[0, 5.3], xaxis_range=[0, 1], height=400,
+                      legend=dict(y=-0.3), margin=dict(b=90))
+    return fig

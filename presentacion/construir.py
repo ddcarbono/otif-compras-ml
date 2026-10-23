@@ -69,6 +69,7 @@ k26 = leer(R, 'prueba_2026', 'contrastes.csv').iloc[0]
 pub = pd.read_csv(os.path.join(AQUI, '..', 'original', 'publicos_otif_resumen.csv'))
 b26 = leer(R, 'prueba_2026', 'brecha.csv').set_index('modelo').loc['XGBoost (las 112)']
 f26 = leer(R, 'prueba_2026', 'confusion.csv').set_index(['real', 'predicho']).posiciones
+od26 = leer(MOD, 'p26_ordenes.csv').set_index('meta')
 cur = leer(MOD, 'curvas_optimizador.csv').pivot(index='eval', columns='optimizador', values='mean')
 met = leer(MOD, 'metricas.csv').set_index(['modelo', 'partición'])
 lb = met.loc[('Regresión logística', 'prueba 2026')]
@@ -88,7 +89,7 @@ NOMBRE = {'xgboost': 'XGBoost', 'random_forest': 'Random Forest', 'logistica': '
 BAL = {'ninguno': 'sin balanceo', 'smote': 'SMOTE', 'adasyn': 'ADASYN', 'pesos': 'pesos'}
 OPT = {'grid': 'Grid', 'random': 'Random', 'optuna': 'Optuna', 'deap': 'DEAP'}
 
-N_TOTAL = 21
+N_TOTAL = 22
 NOTAS = []
 _k = [0]
 
@@ -537,8 +538,8 @@ texto(s, 13.4, 9.9, 10.8, 3.4, [(f'Friedman: χ² = {n(fri.chi2, 1)}, p < 0,001:
                                   f'{n(rb.dif_AUC, 3)}-{n(rl.dif_AUC, 3)} de AUC, con BCa por órdenes lejos de cero.',
                                   {})], tam=10, espacio=3)
 pie(s, f'tablero, página Modelos; data/modelos/friedman.csv, wilcoxon.csv; resultados/pruebas/resumen.csv')
-notas(s, '1:00', 'A', 'criterio 5', 'En vivo: la predicción la sirve XGBoost con Platt, con sus contribuciones SHAP '
-      'exactas. Pruebas: Friedman rechaza la igualdad; Nemenyi es conservador con 8 bloques; el Wilcoxon pareado '
+notas(s, '1:00', 'A', 'criterio 5', 'En vivo: la predicción sirve el modelo original y, para comparar, XGBoost, los dos con '
+      'Platt y contribuciones SHAP exactas. Pruebas: Friedman rechaza la igualdad; Nemenyi es conservador con 8 bloques; el Wilcoxon pareado '
       'con Holm separa porque XGBoost gana en cada bloque. DeLong mira dentro de cada bloque (validado contra pROC); como '
       'supone filas independientes, se lee con el BCa que remuestrea órdenes. Cliff con el bosque: pequeño (0,25).')
 
@@ -569,7 +570,58 @@ notas(s, '0:45', 'B', 'criterio 5', 'Sobreajuste en dos vistas: interno contra e
       'aprendizaje. En 2026, el error se concentra en las órdenes con entidades nuevas y en ganadería; el falso negativo '
       'típico no se podía ver al liberar.')
 
-# ============================================================== 19 LA PROPUESTA EN OTROS DATOS
+# ============================================================== 19 EL MODELO ORIGINAL
+s = nueva()
+cabecera(s, f'El modelo original le gana al óptimo de las 112 por {n(k26["ΔROC-AUC"], 3)} de AUC',
+         'CRITERIO 6  ·  MODELO ORIGINAL (ENTREGABLE 3)')
+texto(s, 1.3, 3.2, 14.5, 0.6, 'Efectos por entidad sobre un boosting, con cortes ordenados', tam=12, color=VERDE,
+      negrita=True)
+figura(s, 'f_original.png', 1.4, 3.9, w=14.3)
+texto(s, 1.3, 4.7, 14.5, 1.5, 'd_i: días de retraso; se predice en c = 1 (y_tarde) y aprende también de cuánto se atrasó. '
+      'b_e: intercepto aleatorio por proveedor, material, solicitante y comprador, encogido hacia 0 (σ²_e por EM). K3: '
+      'los árboles ven efectos estimados solo con los semestres anteriores, como al predecir.', tam=9.5, color=GRIS)
+texto(s, 1.3, 6.2, 14.5, 0.6, 'f es un LightGBM, no un XGBoost', tam=12, color=VERDE, negrita=True)
+texto(s, 1.3, 6.8, 14.5, 1.5, 'Misma suma de árboles, misma log-pérdida y mismo peso de hoja −G/(H + λ) (diapositiva 11). '
+      'Difiere en cómo crece el árbol: por hoja, partiendo la de mayor ganancia hasta 154 hojas, y no por niveles '
+      '(XGBoost: profundidad 10). Aquí toma Σ b_e como desplazamiento fijo del logit y es monótono decreciente en c.',
+      tam=9.5, color=GRIS)
+texto(s, 1.3, 8.4, 14.5, 0.6, 'Plazo log-normal y plazo real', tam=12, color=VERDE, negrita=True)
+figura(s, 'f_lognormal.png', 1.4, 9.0, w=11.5)
+texto(s, 1.3, 9.85, 14.5, 1.3, 'z: cuánto alcanza la promesa frente al plazo real esperado (un LightGBM sin la promesa). '
+      'Más 32 variables de plazo real: mediana y percentil 80 de las últimas 20 entregas, y la holgura empírica.',
+      tam=9.5, color=GRIS)
+c26 = leer(R, 'prueba_2026', 'dos_por_dos.csv').set_index('celda')
+q26 = leer(R, 'prueba_2026', 'contrastes.csv').set_index('contraste')
+filas_o = [['2026, AUC [BCa 95 %]', '136 del dataset', '136 + 32 nuevas']]
+for et, a, b in [('XGBoost', 'XGBoost 136', 'XGBoost 136 + nuevas'),
+                 ('K3, sin log-normal', 'K3 136 (ablación)', 'K3 136 + nuevas (ablación)'),
+                 ('Propuesta', 'Propuesta 136', 'Propuesta 136 + nuevas')]:
+    filas_o.append([et] + [f'{n(c26.loc[k, "ROC-AUC"], 3)} [{n(c26.loc[k, "inf"], 3)}; {n(c26.loc[k, "sup"], 3)}]'
+                           for k in (a, b)])
+tabla(s, 16.2, 3.3, 8.0, 3.6, filas_o, anchos=[2.6, 2.7, 2.7], tam=9)
+
+
+def _q(k):
+    r = q26.loc[k]
+    return f'{n(r["ΔROC-AUC"], 3)} [{n(r.inf, 3)}; {n(r.sup, 3)}]'
+
+
+tarjeta(s, 16.2, 7.1, 8.0, 3.9, 'Lectura de la 2 × 2', [
+    f'Con las 136, la estructura suma {_q("modelo, con las 136")}.',
+    f'El plazo real le da a XGBoost {_q("información, en XGBoost")}; con él, la ventaja de la estructura baja a '
+    f'{n(q26.loc["modelo, con 136 + nuevas", "ΔROC-AUC"], 3)}, sin significancia.',
+    f'El log-normal suma {n(q26.loc["log-normal, con las 136", "ΔROC-AUC"], 3)}; su intervalo toca el cero.'],
+        VERDECL, tam_c=9)
+banda(s, 1.3, 11.2, 22.9, 1.9, [('En el tablero:  ', True, ORO_CL),
+                                ('la pestaña Predicción lo sirve con posiciones reales de 2026, sin códigos de entidad. Es la '
+                                 'tercera mirada a 2026: exploratoria. En las órdenes con alguna entidad nueva no gana: '
+                                 'el arranque en frío sigue abierto.', False, BLANCO)], VERDE, tam=10.5)
+pie(s, 'libro, capítulo 9: resultados/prueba_2026/dos_por_dos.csv y contrastes.csv; tablero: Modelos → Modelo original')
+notas(s, '1:00', 'A', 'criterio 6', 'Qué es la propuesta y qué aporta cada parte. La 2 × 2 separa modelo de información: '
+      'los efectos por entidad y el plazo real son dos caminos a la misma ganancia. Decir que es la tercera mirada a '
+      '2026 y que por eso se lee como exploratoria.')
+
+# ============================================================== 20 LA PROPUESTA EN OTROS DATOS
 s = nueva()
 cabecera(s, 'En otros datos, la propuesta gana donde hay historia por entidad', 'CRITERIO 6  ·  VALIDACIÓN EN CONJUNTOS PÚBLICOS')
 NPUB = {'airlines': 'Vuelos (Airlines)', 'amazon': 'Acceso (Amazon)', 'click': 'Publicidad (Click)',
@@ -611,17 +663,18 @@ lista(s, 1.3, 3.4, 13.4, [
       tam=11.5, paso=1.9, alto=1.8)
 filas_v = [['objetivo', 'cumplido'], ['comparar las 112 con el mismo presupuesto', 'sí'],
            ['costo de las entidades nuevas', f'AUC {n(s26.loc["alguna nueva", "ROC-AUC"], 2)} contra '
-            f'{n(s26.loc["todo conocido", "ROC-AUC"], 2)}'], ['modelo servido en el tablero', 'sí, XGBoost'],
+            f'{n(s26.loc["todo conocido", "ROC-AUC"], 2)}'], ['modelo servido en el tablero', 'sí, el original (y XGBoost)'],
            ['modelo original contra el óptimo', f'+{n(k26["ΔROC-AUC"], 3)} de AUC [{n(k26.inf, 3)}; {n(k26.sup, 3)}]']]
 tabla(s, 15.4, 3.4, 8.8, 4.8, filas_v, anchos=[4.4, 3.6], tam=10.5)
 banda(s, 15.4, 8.6, 8.8, 4.5, [('Para el negocio:  ', True, ORO_CL),
                                (f'marcando el {pc(x26.marcadas, 0)} de las posiciones, XGBoost ve venir el '
-                                f'{pc(x26.sensibilidad, 0)} de las tardías de 2026. El comprador puede concentrar el '
-                                'seguimiento en un tercio de las órdenes.', False, BLANCO)], VERDE, tam=11.5)
+                                f'{pc(x26.sensibilidad, 0)} de las tardías de 2026. Por órdenes: siguiendo el '
+                                f'{pc(od26.loc[0.69, "fracción de las órdenes"], 0)} se ve venir el 69 % de las órdenes '
+                                'con retraso.', False, BLANCO)], VERDE, tam=11.5)
 pie(s, 'libro, capítulos 2 a 10')
 notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo. El modelo original '
-      'del Entregable 3 le gana al óptimo de las 112 por 0,012 en 2026 (pestaña Modelo original del tablero); el tablero '
-      'sirve el XGBoost porque la propuesta necesita la historia de entregas de cada entidad, que no se publica.')
+      'del Entregable 3 le gana al óptimo de las 112 por 0,012 en 2026 (pestaña Modelo original del tablero); la pestaña '
+      'Predicción lo sirve en vivo, con XGBoost al lado para comparar.')
 
 # ============================================================== 21 LIMITACIONES Y MEJORAS
 s = nueva()

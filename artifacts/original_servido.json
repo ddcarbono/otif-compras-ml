@@ -1,0 +1,21 @@
+{
+ "modelo": "Modelo original: K3 + plazo log-normal + 32 variables nuevas, con Platt",
+ "entrenado_con": "órdenes de 2021-2025",
+ "umbral": 0.3484857059162891,
+ "arboles": 881,
+ "platt": [
+  0.8503136943061866,
+  0.06599589084397973
+ ],
+ "reproduccion_2x2": {
+  "filas": 51941,
+  "dif_max": 1.1102230246251565e-16,
+  "correlacion": 1.0,
+  "misma_decision": 1.0
+ },
+ "versiones": {
+  "lightgbm": "4.3.0",
+  "pandas": "2.1.0",
+  "numpy": "1.26.4"
+ }
+}

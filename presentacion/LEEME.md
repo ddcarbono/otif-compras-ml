@@ -1,6 +1,6 @@
 # Diapositivas de la sustentación
 
-`sustentacion_otif.pptx` (y su PDF): 21 diapositivas de 25,4 × 14,29 cm con la plantilla Uninorte de las
+`sustentacion_otif.pptx` (y su PDF): 23 diapositivas de 25,4 × 14,29 cm con la plantilla Uninorte de las
 sustentaciones de GLM (`plantilla_uninorte.py`, la misma de la regresión Beta). Siguen la rúbrica de 20 minutos, con la
 tabla de `entregables/diapositivas.md` y el mejor benchmark (XGBoost) en la teoría: 18 minutos de exposición y 2 de
 preguntas.
@@ -12,8 +12,8 @@ preguntas.
 | 9-12 | 3 | 5:00 | XGBoost: modelo y pérdida; Taylor con la derivación de g y h; peso de hoja y ganancia; regularización, supuestos y complejidad medida | B |
 | 13-15 | 4 | 3:00 | diseño anidado; implementación y espacio de búsqueda; tablero en vivo (las 112 y los optimizadores) | B, A |
 | 16-18 | 5 | 3:00 | métricas y línea base; tablero en vivo (predicción) con Friedman, Nemenyi y Wilcoxon; errores y sobreajuste | B, A |
-| 19-20 | 6 | 2:00 | conclusiones con el veredicto de cada objetivo; limitaciones y mejoras | A, B |
-| 21 | 7 | 2:00 | preguntas | A y B |
+| 19-21 | 6 | 3:00 | modelo original (fórmula y la 2 × 2 de 2026); conjuntos públicos; conclusiones con el veredicto de cada objetivo; limitaciones y mejoras | A, B |
+| 22 | 7 | 2:00 | preguntas | A y B |
 
 A = Daniel Carbonó, B = Luis Pérez. Guion y tiempos en `notas.md` y en las notas de cada diapositiva. Las pantallas del
 tablero llevan su captura (`capturar_tablero.py`) por si Render no carga.

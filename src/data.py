@@ -113,3 +113,59 @@ def predecir(fila):
         c.loc[cat & c.variable.str.startswith(v + "_"), "variable"] = v
     c = c.groupby("variable", as_index=False).contribucion.sum()
     return p, ficha["umbral"], c.reindex(c.contribucion.abs().sort_values(ascending=False).index)
+
+
+# --- predicción en vivo con el modelo original ---------------------------------------------------------------------------
+HOLGURAS = ["prov", "provmat", "provga", "mat"]
+
+
+@lru_cache(maxsize=None)
+def original_servido():
+    """El modelo original publicado (``artifacts/original_servido.joblib``, lo escribe ``original/servir_original.py``):
+    el LightGBM del modelo y el del plazo log-normal, en texto, y su ficha. Se carga al primer uso."""
+    import joblib
+    import lightgbm as lgb
+    art = DATA.parent / "artifacts"
+    s = joblib.load(art / "original_servido.joblib")
+    s["booster"] = lgb.Booster(model_str=s["modelo"])
+    s["booster_lognormal"] = lgb.Booster(model_str=s["lognormal"])
+    return s, json.loads((art / "original_servido.json").read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=None)
+def ejemplos_original():
+    return pd.read_parquet(DATA / "prediccion" / "ejemplos_original.parquet")
+
+
+@lru_cache(maxsize=None)
+def rangos_original():
+    return pd.read_csv(DATA / "prediccion" / "rangos_original.csv").set_index("campo")
+
+
+def predecir_original(fila):
+    """Probabilidad de llegar tarde con el modelo original (``fila``: una posición de ``ejemplos_original``, quizá con
+    campos cambiados), la probabilidad del plazo log-normal sola (1 − Φ(z)) y la contribución al logit de cada variable
+    (valores SHAP exactos del LightGBM en el corte c = 1) y de cada efecto por entidad.
+
+    Las holguras y z se recalculan con el plazo de la fila: son el plazo al liberar menos el plazo real previo, y cambiar
+    uno sin las otras daría una posición imposible."""
+    from math import erfc, sqrt
+    s, ficha = original_servido()
+    x = fila.copy()
+    for k in HOLGURAS:
+        for q in ("med", "q80"):
+            x[f"{k}_holgura_{q}"] = x.plazo_habil_al_liberar - x[f"{k}_lt_{q}"]
+    for c, cats in s["categorias"].items():
+        x[c] = pd.Categorical(x[c], categories=cats)
+    mu = float(s["booster_lognormal"].predict(x[s["sin_plazo"]])[0])
+    z = (np.log1p(max(float(x.plazo_habil_al_liberar.iloc[0]), 0) + 1.5) - mu) / s["s"]
+    x = x.assign(dist_mu=mu, dist_z=z)
+    X = x[s["columnas"]].assign(corte=s["corte"])
+    efectos = x[s["efectos"]].iloc[0].astype(float)
+    logit = float(s["booster"].predict(X, raw_score=True)[0]) + efectos.sum()
+    a, b = s["platt"]
+    p = float(1 / (1 + np.exp(-(a * logit + b))))
+    shap = s["booster"].predict(X, pred_contrib=True)[0]
+    c = pd.DataFrame({"variable": list(X.columns) + list(efectos.index),
+                      "contribucion": np.r_[shap[:-1], efectos.to_numpy()]})
+    return p, ficha["umbral"], 0.5 * erfc(z / sqrt(2)), c.reindex(c.contribucion.abs().sort_values(ascending=False).index)

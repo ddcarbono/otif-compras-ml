@@ -1,4 +1,4 @@
-"""Sección 3: modelos. La predicción en vivo (sirve XGBoost con Platt), la tabla de líderes de las 112 combinaciones
+"""Sección 3: modelos. La predicción en vivo (el modelo original y XGBoost, con Platt), la tabla de líderes de las 112 combinaciones
 (validación anidada en 8 bloques semestrales, con Friedman, Nemenyi, Wilcoxon, DeLong y BCa), el mejor modelo en la
 prueba 2026 con SHAP y la comparación 2 × 2 con la propuesta original, y el modelo base (regresión logística).
 Todo se lee de ``data/modelos`` (lo escribe ``src.preparar`` a partir de ``src.modelo_base``): aquí no se entrena."""
@@ -10,6 +10,7 @@ from dash import Input, Output, callback, dash_table, dcc, html
 from src import plots
 from src.data import diccionario, modelo
 from src.vista_prediccion import vista
+from src.vista_original import vista as vista_original
 
 dash.register_page(__name__, path="/modelos", name="Modelos", order=2, title="Modelos · órdenes de compra")
 
@@ -97,6 +98,7 @@ def pestana_2026():
     m = P26.reset_index()[["modelo", "ROC-AUC", "ROC-AUC inf", "ROC-AUC sup", "PR-AUC", "F1", "precisión",
                            "sensibilidad", "ECE", "umbral"]]
     c = modelo("p26_criticas").set_index("cifra")
+    od = modelo("p26_ordenes")
     ent = lambda v: f"{v:,.0f}".replace(",", ".")
     dif = lambda f: f"{ent(c.loc[f, 'total'])} [{ent(c.loc[f, 'BCa inf'])}; {ent(c.loc[f, 'BCa sup'])}]"
     cr = pd.DataFrame({
@@ -116,6 +118,7 @@ def pestana_2026():
                  cifra(_n(XG.F1), f"F1 al umbral {_n(XG.umbral)}"),
                  cifra(f"+{_n(d.diferencia)}", f"de AUC sobre la logística [{_n(d['BCa inf'])}; {_n(d['BCa sup'])}]"),
                  cifra(_n(XG.ECE), "error de calibración esperado (ECE), con Platt")]),
+        tarjeta_formula(1),
         tabla_simple(m),
         dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("p26_curvas"), "ROC", P26.reset_index()),
                                    config=CONFIG), lg=6),
@@ -137,6 +140,18 @@ def pestana_2026():
                "tarda minutos: se puede reentrenar cada mes. En los 8 bloques gana los 8 (Wilcoxon-Holm 0,047, Cliff "
                "0,34).", className="small text-muted"),
         tabla_simple(cr),
+        html.H4("Llevado a órdenes: cuántas seguir"),
+        html.P(f"El comprador sigue órdenes, no posiciones. El riesgo de una orden es el de su posición más riesgosa, y "
+               f"una orden es tardía si tiene al menos una posición tardía ({ent(od.tardías.iloc[0])} de "
+               f"{ent(od.órdenes.iloc[0])} en 2026). Siguiendo el {od.loc[2, 'fracción de las órdenes']:.0%} de las "
+               f"órdenes se ve venir el 69 % de las órdenes con retraso. Es menos que por posiciones (33 % para el "
+               f"69 %): una orden tardía suele traer varias posiciones tardías juntas.", className="small text-muted"),
+        tabla_simple(pd.DataFrame({
+            "Encontrar": [f"{v:.0%}" for v in od.meta],
+            "Órdenes tardías": [ent(v) for v in od["órdenes tardías"]],
+            "Órdenes a seguir": [ent(v) for v in od["órdenes a seguir"]],
+            "% de las órdenes": [f"{v:.1%}".replace(".", ",") for v in od["fracción de las órdenes"]],
+            "Seguidas por cada tardía": [f"{v:.2f}".replace(".", ",") for v in od["seguidas por tardía"]]})),
     ])
 
 
@@ -175,6 +190,7 @@ def pestana_original():
                  cifra(_n(pr.F1), f"F1 al umbral {_n(pr.umbral)}"),
                  cifra(f"+{_n(k0['ΔROC-AUC'])}", f"de AUC sobre el ganador de las 112 [{_n(k0.inf)}; {_n(k0.sup)}]"),
                  cifra(_n(pr.ECE), "error de calibración esperado (ECE)")]),
+        tarjeta_formula(2),
         tabla_simple(m),
         html.H4("Modelo × información: la comparación 2 × 2", className="mt-4"),
         html.P("Separa lo que aporta el modelo de lo que aporta la información: cada modelo con las 136 variables del "
@@ -198,14 +214,80 @@ def pestana_original():
                "transporte, con entidades pocas y estables; pierde sin tiempo ni desenlace continuo. Cuidado: esa "
                "separación se vio después de la segunda ronda; confirmarla pide una tercera fijada antes de correr.",
                className="small text-muted mt-2"),
-        html.P("La predicción en vivo sirve XGBoost: la propuesta necesita la historia de entregas de cada proveedor y "
-               "material, que lleva códigos de entidad y no se publica.", className="small text-muted"),
+        html.P("La pestaña Predicción sirve este modelo con posiciones reales de 2026: cada una trae sus entidades ya "
+               "convertidas en números (efectos y tasas), sin sus códigos.", className="small text-muted"),
     ])
 
 
 def cifra(valor, texto):
     return dbc.Col(dbc.Card(dbc.CardBody([html.Div(valor, className="cifra"), html.Div(texto, className="cifra-texto")]),
                             className="h-100"), md=3, xs=6, className="mb-3")
+
+
+FORMULAS = [
+    ("Modelo base: regresión logística",
+     r"$$\hat p(x) = \sigma(\beta_0 + x^\top\beta)$$"
+     r"$$\min_\beta \; \sum_i \ell(y_i, \hat p_i) + \frac{1}{2C}\lVert\beta\rVert^2$$",
+     "Una recta en el logit: cada variable empuja siempre igual. La penalización L2 (C por validación cruzada) encoge "
+     "los coeficientes. Bien calibrada sin corrección."),
+    ("XGBoost: suma de árboles",
+     r"$$F(x) = \sum_{m=1}^{M} \eta\, f_m(x)$$"
+     r"$$\hat p(x) = \sigma\big(a\,F(x) + b\big)$$"
+     r"$$\min_{f_m} \sum_i \ell(y_i, \hat p_i) + \gamma T + \tfrac{1}{2}\lambda \textstyle\sum_j w_j^2$$",
+     "Cada árbol corrige lo que los anteriores predicen mal (g = p̂ − y). γ cobra cada hoja y λ encoge sus pesos. "
+     "a y b son la calibración de Platt, fijada en 2025."),
+    ("Modelo original: efectos por entidad y cortes ordenados",
+     r"$$P(d_i > c \mid x_i) = \sigma\Big(f(x_i, c) + \sum_{e} b_{e(i)}\Big)$$"
+     r"$$c \in \{0, 1, 5, 15\}, \qquad b_e \sim N(0, \sigma_e^2)$$"
+     r"$$f(x, c) = \sum_{m} \eta\, f_m(x, c), \qquad w_j^* = -\frac{G_j}{H_j + \lambda}, \qquad \frac{\partial f}{\partial c} \le 0$$",
+     "f es un LightGBM: la misma suma de árboles, la misma log-pérdida y el mismo peso de hoja que XGBoost. Difiere en "
+     "que crece por hoja (parte la de mayor ganancia, hasta 154 hojas) y no por niveles (XGBoost: profundidad 10), y "
+     "aquí recibe los efectos como desplazamiento fijo del logit y es monótono decreciente en el corte c. "
+     "d son los días de retraso; se predice en c = 1. Cada b es un intercepto aleatorio por "
+     "proveedor, material, solicitante y comprador, "
+     "encogido hacia 0 si tiene pocas posiciones. Recibe además el plazo log-normal y las 32 variables de plazo real."),
+]
+
+
+def tarjeta_formula(i, titulo="Formulación"):
+    """La formulación de un modelo (``FORMULAS[i]``): la fórmula a la izquierda y su lectura a la derecha."""
+    t, f, d = FORMULAS[i]
+    return html.Div([html.H4(titulo, className="mt-4"), dbc.Card(dbc.CardBody(dbc.Row([
+        dbc.Col(dcc.Markdown(f.replace("$$$$", "$$\n\n$$"), mathjax=True, style={"overflowX": "auto"}), md=7),
+        dbc.Col([html.H6(t), html.Small(d, className="text-muted")], md=5)])), className="mb-2")])
+
+
+def formulacion():
+    """La de la logística, con la log-pérdida que comparten los tres modelos y su gráfica interactiva."""
+    return html.Div([
+        tarjeta_formula(0),
+        html.P("Los tres modelos (base, óptimo y original) estiman la misma probabilidad con la logística σ y minimizan "
+               "la misma pérdida, la log-pérdida (menos la log-verosimilitud de Bernoulli); cambia la forma de la "
+               "función.", className="mb-0"),
+        dcc.Markdown(r"$$\ell(y, \hat p) = -\,y \ln \hat p - (1 - y)\ln(1 - \hat p), \qquad \sigma(z) = \frac{1}{1 + e^{-z}}$$",
+                     mathjax=True),
+        html.P("Mueva p: equivocarse con seguridad cuesta sin límite; dudar (p = 0,5) cuesta ln 2 = 0,69 en los dos casos.",
+               className="small text-muted mb-1"),
+        dcc.Slider(id="m-p", min=0.01, max=0.99, step=0.01, value=0.3, marks={v: f"{v:.1f}".replace(".", ",")
+                                                                              for v in (0.1, 0.3, 0.5, 0.7, 0.9)}),
+        dcc.Graph(id="m-perdida", config=CONFIG),
+    ])
+
+
+def pestana_prediccion():
+    """Las dos predicciones en vivo: el modelo original (el foco del proyecto) y el XGBoost de las 112, para comparar."""
+    return html.Div([
+        dbc.RadioItems(id="p-modelo", value="original", inline=True, className="mb-3",
+                       options=[{"label": "Modelo original (propuesta)", "value": "original"},
+                                {"label": "XGBoost (las 112)", "value": "xgboost"}]),
+        html.Div(vista_original(), id="p-vista-original"),
+        html.Div(vista(), id="p-vista-xgboost", style={"display": "none"}),
+    ])
+
+
+@callback(Output("p-vista-original", "style"), Output("p-vista-xgboost", "style"), Input("p-modelo", "value"))
+def elegir_modelo(m):
+    return ({}, {"display": "none"}) if m == "original" else ({"display": "none"}, {})
 
 
 PESTANAS = ("t-base", "t-112", "t-2026", "t-original", "t-prediccion")
@@ -228,6 +310,7 @@ def layout(pestana="t-base", **_):
                          cifra(_n(PRU.loc["Regla del proveedor", "ROC-AUC"]), "ROC-AUC de la regla del proveedor"),
                          cifra(_n(LOG.F1), f"F1 al umbral {_n(LOG.umbral)}, fijado en la validación 2025"),
                          cifra(_n(LOG.ECE), "error de calibración esperado (ECE)")]),
+                formulacion(),
                 html.H4("Métricas en la prueba 2026"),
                 html.P(f"Intervalos al 95 % por bootstrap de órdenes ({RES['bootstrap']} remuestras): las posiciones de una misma "
                        "orden no son independientes, así que se remuestrean órdenes completas. El umbral de cada modelo es el que "
@@ -308,10 +391,10 @@ def layout(pestana="t-base", **_):
             ]), label="Las 112 combinaciones", tab_id="t-112", className="pt-3"),
             dbc.Tab(pestana_2026(), label="Modelo óptimo", tab_id="t-2026", className="pt-3"),
             dbc.Tab(pestana_original(), label="Modelo original", tab_id="t-original", className="pt-3"),
-            dbc.Tab(vista(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
+            dbc.Tab(pestana_prediccion(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
         ], active_tab=pestana),
-        dbc.Alert("La predicción en vivo sirve XGBoost (el modelo óptimo de las 112) con Platt. El modelo original le gana "
-                  "por 0,012 de AUC en 2026, pero necesita la historia de entregas de cada entidad, que no se publica.", color="light",
+        dbc.Alert("La predicción en vivo sirve el modelo original, que le gana al óptimo de las 112 por 0,012 de AUC en 2026, "
+                  "y deja comparar con XGBoost. Las entidades llegan como números, sin sus códigos.", color="light",
                   className="mt-3"),
     ])
 
@@ -321,6 +404,11 @@ def mapa(m):
     fig = plots.mapa_combinaciones(LID, m, plots.BALANCEO, plots.OPTIMIZADOR)
     fig.update_layout(title=f"{plots.MODELO[m]}: AUC medio por balanceo y optimizador")
     return fig
+
+
+@callback(Output("m-perdida", "figure"), Input("m-p", "value"))
+def perdida(p):
+    return plots.log_perdida(p)
 
 
 @callback(Output("m-coef", "figure"), Input("m-n-coef", "value"))

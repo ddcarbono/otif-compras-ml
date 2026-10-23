@@ -28,7 +28,9 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `src/complejidad.py` | Tiempo de ajuste e inferencia de los 7 modelos contra el número de filas, con hiperparámetros fijos (exponente empírico). |
 | `src/similitud.py` | Validación adversaria: qué tan distinta es la evaluación del entrenamiento en la partición cronológica y en una aleatoria. |
 | `src/prediccion.py` | Prepara el modelo que sirve el tablero sin tablas de entidades (`artifacts/servido.joblib`), los ejemplos reales y los rangos de desarrollo. |
-| `src/vista_prediccion.py` | La pestaña de predicción en vivo de la página Modelos. |
+| `src/vista_prediccion.py` | La predicción en vivo con XGBoost, en la pestaña Predicción de la página Modelos. |
+| `src/vista_original.py` | La predicción en vivo con el modelo original (la opción por defecto de la pestaña Predicción). |
+| `original/servir_original.py` | Entrena el modelo original con 2021-2025 para el tablero (`artifacts/original_servido.joblib`: el LightGBM del modelo y el del plazo log-normal, Platt y umbral), comprueba que reproduce la 2x2 en 2026 y escribe 300 posiciones de 2026 sin códigos (`data/prediccion/ejemplos_original.parquet`). |
 | `srvgdai/` | Guiones para correr los 112 en el servidor: subir el código, piloto, preparar las matrices y correr (30 trabajos a la vez). |
 | `src/preparar.py` | Escribe `data/` para el tablero a partir del dataset completo y de las tablas del libro. |
 | `artifacts/` | El modelo que sirve el tablero (`servido.joblib` y `servido.json`: transformaciones, modelo, umbral, versiones y métricas) y la ficha del modelo base. El *pipeline* completo no se publica: sus tablas de entidades llevan los códigos. |

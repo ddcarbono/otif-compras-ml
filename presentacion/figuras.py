@@ -65,7 +65,9 @@ FORMULAS = {
     'f_logit': r'\min_{\beta}\ \sum_i \ell(y_i,\, x_i^{\top}\beta) + \frac{1}{2C}\,\Vert\beta\Vert^2',
     'f_bern': r'\ell(y, F) = -\log\left[\hat p^{\,y}(1-\hat p)^{1-y}\right],\qquad \hat p = \sigma(F)',
     'f_deriv': r"\sigma\,'(F) = \sigma(1-\sigma)\ \Rightarrow\ \frac{\partial \ell}{\partial F} = -y(1-\sigma) + (1-y)\,\sigma = \sigma - y,\quad \frac{\partial^2 \ell}{\partial F^2} = \sigma(1-\sigma)",
-    'f_112': r'7 \times 4 \times 4 = 112\ \mathrm{combinaciones} \times 8\ \mathrm{bloques} = 896\ \mathrm{trabajos}',
+    'f_original': r'P(d_i > c \mid x_i) = \sigma\left(f(x_i, c) + b_{\mathrm{prov}} + b_{\mathrm{mat}} + b_{\mathrm{sol}} + b_{\mathrm{comp}}\right),\quad c \in \{0, 1, 5, 15\},\quad b_e \sim N(0, \sigma_e^2)',
+    'f_lognormal': r'z_i = \frac{\log(1 + \mathrm{plazo\ prometido}_i + 1{,}5) - \mu_i}{s},\qquad \mu_i = E[\log(1 + \mathrm{plazo\ real}_i)]',
+    'f_112':r'7 \times 4 \times 4 = 112\ \mathrm{combinaciones} \times 8\ \mathrm{bloques} = 896\ \mathrm{trabajos}',
 }
 for k, v in FORMULAS.items():
     formula(k + '.png', v)
