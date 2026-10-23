@@ -4,9 +4,9 @@ Guía para que cada autor defienda el proyecto completo: lo que hay que saber de
 cifras clave y las preguntas difíciles del jurado con su respuesta corta.
 
 **Fuentes.** La rúbrica de sustentación (siete criterios, 20 minutos; `entregables/diapositivas.md`), los capítulos del
-libro (`book/fuentes/02a` a `03b`), `resultados/` y `src/`. Toda cifra sale de esos archivos. Lo que depende de la
-evaluación final de XGBoost en la prueba 2026 está marcado «(pendiente: evaluación 2026)»: no se dice como hecho hasta
-que exista. El glosario (`book/glosario.md`) define cada estadístico.
+libro (`book/fuentes/02a` a `05`), `resultados/` y `src/`. Toda cifra sale de esos archivos. La evaluación de XGBoost en
+2026 (`resultados/prueba_2026/`) es la tercera mirada del proyecto a la prueba: se dice que es exploratoria. El glosario
+(`book/glosario.md`) define cada estadístico.
 
 **Cómo usarla.** El criterio 7 evalúa el dominio individual: los dos autores responden y cada uno ensaya también las
 partes del otro. Primero las cifras, luego los criterios, y al final las preguntas en voz alta con la respuesta tapada.
@@ -32,6 +32,7 @@ partes del otro. Primero las cifras, luego los criterios, y al final las pregunt
 | modelos | AUC por mejor combinación: XGBoost 0,8517, Random Forest 0,8427, logística 0,8394, SVM 0,8385, árbol 0,8100, KNN 0,7814, Naive Bayes 0,7347 |
 | comparación | Friedman χ² = 45,6 (p = 3,5·10⁻⁸); diferencia crítica de Nemenyi 3,19; Wilcoxon con Holm: p = 0,047 contra cada uno de los seis |
 | dentro de cada bloque | DeLong (validado contra pROC hasta 1e-10), Holm sobre 48: XGBoost supera al bosque en 6 de 8 bloques, a la logística y al SVM en 7, y a los otros tres en 8; ningún rival le gana en ninguno. Diferencia media con BCa 95 % por órdenes: bosque 0,009 [0,006; 0,012], logística 0,012 [0,007; 0,016], SVM 0,013 [0,008; 0,017]. δ de Cliff: 0,25 (pequeño), 0,34 y 0,38 (medianos), 0,88-1,00 (grandes) |
+| XGBoost en 2026 | AUC 0,848 [0,835; 0,860], PR-AUC 0,758, F1 0,675 al umbral 0,345, ECE 0,022 con Platt; Δ sobre la logística 0,023 [0,017; 0,030]; con el 20 % de alertas, 8.242 tardías contra 7.895. Propuesta del E3: 0,860, Δ 0,012 [0,004; 0,018] |
 | balanceo | AUC medio de las 112: ninguno 0,8111, pesos 0,8110, SMOTE 0,8112, ADASYN 0,8086 |
 | optimizadores | arrepentimiento en la evaluación 5: Optuna 0,006, genético 0,013, aleatoria 0,015, rejilla 0,042 |
 
@@ -182,10 +183,12 @@ base; por eso no se compara su cifra con la del base. E = 20 es un presupuesto d
   alarmas (22,3 % de las 35.567 a tiempo); en cada decil la tasa observada queda a 4,2 puntos o menos de la predicha. La
   curva de aprendizaje de la logística muestra sesgo, no varianza (brecha de 0,066 a 0,037). En XGBoost, el AUC interno
   (0,8542) y el externo (0,8517) difieren en 0,003, lo que indica poco sobreajuste de la selección de hiperparámetros.
-  Dónde yerra XGBoost (por línea, por entidad nueva), su matriz de confusión, ROC, PR, calibración y SHAP:
-  (pendiente: evaluación 2026).
-- Coherencia con los objetivos: el objetivo 1 (probabilidad como riesgo) se juzga con Brier y ECE de XGBoost
-  (pendiente: evaluación 2026); el objetivo 2 (qué variables) con las asociaciones del EDA y SHAP (pendiente).
+  XGBoost en 2026, con Platt y umbral congelados en 2025: AUC 0,848 [0,835; 0,860] (BCa por órdenes), PR-AUC 0,758,
+  F1 0,675, ECE 0,022. De 16.374 tardías marcó 11.341 (69,3 %) con 5.889 falsas alarmas (16,6 %). Yerra más con alguna
+  entidad nueva (AUC 0,821 contra 0,856) y en ganadería (0,712). Brecha: interno 0,854, bloques 0,852, 2026 0,848.
+- Coherencia con los objetivos: el objetivo 1 (probabilidad como riesgo) se cumple con Platt (ECE 0,022, como la
+  logística); el objetivo 2 (qué variables) lo responde SHAP: plazo hábil al liberar (0,85 de |SHAP| medio), proveedor
+  (0,46) y, muy por debajo, promesa, experiencia con el centro, cuenta, liberación y material.
 - Dato útil para el comprador: con la logística, para encontrar el 10 % de las tardías acierta el 97 % de lo que marca.
 
 ## Criterio 6: conclusiones y limitaciones (2 min, 10 %)
@@ -197,7 +200,8 @@ base; por eso no se compara su cifra con la del base. E = 20 es un presupuesto d
 2. El modelo decide la comparación: XGBoost sin balanceo (AUC 0,852 ± 0,020, F1 0,676 ± 0,048 en ocho bloques) y gana en
    los ocho. El balanceo no mejora el ordenamiento y con 20 evaluaciones Optuna y el genético llegan antes a lo mismo.
 3. La señal está repartida: ninguna variable pasa de 0,75 de AUC; plazo, historial de quien participa y la aprobación.
-4. La probabilidad de XGBoost en 2026 y su ventaja sostenida en un año nuevo: (pendiente: evaluación 2026).
+4. En 2026 XGBoost da 0,848 y le gana a la logística por 0,023 [0,017; 0,030]: la ventaja se sostiene en un año que
+   ningún modelo vio. La propuesta del Entregable 3 le gana a su vez por 0,012 [0,004; 0,018].
 
 **Limitaciones.**
 
@@ -268,7 +272,8 @@ logaritmo con signo; los árboles son invariantes a transformaciones monótonas.
 **¿Qué pasa con los proveedores nuevos?** Es el arranque en frío: en 2026, 11,1 % de las posiciones trae un proveedor que
 no estaba en 2021-2024 y 9,7 %, un material nuevo. Sin historial, la codificación les da la tasa de su nivel superior
 (la región del proveedor, el grupo de artículos), así que el modelo los trata como «un proveedor promedio de su región».
-Cuánto baja el AUC en esas filas con XGBoost: (pendiente: evaluación 2026).
+Con XGBoost en 2026, las órdenes con alguna entidad nueva (20 % de la prueba) bajan a AUC 0,821, contra 0,856 con todo
+conocido. Ni la propuesta del Entregable 3 lo mejora de forma significativa: el arranque en frío sigue abierto.
 
 **¿Las posiciones de una misma orden no son dependientes?** Sí, comparten proveedor, fechas y comprador. Por eso las
 unidades independientes son las 104.614 órdenes, ninguna se parte entre particiones, la validación agrupa por orden y los
@@ -314,8 +319,9 @@ corto con proveedor lento. La curva de aprendizaje de la logística dice sesgo: 
 **Los coeficientes de la logística: ¿se pueden interpretar?** Condicionales y encogidos, no causales. El bloque de plazo
 tiene VIF de más de 300, así que solo la suma de los coeficientes de esas variables se puede leer (−1,6).
 
-**¿La probabilidad es confiable?** La logística: ECE 0,021 y desvíos de a lo sumo 4,2 puntos por decil. XGBoost: (pendiente:
-evaluación 2026); si sale descalibrado, se aplica Platt con la validación 2025.
+**¿La probabilidad es confiable?** La logística: ECE 0,021 y desvíos de a lo sumo 4,2 puntos por decil. XGBoost crudo es
+sobreconfiado (en validación, ECE medio 0,040 y pendiente de Platt de 0,61 a 0,95): la log-loss externa toca su mínimo
+mucho antes que el AUC, entre 55 y 501 árboles. Con Platt ajustado en 2025, en 2026 da ECE 0,022.
 
 **¿Qué hacen $\lambda$ y $\gamma$ en XGBoost?** Penalizan los pesos de las hojas ($\lambda$) y el número de hojas ($\gamma$). En
 este proyecto quedaron en el valor por defecto; la regularización viene de $\eta$, la profundidad, el peso mínimo por hoja y
@@ -335,7 +341,8 @@ $2/2^8 = 0{,}0078$, que con Holm por seis comparaciones queda en 0,047, apenas b
 independientes: las ventanas crecientes comparten entrenamiento, y las pruebas suponen independencia. Es una limitación.
 Por eso se miró también dentro de cada bloque, con las predicciones: DeLong en cada uno y un intervalo BCa que remuestrea
 órdenes. La ventaja se sostiene ahí (seis o siete bloques significativos frente a los más cercanos, ninguno en contra).
-Si se sostiene en un año que nadie vio se mide en la prueba 2026 (pendiente: evaluación 2026).
+En 2026 se sostiene: 0,848 contra 0,825 de la logística, Δ 0,023 [0,017; 0,030]. Y la semilla no la explica: la ventaja
+sobre el bosque va de 0,008 a 0,011 con diez semillas, catorce veces lo que mueve la semilla.
 
 **¿Por qué comparar los modelos con la combinación de mayor AUC interno y no con la de mayor AUC externo?** Elegir por el
 AUC externo sería escoger con el mismo dato que se quiere comparar; el AUC interno es donde se eligió y no sesga la
@@ -357,8 +364,8 @@ y ignorar la covarianza subestima la potencia. El empate cuenta 0,5 porque el AU
 Se aplicó en cada uno de los 8 bloques, XGBoost contra los otros seis (48 pruebas, Holm): supera al bosque en 6, a la
 logística y al SVM en 7, y al árbol, KNN y Naive Bayes en 8 (z de 19 a 32 en el peor bloque). Donde no es significativo
 es empate (diferencias de ±0,001), nunca un rival por encima. La implementación es propia (Sun y Xu, 2014) y coincide con
-`pROC::roc.test` de R hasta la décima cifra, en seis casos sintéticos y en el bloque 2025-S2. Falta hacerlo en la prueba
-2026 (pendiente: evaluación 2026).
+`pROC::roc.test` de R hasta la décima cifra, en seis casos sintéticos y en el bloque 2025-S2. En 2026, XGBoost contra la
+logística: z = 22,5; la propuesta contra XGBoost: z = 12,9.
 
 **¿DeLong no supone filas independientes?** Sí, y las posiciones de una orden no lo son: su error estándar queda corto y
 sus p, demasiado pequeños. Por eso no se lee solo: va junto al intervalo BCa, que remuestrea órdenes completas y sí
@@ -407,16 +414,30 @@ que KNN y el bosque pueden estar algo subestimados. Se declaran como limitación
 
 **¿Dónde se equivoca el modelo?** Con la logística: de las 16.374 tardías de 2026 marcó 11.672 y dio 7.929 falsas alarmas.
 Los activos fijos (56,2 % de retraso) y la materia prima (64,0 %) son clases con pocas posiciones (5.043 y 1.699) y retrasan
-más. El detalle de XGBoost, por línea y por entidad nueva o conocida, con un falso negativo típico: (pendiente: evaluación
-2026).
+más. XGBoost en 2026 marcó 11.341 de las 16.374 tardías con 5.889 falsas alarmas; AUC 0,821 con entidad nueva y 0,856
+sin ella; peor en ganadería (0,712) y mejor en transporte (0,864). El falso negativo típico tenía 13 días hábiles de
+plazo al liberar, un proveedor con tasa previa de 0,31 y una liberación rápida: nada anunciaba el retraso.
 
 **¿Hay sobreajuste?** En la logística, la curva de aprendizaje dice que no: la brecha entre entrenamiento y validación se
 cierra de 0,066 a 0,037 y es un modelo con sesgo. En XGBoost, el AUC interno y el externo difieren en 0,003, pero esa no es
-la brecha entre entrenamiento y validación: la curva de convergencia y la brecha de XGBoost: (pendiente: evaluación 2026).
+la brecha entre entrenamiento y validación. La curva de convergencia sí lo es: al final, AUC de entrenamiento 0,92-0,99
+contra 0,83-0,89 externo (brecha media 0,12), pero el mejor AUC externo solo está 0,0014 por encima del final. Hay
+sobreajuste de probabilidades (la log-loss externa sube), no de orden; lo corrige Platt.
 
 **¿Qué variables explican el retraso?** Tres familias: el plazo real que le queda al proveedor, quién provee y quién pide
 (con su historial) y la aprobación interna (días de liberación, estrategia). Con la logística, el coeficiente mayor es el del
-proveedor codificado (1,87). La explicación de XGBoost con SHAP: (pendiente: evaluación 2026).
+proveedor codificado (1,87). Con SHAP en XGBoost (2026): plazo hábil al liberar 0,85 de |SHAP| medio, proveedor 0,46, y
+el resto bajo 0,13 (promesa, experiencia con el centro, cuenta, días de liberación, material, creador de la solped).
+
+**¿Por qué XGBoost y no la logística, si es más simple y queda cerca?** Por parsimonia aplicada con cifras: se acepta lo
+complejo solo si gana de forma significativa y material, y aquí pasan las dos. (1) Significativa: en 2026, 0,848 contra
+0,825, Δ 0,023 [0,017; 0,030], DeLong z = 22,5; en los ocho bloques gana los ocho (Wilcoxon-Holm 0,047), Cliff 0,34. (2)
+Material: con el mismo 20 % de alertas atrapa 8.242 tardías contra 7.895, unas 35 más por mes, con precisión 0,79 contra
+0,76; F1 0,675 contra 0,649. Ojo: esas tardías de más caen en órdenes que ya tenían alerta (2.362 órdenes contra 2.407).
+(3) Forma: sin plazo, el riesgo sube 3,4 de logit en Generales y 2,4 en Producción Cluster; la logística da la misma
+pendiente a todas y una caída suave cerca de cero. (4) Costo: un ajuste tarda 3,2 min contra 12 s y mil predicciones 17
+ms contra 0,7; nada para unas 5.200 posiciones al mes. SHAP da la lectura. (5) Si el negocio pusiera explicar cada
+coeficiente por encima de atrapar tardías, la logística sería defendible: pierde 0,023 de AUC y unas 35 tardías al mes.
 
 **¿La diferencia entre XGBoost y el bosque es real?** Sí, y pequeña. Con las combinaciones de mayor AUC interno gana en
 los ocho bloques (Wilcoxon, p Holm 0,047); con las de la tabla de líderes, en siete, y DeLong la da por significativa en
@@ -435,13 +456,8 @@ umbral por costo; ventana adaptativa; y tratamiento del arranque en frío.
 validación anidada, que muestran que decide el modelo y no el balanceo ni el optimizador, y un clasificador que ordena
 mejor que la regla del comprador.
 
-## Lo que falta antes de la sustentación
+## La evaluación en 2026, de dónde sale
 
-Se rellena con la evaluación de XGBoost en la prueba 2026, que se usa una sola vez y con el umbral fijado en 2025:
-
-- AUC, PR-AUC, F1, precisión, sensibilidad, Brier y ECE con intervalos por bootstrap de órdenes;
-- matriz de confusión, ROC, PR y calibración (y Platt si hace falta);
-- errores por línea y por entidad nueva o conocida, y un falso negativo típico;
-- brecha entre entrenamiento y validación por iteración (curva de convergencia);
-- DeLong en la prueba (en los 8 bloques ya está), la tabla con el modelo en la prueba, y SHAP global y local;
-- con eso, reescribir las respuestas marcadas «(pendiente: evaluación 2026)».
+`src/prueba_2026.py`, `src/modelo_final.py` y `src/xgb_vs_logistica.py`, sobre las probabilidades de la comparación 2 × 2
+(Platt y umbral congelados en 2025). El modelo servido en el tablero las reproduce (diferencia máxima 3·10⁻⁸, misma
+decisión en las 51.941 posiciones). Capítulos 6 (mejor modelo) y 9 (modelo original) del libro.

@@ -36,6 +36,11 @@ def separar(pipe):
     """Del pipeline entrenado, lo que se puede publicar."""
     pre = pipe.named_steps["pre"]
     ent = pre.named_transformers_["ent"]
+    if hasattr(pipe.named_steps["modelo"], "modelo_"):
+        # XGBoost se entrenó con todos los hilos; en Render (una fracción de CPU) eso son decenas de hilos peleando por
+        # ella y una predicción que no termina. Una fila no necesita más de uno.
+        pipe.named_steps["modelo"].modelo_.set_params(n_jobs=1)
+        pipe.named_steps["modelo"].modelo_.get_booster().set_param({"nthread": 1})
     return {"num": pre.named_transformers_["num"], "cat": pre.named_transformers_["cat"],
             "num_cols": list(datos.NUMERICAS), "cat_cols": list(datos.CATEGORICAS),
             "te_cols": list(ent.get_feature_names_out()), "modelo": pipe.named_steps["modelo"],

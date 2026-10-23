@@ -17,7 +17,7 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | Ruta | Contenido |
 |---|---|
 | `app.py` | Tablero Dash multipágina (`use_pages=True`); lee solo `data/` y no entrena nada. Producción: `gunicorn app:server`. |
-| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (predicción en vivo, tabla de líderes de las 112 combinaciones con Friedman, Nemenyi y Wilcoxon, y el modelo base frente a dos líneas base). |
+| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (predicción en vivo con XGBoost, las 112 combinaciones con sus pruebas, el mejor modelo en 2026 con SHAP y la 2 × 2, y el modelo base). |
 | `src/` | Código del proyecto, compartido por el libro y el tablero. |
 | `src/datos.py` | Ruta del dataset, semilla, partición cronológica, tipos de variable y preprocesamiento. |
 | `src/data.py` | Carga y caché de lo que lee el tablero (`data/`); no importa scikit-learn. |
@@ -25,20 +25,6 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `src/tiempo.py` | Series de tiempo del EDA: volumen y tasa por periodo, huecos, STL, estacionariedad y autocorrelación. |
 | `src/plots.py` | Una función por figura (Plotly) con la plantilla y la paleta del proyecto. |
 | `src/modelo_base.py` | Regresión logística L2 frente al Dummy y a la regla del proveedor: C por validación temporal, umbral en 2025, prueba 2026 con bootstrap de órdenes. `python -m src.modelo_base` |
-| `src/validacion.py` | Validación anidada por semestre (8 bloques externos) y caché de matrices preprocesadas, SMOTE y ADASYN por ventana. |
-| `src/optimizadores.py` | Grid, Random, Optuna (TPE) y DEAP (genético) con el mismo presupuesto de evaluaciones. |
-| `src/experimentos.py` | Las 112 combinaciones (7 modelos × 4 balanceos × 4 optimizadores) en los 8 bloques; reanudable. |
-| `src/comparar.py` | Resume los 896 trabajos: tabla de líderes, curvas de los optimizadores, Friedman, Nemenyi y Wilcoxon con Holm. `python -m src.comparar` |
-| `src/puntajes.py` | Reajusta la mejor combinación de cada modelo en cada bloque con los hiperparámetros ya elegidos y guarda el puntaje por posición (`resultados/puntajes/`); comprueba que el AUC coincide con el del trabajo. Corre en srvgdai (`srvgdai/puntajes.sh`). |
-| `src/pruebas.py` | DeLong para dos AUC pareados (validado contra `pROC::roc.test` con `src/validar_delong.R`), delta de Cliff e intervalo BCa con remuestreo de órdenes por bloque. |
-| `src/comparar_pruebas.py` | DeLong de XGBoost contra cada rival en los 8 bloques (Holm), AUC medio y diferencias con BCa 95 %, delta de Cliff, y la validación en un bloque real contra pROC. `python -m src.comparar_pruebas` |
-| `src/estabilidad.py` | La mejor combinación de 4 modelos con 10 semillas por bloque y la curva de convergencia de XGBoost. Corre en srvgdai (`srvgdai/estabilidad.sh`). |
-| `src/diagnostico_validacion.py` | Calibración (y Platt de un bloque al siguiente) y errores de XGBoost en los 8 bloques: por línea, proveedor nuevo y perfil de los falsos negativos. `python -m src.diagnostico_validacion` |
-| `src/calibrado.py` | XGBoost con el escalado de Platt congelado en 2025: lo que sirve el tablero. |
-| `src/modelo_final.py` | Entrena ese modelo con 2021-2025 (`artifacts/xgboost.joblib`), comprueba que reproduce las probabilidades de la comparación 2 × 2 y calcula SHAP en 2026. `python -m src.modelo_final <predicciones_prueba_2x2.csv>` |
-| `src/prueba_2026.py` | XGBoost, la logística y la propuesta en la prueba 2026 con BCa por órdenes y DeLong; la tabla de brecha y la 2 × 2. `python -m src.prueba_2026 <predicciones_prueba_2x2.csv>` |
-| `src/xgb_vs_logistica.py` | Por qué XGBoost y no la logística: presupuesto de alertas, forma del efecto del plazo (SHAP) y costo. `python -m src.xgb_vs_logistica <predicciones_prueba_2x2.csv>` |
-| `original/` | El modelo original del Entregable 3 (K3 + log-normal + variables nuevas); ver `original/LEEME.md`. |
 | `src/complejidad.py` | Tiempo de ajuste e inferencia de los 7 modelos contra el número de filas, con hiperparámetros fijos (exponente empírico). |
 | `src/similitud.py` | Validación adversaria: qué tan distinta es la evaluación del entrenamiento en la partición cronológica y en una aleatoria. |
 | `src/prediccion.py` | Prepara el modelo que sirve el tablero sin tablas de entidades (`artifacts/servido.joblib`), los ejemplos reales y los rangos de desarrollo. |
@@ -60,6 +46,27 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `tests/` | Pruebas con pytest: preprocesamiento y codificación por objetivo, series de tiempo, modelo servido, arranque del tablero y que `data/` no publique identificadores. Usan datos sintéticos y lo que trae el repositorio, no el dataset completo. |
 | `requirements-dev.txt` | Dependencias de las pruebas (el tablero más pytest). |
 | `.github/workflows/ci.yml` | CI: corre las pruebas en cada push a `main`, con Python 3.11.9 como Render. |
+
+## Código de los experimentos y de la evaluación
+
+Lo que corre una vez (en el servidor o en local) y deja sus tablas en `resultados/`; el libro solo las lee.
+
+| Ruta | Contenido |
+|---|---|
+| `src/validacion.py` | Validación anidada por semestre (8 bloques externos) y caché de matrices preprocesadas, SMOTE y ADASYN por ventana. |
+| `src/optimizadores.py` | Grid, Random, Optuna (TPE) y DEAP (genético) con el mismo presupuesto de evaluaciones. |
+| `src/experimentos.py` | Las 112 combinaciones (7 modelos × 4 balanceos × 4 optimizadores) en los 8 bloques; reanudable. |
+| `src/comparar.py` | Resume los 896 trabajos: tabla de líderes, curvas de los optimizadores, Friedman, Nemenyi y Wilcoxon con Holm. `python -m src.comparar` |
+| `src/puntajes.py` | Reajusta la mejor combinación de cada modelo en cada bloque con los hiperparámetros ya elegidos y guarda el puntaje por posición (`resultados/puntajes/`); comprueba que el AUC coincide con el del trabajo. Corre en srvgdai (`srvgdai/puntajes.sh`). |
+| `src/pruebas.py` | DeLong para dos AUC pareados (validado contra `pROC::roc.test` con `src/validar_delong.R`), delta de Cliff e intervalo BCa con remuestreo de órdenes por bloque. |
+| `src/comparar_pruebas.py` | DeLong de XGBoost contra cada rival en los 8 bloques (Holm), AUC medio y diferencias con BCa 95 %, delta de Cliff, y la validación en un bloque real contra pROC. `python -m src.comparar_pruebas` |
+| `src/estabilidad.py` | La mejor combinación de 4 modelos con 10 semillas por bloque y la curva de convergencia de XGBoost. Corre en srvgdai (`srvgdai/estabilidad.sh`). |
+| `src/diagnostico_validacion.py` | Calibración (y Platt de un bloque al siguiente) y errores de XGBoost en los 8 bloques: por línea, proveedor nuevo y perfil de los falsos negativos. `python -m src.diagnostico_validacion` |
+| `src/calibrado.py` | XGBoost con el escalado de Platt congelado en 2025: lo que sirve el tablero. |
+| `src/modelo_final.py` | Entrena ese modelo con 2021-2025 (`artifacts/xgboost.joblib`), comprueba que reproduce las probabilidades de la comparación 2 × 2 y calcula SHAP en 2026. `python -m src.modelo_final <predicciones_prueba_2x2.csv>` |
+| `src/prueba_2026.py` | XGBoost, la logística y la propuesta en la prueba 2026 con BCa por órdenes y DeLong; la tabla de brecha y la 2 × 2. `python -m src.prueba_2026 <predicciones_prueba_2x2.csv>` |
+| `src/xgb_vs_logistica.py` | Por qué XGBoost y no la logística: presupuesto de alertas, forma del efecto del plazo (SHAP) y costo. `python -m src.xgb_vs_logistica <predicciones_prueba_2x2.csv>` |
+| `original/` | El modelo original del Entregable 3 (K3 + log-normal + variables nuevas); ver `original/LEEME.md`. |
 
 ## Datos
 

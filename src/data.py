@@ -103,7 +103,7 @@ def predecir(fila):
         contrib = X[0] * m.coef_[0]
     else:
         import xgboost
-        contrib = m.get_booster().predict(xgboost.DMatrix(X), pred_contribs=True)[0][:-1]
+        contrib = m.get_booster().predict(xgboost.DMatrix(X, nthread=1), pred_contribs=True)[0][:-1]
     c = pd.DataFrame({"columna": s["nombres"], "contribucion": contrib})
     c["variable"] = c.columna.str.split("__").str[1].str.replace(r"^te_", "", regex=True)
     c["bloque"] = c.columna.str.split("__").str[0]
