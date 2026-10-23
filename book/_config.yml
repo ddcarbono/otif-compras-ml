@@ -4,10 +4,14 @@ copyright: "2026"
 execute:
   execute_notebooks: 'off'     # los .ipynb se ejecutan con compilar.py y se publican con sus salidas
 only_build_toc_files: true
-exclude_patterns: [fuentes/*, _build/*]
+exclude_patterns: [fuentes/*, _build/*, _ext/*]
 bibtex_bibfiles:
   - references.bib
+html:
+  home_page_in_navbar: false   # el título ya está arriba en la barra lateral: no se repite como primera entrada
 sphinx:
+  local_extensions:
+    bibliografia_html: _ext      # quita el </div> de más de la bibliografía (pie de la portada fuera de lugar)
   config:
     language: es
     html_show_copyright: false
