@@ -1,0 +1,30 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Lámina 5</title><script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script><style>@page { size: 1920px 1080px; margin: 0 }
+* { margin: 0; box-sizing: border-box }
+:root { --k: 1 }
+html, body { overflow-x: hidden; background: #E9E9E4; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #2B2B2B }
+section { width: 1920px; height: 1080px; position: relative; overflow: hidden; break-after: page; background: #FFFFFF;
+  padding: 56px 90px 0 90px }
+section:last-child { break-after: auto }
+@media screen { section { zoom: var(--k); margin: 0 auto 24px auto; box-shadow: 0 2px 10px #0003 } }
+h1 { font-size: 46px; line-height: 1.15; color: #405731; font-weight: 700; height: 118px; letter-spacing: -0.5px }
+.cuerpo { height: 820px; font-size: 30px; line-height: 1.4 }
+.pie { position: absolute; left: 90px; right: 90px; bottom: 26px; display: flex; justify-content: space-between;
+  font-size: 22px; color: #6B6B6B; border-top: 2px solid #E4E4DE; padding-top: 12px }
+.cols { display: flex; gap: 44px } .cols > div { flex: 1 }
+ul { padding-left: 1.1em } li { margin: 0 0 12px }
+.fm { font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif; font-size: 34px; background: #F6F5EE;
+  border-left: 8px solid #B08A2D; padding: 12px 22px; margin: 10px 0 4px 0; line-height: 1.5 }
+.fm i { font-style: italic }
+.def { font-size: 24px; color: #4A4A4A; margin: 4px 0 16px 4px; line-height: 1.3 }
+.pend { background: #E6E6E6; border: 3px dashed #9A9A9A; color: #555; display: flex; align-items: center;
+  justify-content: center; text-align: center; font-size: 28px; padding: 24px; border-radius: 6px }
+.prov { display: inline-block; background: #B08A2D; color: #fff; font-size: 20px; padding: 2px 12px; border-radius: 14px;
+  vertical-align: middle; font-weight: 600 }
+table { border-collapse: collapse; font-size: 30px } th, td { padding: 12px 22px; border-bottom: 2px solid #E4E4DE; text-align: right }
+th:first-child, td:first-child { text-align: left } th { color: #405731; font-weight: 700 }
+.paso { background: #F1F4EE; border: 2px solid #405731; border-radius: 8px; padding: 12px 14px; font-size: 26px; text-align: center; flex: 1 }
+.flecha { align-self: center; font-size: 40px; color: #B08A2D }
+.caja { background: #F6F5EE; border-radius: 8px; padding: 18px 24px }
+.peq { font-size: 24px; color: #555 }
+</style></head><body><section><!-- notas del expositor (2:00): Dos minutos. Boosting: cada árbol es un paso de descenso por gradiente sobre la log-pérdida en el espacio de funciones, usando gradiente y hessiano; el peso de hoja sale cerrado. Regularización: η, hojas, λ, α, submuestreo. Complejidad: histograma. Contraste: logística, convexa, un óptimo, L2/L1. El nombre exacto del mejor benchmark depende de los 112. --><h1>El boosting minimiza la log-pérdida paso a paso con árboles; la logística hace lo mismo con una sola recta y un óptimo</h1><div class="cuerpo"><div class="cols"><div><p><b>Mejor benchmark: boosting de árboles</b> <span class="peq">(hoy LightGBM; puede cambiar con los 112)</span></p><div class="fm"><i>ℓ</i>(<i>y</i>, <i>F</i>) = −[ <i>y</i> log <i>p</i> + (1 − <i>y</i>) log(1 − <i>p</i>) ]</div><div class="def">log-pérdida sobre el puntaje <i>F</i>(<i>x</i>), con <i>p</i> = 1 / (1 + e<sup>−<i>F</i></sup>); es convexa en <i>F</i></div><div class="fm"><i>F<sub>m</sub></i> = <i>F</i><sub><i>m</i>−1</sub> + <i>η</i> <i>f<sub>m</sub></i>,  <i>g<sub>i</sub></i> = <i>p<sub>i</sub></i> − <i>y<sub>i</sub></i>,  <i>h<sub>i</sub></i> = <i>p<sub>i</sub></i>(1 − <i>p<sub>i</sub></i>)</div><div class="def">descenso por gradiente en el espacio de funciones: cada árbol <i>f<sub>m</sub></i> ajusta gradiente <i>g</i> y curvatura <i>h</i>; <i>η</i> = tasa de aprendizaje</div><div class="fm" style="font-size:30px">Obj = Σ<sub><i>i</i></sub> <i>ℓ</i><sub><i>i</i></sub> + Σ<sub><i>m</i></sub> [ <i>γ</i> <i>T<sub>m</sub></i> + ½ <i>λ</i> ‖<i>w<sub>m</sub></i>‖² + <i>α</i> ‖<i>w<sub>m</sub></i>‖<sub>1</sub> ]</div><div class="def"><i>T</i> = hojas, <i>w</i> = valores de hoja; peso óptimo de una hoja (sin L1): <i>w</i>* = − <i>G</i> / (<i>H</i> + <i>λ</i>), con <i>G</i> = Σ<i>g</i> y <i>H</i> = Σ<i>h</i> de la hoja</div></div><div><div class="caja"><p><b>Regularización:</b> tasa de aprendizaje <i>η</i>, número de hojas, mínimo de filas por hoja, <i>λ</i> (L2), <i>α</i> (L1), submuestreo de filas y columnas, parada temprana.</p><p style="margin-top:12px"><b>Complejidad:</b> árbol por histograma (columnas en bins): construir un árbol cuesta O(<i>n</i>·<i>p</i>) más la búsqueda de cortes O(<i>bins</i>·<i>p</i>); predecir cuesta O(<i>M</i>·profundidad).</p></div><p style="margin-top:22px"><b>Contraste: regresión logística</b></p><div class="fm" style="font-size:30px">mín<sub><i>β</i></sub> Σ<sub><i>i</i></sub> <i>ℓ</i>(<i>y<sub>i</sub></i>, <i>x<sub>i</sub></i>ᵀ<i>β</i>) + (1 / 2<i>C</i>) ‖<i>β</i>‖²</div><div class="def">pérdida convexa: un solo óptimo; log-odds lineal en <i>x</i>; <i>C</i> controla la penalización L2 (o L1). No captura interacciones ni no linealidades sin construirlas.</div><p class="peq">El boosting corrige lo que la recta no ve (interacciones, umbrales) y paga con más hiperparámetros y riesgo de sobreajuste.</p></div></div></div><div class="pie"><span>Fuente: libro, capítulo de modelos (en preparación); Friedman (2001), Chen y Guestrin (2016)</span><span>5 / 9</span></div></section></body></html>

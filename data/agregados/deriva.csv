@@ -1,0 +1,13 @@
+variable,nombre,PSI 2025,PSI 2026
+plazo_habil_al_liberar,Plazo hábil al liberar,0.09950764683450451,0.06414264268951461
+prov_retraso_medio_previo,Retraso medio previo del proveedor,0.09291060648464299,0.10249348944236862
+prov_tasa_tarde_previa,Tasa de retraso previa del proveedor,0.08323631643227458,0.12656320003956953
+plazo_prometido_dias,Plazo prometido,0.1486569737579518,0.08140495528742075
+mat_tasa_tarde_previa,Tasa de retraso previa del material,0.10156934488105697,0.13496032100811411
+dias_habiles_liberacion,Días hábiles de liberación,0.017231143743512114,0.13126412145011035
+sp_prometida_menos_deseada,Prometida menos deseada,0.08084169717539028,0.0803691433393577
+nace_vencida,Nace vencida,5.086068683438526e-05,0.007372652498158429
+plazo_al_crear_dias,Plazo original al crear,0.10736453385216639,0.05668081182485231
+sol_tasa_tarde_previa,Tasa de retraso previa del solicitante,0.19596793579342123,0.24475894847124244
+cmp_tasa_tarde_previa,Tasa de retraso previa del comprador,1.0186450459976266,0.8114947150015426
+prov_centro_oc_previas,Órdenes previas proveedor-centro,0.0372527979606174,0.10845496145743676

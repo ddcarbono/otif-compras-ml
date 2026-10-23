@@ -1,0 +1,14 @@
+/* Paleta del proyecto (cinco colores): verde #405731, oro #B08A2D, azul #3F6F8F, gris #6B6B6B, marrón #7A5526 */
+:root { --verde: #405731; --oro: #B08A2D; --azul: #3F6F8F; --gris: #6B6B6B; --marron: #7A5526; }
+body { color: #333333; background: #FAFAF8; }
+.navbar-otif { background-color: var(--verde) !important; }
+.navbar-otif .nav-link.active { border-bottom: 3px solid var(--oro); }
+h1.titulo { color: var(--verde); font-weight: 700; margin-top: .5rem; }
+h2, h3, h4 { color: var(--verde); margin-top: 1.2rem; }
+.lead { max-width: 60rem; }
+.cifra { font-size: 2.4rem; font-weight: 700; color: var(--oro); line-height: 1.1; }
+.cifra-texto { font-weight: 600; margin-bottom: .3rem; }
+.paso { border-left: 4px solid var(--oro); }
+.lectura { color: #333333; border-left: 3px solid var(--azul); padding-left: .6rem; margin: .3rem 0 0; font-size: .95rem; }
+.filtros { top: 4.2rem; z-index: 10; }
+.card { border-color: #E3E0D8; }

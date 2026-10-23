@@ -1,0 +1,12 @@
+variable,nombre,nuevo en validacion (%),nuevo en prueba (%)
+proveedor,Proveedor,6.624876198758364,11.145337979630735
+material,Material,8.333937241829117,9.739897191043683
+ultimo_liberador,Último liberador,2.3178008068217504,6.022217516027801
+imp_ceco,Centro de costo,1.1945310046621738,4.160489786488516
+creador_oc,Comprador (creador de la orden),2.1136797352465155,3.1439517914556903
+estrategia_lib,Estrategia de liberación,1.1123994492354519,2.6568606688357943
+sp_creador,Creador de la solicitud,1.2331811483923956,2.2698831366357983
+imp_cuenta,Cuenta contable,2.79126506751697,0.9414528022179011
+sociedad,Sociedad,0.0,0.0
+grupo_compras,Grupo de compras,0.0,0.0
+centro,Centro,0.14131458801362418,0.0

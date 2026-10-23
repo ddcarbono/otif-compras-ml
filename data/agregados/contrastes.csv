@@ -1,0 +1,5 @@
+grupo,prueba,estadístico,gl,p,efecto,medida del efecto,p Holm
+linea,chi-cuadrado de y_tarde,3088.1172515530006,5,0.0,0.10667168863830266,V de Cramér,4e-300
+linea,Kruskal-Wallis de dias_retraso,5335.610492272679,5,0.0,0.019642244384445267,épsilon²,4e-300
+clase_compras,chi-cuadrado de y_tarde,2488.3674955811316,4,0.0,0.09575457636445053,V de Cramér,4e-300
+clase_compras,Kruskal-Wallis de dias_retraso,2734.6232446507056,4,0.0,0.010061769010378965,épsilon²,4e-300

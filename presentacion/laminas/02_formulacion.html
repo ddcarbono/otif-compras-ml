@@ -1,0 +1,30 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Lámina 2</title><script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script><style>@page { size: 1920px 1080px; margin: 0 }
+* { margin: 0; box-sizing: border-box }
+:root { --k: 1 }
+html, body { overflow-x: hidden; background: #E9E9E4; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #2B2B2B }
+section { width: 1920px; height: 1080px; position: relative; overflow: hidden; break-after: page; background: #FFFFFF;
+  padding: 56px 90px 0 90px }
+section:last-child { break-after: auto }
+@media screen { section { zoom: var(--k); margin: 0 auto 24px auto; box-shadow: 0 2px 10px #0003 } }
+h1 { font-size: 46px; line-height: 1.15; color: #405731; font-weight: 700; height: 118px; letter-spacing: -0.5px }
+.cuerpo { height: 820px; font-size: 30px; line-height: 1.4 }
+.pie { position: absolute; left: 90px; right: 90px; bottom: 26px; display: flex; justify-content: space-between;
+  font-size: 22px; color: #6B6B6B; border-top: 2px solid #E4E4DE; padding-top: 12px }
+.cols { display: flex; gap: 44px } .cols > div { flex: 1 }
+ul { padding-left: 1.1em } li { margin: 0 0 12px }
+.fm { font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif; font-size: 34px; background: #F6F5EE;
+  border-left: 8px solid #B08A2D; padding: 12px 22px; margin: 10px 0 4px 0; line-height: 1.5 }
+.fm i { font-style: italic }
+.def { font-size: 24px; color: #4A4A4A; margin: 4px 0 16px 4px; line-height: 1.3 }
+.pend { background: #E6E6E6; border: 3px dashed #9A9A9A; color: #555; display: flex; align-items: center;
+  justify-content: center; text-align: center; font-size: 28px; padding: 24px; border-radius: 6px }
+.prov { display: inline-block; background: #B08A2D; color: #fff; font-size: 20px; padding: 2px 12px; border-radius: 14px;
+  vertical-align: middle; font-weight: 600 }
+table { border-collapse: collapse; font-size: 30px } th, td { padding: 12px 22px; border-bottom: 2px solid #E4E4DE; text-align: right }
+th:first-child, td:first-child { text-align: left } th { color: #405731; font-weight: 700 }
+.paso { background: #F1F4EE; border: 2px solid #405731; border-radius: 8px; padding: 12px 14px; font-size: 26px; text-align: center; flex: 1 }
+.flecha { align-self: center; font-size: 40px; color: #B08A2D }
+.caja { background: #F6F5EE; border-radius: 8px; padding: 18px 24px }
+.peq { font-size: 24px; color: #555 }
+</style></head><body><section><!-- notas del expositor (0:45): x_i son 136 predictoras conocidas el día de liberación; y_i es la etiqueta de retraso (tolerancia 1 día hábil). Se estima p(x) y se decide con un umbral τ. Se pone en validación para no mirar la prueba. --><h1>Estimamos la probabilidad de que cada posición llegue tarde y decidimos con un umbral elegido en validación</h1><div class="cuerpo"><div class="cols"><div><p>Cada fila es una <b>posición de orden de compra</b>, observada el día en que la orden sale hacia el proveedor.</p><div class="fm"><i>x<sub>i</sub></i> ∈ ℝ<sup>136</sup></div><div class="def">predictoras conocidas en la fecha de liberación <i>t<sub>i</sub></i></div><div class="fm"><i>y<sub>i</sub></i> ∈ {0, 1}</div><div class="def"><i>y<sub>i</sub></i> = 1 si la primera entrada de mercancía llega más de 1 día hábil después de la fecha prometida</div><div class="fm"><i>p</i>(<i>x</i>) = P(<i>y</i> = 1 | <i>x</i>)</div><div class="def">probabilidad de llegar tarde, que se estima</div><div class="fm"><i>ŷ</i> = 1 si <i>p̂</i>(<i>x</i>) ≥ <i>τ</i></div><div class="def">el umbral <i>τ</i> se elige en validación (2025), no en prueba</div></div><div><div class="caja"><p><b>Tarea:</b> clasificación binaria supervisada.</p><p style="margin-top:14px"><b>Por qué binaria:</b> la decisión del comprador es una: dar seguimiento a la orden o no hacerlo.</p><p style="margin-top:14px"><b>Magnitud:</b> 33,0 % de las posiciones llega tarde.</p></div><p style="margin-top:30px"><b>Objetivo general:</b> ordenar las posiciones por riesgo de retraso y señalar cuáles atender primero.</p><p style="margin-top:14px"><b>Objetivos específicos:</b></p><ul><li>comparar 7 modelos con 4 formas de balancear y 4 optimizadores de hiperparámetros;</li><li>medir el costo de decidir con entidades nuevas (proveedor o material sin historia).</li></ul></div></div></div><div class="pie"><span>Fuente: libro, capítulo 02a_datos (definición de la etiqueta y de la población)</span><span>2 / 9</span></div></section></body></html>

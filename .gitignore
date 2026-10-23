@@ -1,0 +1,10 @@
+# El dataset completo no viaja (342 MB; se entrega aparte al docente)
+data/otif_depurado.csv
+data/otif_depurado.parquet
+data/*.zip
+# Productos que se rehacen
+book/_build/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.log

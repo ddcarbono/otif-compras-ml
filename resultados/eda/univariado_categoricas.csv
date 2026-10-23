@@ -1,0 +1,54 @@
+variable,nombre,grupo,vacíos (%),categorías,más frecuente,% de la más frecuente,raras (< 30 filas)
+moneda,Moneda de la orden,Orden y posición,0.0,4,COP,95.28761086403013,1
+cond_pago,Condición de pago,Orden y posición,0.0,12,V030,59.44559694315581,1
+tipo_material,Tipo de material,Clasificación,0.0,16,(en blanco),35.51481073432796,1
+grupo_articulos,Grupo de artículos,Clasificación,0.0,64,REPUESTOS,18.547040985146893,3
+imputacion,Clase de imputación,Imputación,0.0,6,(en blanco),50.272485086093496,0
+tipo_posicion,Tipo de posición,Orden y posición,0.0,4,0,60.170749951177456,0
+unidad,Unidad de medida,Orden y posición,0.0,20,ST,51.92397684521594,0
+a_inspeccion,Va a inspección de calidad,Orden y posición,0.0,2,(en blanco),98.03788629689268,0
+actualiza_registro_info,Actualiza registro info,Orden y posición,0.0,3,C,58.988691592573076,0
+almacen,Almacén,Orden y posición,0.0,23,(sin),75.11044949906224,0
+indicador_iva,Indicador de IVA,Orden y posición,0.0,15,W3,36.30297246408318,1
+acuse_exigido,Acuse de recibo exigido,Orden y posición,0.0,2,X,50.262904812613534,0
+espera_factura,Espera factura,Orden y posición,0.0,2,X,92.93528525264287,0
+sobreentrega_ilimitada,Sobreentrega ilimitada,Orden y posición,0.0,2,(en blanco),67.34342701121261,0
+unidad_peso,Unidad de peso,Orden y posición,0.0,2,(en blanco),58.585214690243966,0
+tipo_consumo,Tipo de consumo,Imputación,0.0,3,(en blanco),50.272485086093496,0
+familia_texto,Familia del texto de cabecera,Clasificación,0.0,9,otra,73.81342785869833,0
+clase_compras,Clase de compras,Clasificación,0.0,5,Generales,60.224546871488,0
+mes,Mes de creación,Plazo y calendario,0.0,12,3,9.453150620322708,0
+dia_semana,Día de la semana de creación,Plazo y calendario,0.0,7,1,21.078812488254954,0
+mes_prometido,Mes de la fecha prometida,Plazo y calendario,0.0,12,12,10.73838115486512,0
+imp_tipo_ceco,Tipo de centro de costo,Imputación,0.0,11,(no aplica),63.9855411564864,1
+imp_clase_orden,Clase de orden interna,Imputación,0.0,10,(sin),88.75865448743694,0
+imp_categoria_orden,Categoría de orden interna,Imputación,88.75865448743696,2,1,94.9390323849482,0
+sp_origen,Origen de la solicitud,Solicitud de pedido,0.0,3,R,87.3547759505658,0
+sp_clase,Clase de solicitud,Solicitud de pedido,0.0,6,NB,46.972817816360894,1
+mc_tipo_mrp,Tipo de planificación (MRP),Maestros,0.0,8,(no aplica),72.93093728237119,1
+mc_tipo_aprov,Tipo de aprovisionamiento,Maestros,0.0,4,(no aplica),72.89888021341902,0
+mc_aprov_especial,Aprovisionamiento especial,Maestros,93.63796146519229,3,10,99.4266187883702,0
+mc_control_precio,Control de precio,Maestros,0.0,3,V,64.45865927757369,0
+mc_clase_valoracion,Clase de valoración,Maestros,35.515547678441806,32,3040,21.573097911488244,4
+m_sector,Sector del material,Maestros,44.80067504080828,11,19,73.87754829579589,5
+m_material_base,Material base,Maestros,0.0,15,(no aplica),97.21066652910376,0
+pv_region,Región del proveedor,Maestros,0.0,38,47,38.06721667262363,0
+pv_grupo_cuentas,Grupo de cuentas del proveedor,Maestros,0.0,10,PNAS,51.616302677686434,1
+pv_sector,Tamaño del proveedor,Maestros,0.0,9,(no aplica),29.38896278800697,1
+pv_persona_natural,Proveedor persona natural,Maestros,0.0,2,(no aplica),83.98988912675807,0
+ps_cond_pago,Condición de pago del proveedor,Maestros,0.0,12,V030,59.761009023880675,1
+ps_vias_pago,Vías de pago del proveedor,Maestros,0.0,79,ABCDJKTUVW,32.39458935631616,0
+ce_region,Región del centro,Maestros,0.0,6,47,80.58336496051822,0
+dia_semana_prometido,Día de la semana prometido,Plazo y calendario,0.0,7,4,18.26847611011419,0
+linea,Línea de negocio,Marcas de estructura,0.0,6,palma,41.268870375215094,0
+sociedad,Sociedad,Orden y posición,0.0,23,SOC-ELO,27.447851992144177,1
+grupo_compras,Grupo de compras,Orden y posición,0.0,26,G04,27.419479643761214,0
+creador_oc,Comprador (creador de la orden),Personas,0.0,61,CMP021,24.39874572111824,13
+estrategia_lib,Estrategia de liberación,Liberación,0.0,72,EST19,19.708096436506736,3
+centro,Centro,Orden y posición,0.0,63,ELO-01,27.447851992144177,4
+ultimo_liberador,Último liberador,Personas,0.0,45,LIB009,33.077736549848744,15
+imp_cuenta,Cuenta contable,Imputación,0.0,453,(sin),50.272485086093496,238
+sp_creador,Creador de la solicitud,Personas,0.0,176,SOL0279,13.419383841026416,7
+proveedor,Proveedor,Historial del proveedor,0.0,2603,PRV02475,5.057647453305378,1918
+material,Material,Clasificación,0.0,24706,(sin),35.51481073432796,23550
+imp_ceco,Centro de costo,Imputación,0.0,1157,(sin),63.9855411564864,560

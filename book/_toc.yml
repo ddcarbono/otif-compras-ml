@@ -1,0 +1,11 @@
+# Solo los capítulos ya escritos. Orden del cuadro 4 del Entregable 3; los del 3 se agregan cuando existan.
+format: jb-book
+root: intro
+defaults:
+  numbered: true
+parts:
+  - caption: Datos y análisis exploratorio
+    chapters:
+      - file: 02a_datos
+      - file: 02b_eda
+      - file: 02c_tiempo_y_fuga

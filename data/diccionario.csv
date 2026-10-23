@@ -1,0 +1,146 @@
+variable,nombre,grupo,tipo,unidad,significado,disponible_al_liberar
+oc_id,Orden de compra,Identificación y fechas,identificador,—,Código anonimizado de la orden de compra; las posiciones de una misma orden comparten código y no son independientes entre sí.,referencia
+posicion,Posición de la orden,Identificación y fechas,identificador,—,Número de la posición dentro de la orden de compra: cada material o servicio pedido es una posición.,referencia
+fecha_pedido,Fecha de creación de la orden,Identificación y fechas,fecha,—,"Fecha en que se creó la orden de compra en SAP; es el corte de todo el historial de proveedor, material, comprador y pagos.",referencia
+fecha_prediccion,Fecha de la predicción,Identificación y fechas,fecha,—,"Día de la última liberación (aprobación) de la orden, cuando sale hacia el proveedor; si la orden no tiene aprobación, es el día de creación.",referencia
+fecha_prometida,Fecha prometida de entrega,Identificación y fechas,fecha,—,"Fecha de entrega vigente el día de la predicción, reconstruida con el historial de cambios de SAP; los cambios posteriores no cuentan.",referencia
+sociedad,Sociedad,Orden y posición,entidad,—,"Sociedad del grupo que compra, con abreviatura legible; las que tienen menos de 30 filas en entrenamiento se agrupan por línea de negocio.",sí
+grupo_compras,Grupo de compras,Orden y posición,entidad,—,"Código anonimizado del grupo de compras, el equipo de compradores responsable de la orden.",sí
+creador_oc,Comprador (creador de la orden),Personas,entidad,—,Código anonimizado del usuario que creó la orden de compra; los poco frecuentes se agrupan por su grupo de compras.,sí
+moneda,Moneda de la orden,Orden y posición,categórica,—,"Moneda en que se pactó la orden con el proveedor (COP, USD o EUR).",sí
+cond_pago,Condición de pago,Orden y posición,categórica,—,"Clave de la condición de pago acordada en la orden, que fija en cuántos días se paga la factura.",sí
+estrategia_lib,Estrategia de liberación,Liberación,entidad,—,Código anonimizado de la estrategia de aprobación que SAP asigna a la orden según su valor y su clase.,sí
+tipo_material,Tipo de material,Clasificación,categórica,—,"Tipo de material de SAP (repuestos, insumos, dotación, etc.) del material pedido; vacío en los servicios.",sí
+grupo_articulos,Grupo de artículos,Clasificación,categórica,—,Grupo de artículos al que pertenece el material o servicio; los poco frecuentes se agrupan por clase de compras.,sí
+centro,Centro,Orden y posición,entidad,—,"Centro (planta, finca u oficina) al que se entrega la compra, con abreviatura de su sociedad y un número.",sí
+imputacion,Clase de imputación,Imputación,categórica,—,"Clave de imputación contable de la posición (centro de costo, orden interna, activo fijo u otra); vacía si la compra va a inventario.",sí
+tipo_posicion,Tipo de posición,Orden y posición,categórica,—,"Categoría de posición de SAP: 0 es normal, 3 subcontratación y 9 servicio.",sí
+cantidad,Cantidad pedida,Orden y posición,numérica,unidades del pedido,"Cantidad pedida de la posición, expresada en la unidad de medida del pedido.",sí
+unidad,Unidad de medida,Orden y posición,categórica,—,"Unidad de medida en que se pide la cantidad (kilogramos, piezas, litros, metros, galones, etc.).",sí
+plazo_plan_dias,Plazo de entrega previsto,Plazo y calendario,numérica,días,"Plazo de entrega previsto que SAP trae en la posición, en días; es un dato de la orden, no el plazo prometido.",sí
+dias_inspeccion,Días de inspección de entrada,Plazo y calendario,numérica,días,Días que la posición reserva para tratar la mercancía recibida (inspección o ingreso) antes de dejarla disponible.,sí
+tolerancia_exceso,Tolerancia de sobreentrega,Orden y posición,numérica,%,Porcentaje por encima de la cantidad pedida que el almacén acepta recibir sin objetar.,sí
+con_solped,Viene de solicitud de pedido,Solicitud de pedido,binaria,—,Vale 1 si la posición se originó en una solicitud de pedido y 0 si se creó directamente.,sí
+valor_liberacion,Valor para la liberación,Liberación,numérica,moneda de la orden,"Valor de la orden que SAP usa para decidir qué aprobaciones requiere, en la moneda de la orden.",sí
+dias_pago_1,Días de pago,Orden y posición,numérica,días,"Días de plazo para pagar la factura, según la condición de pago de la orden.",sí
+con_registro_info,Con registro info,Orden y posición,binaria,—,"Vale 1 si la posición usa un registro info, que guarda el precio y las condiciones pactadas con el proveedor para el material.",sí
+a_inspeccion,Va a inspección de calidad,Orden y posición,categórica,—,"Marca «X» si la mercancía recibida pasa a inspección de calidad antes de quedar disponible, vacío si no (por verificar).",sí
+actualiza_registro_info,Actualiza registro info,Orden y posición,categórica,—,Indicador de si la orden actualiza el registro info del proveedor y de qué manera (por verificar).,sí
+almacen,Almacén,Orden y posición,categórica,—,Código anonimizado del almacén al que se destina la mercancía; los poco frecuentes se agrupan en «(otras)».,sí
+indicador_iva,Indicador de IVA,Orden y posición,categórica,—,Clave del impuesto al valor agregado aplicable a la posición.,sí
+acuse_exigido,Acuse de recibo exigido,Orden y posición,categórica,—,Marca «X» si la posición exige que el proveedor confirme la orden con un acuse de recibo (por verificar).,sí
+espera_factura,Espera factura,Orden y posición,categórica,—,Marca «X» si se espera factura del proveedor para esta posición; casi todas la esperan.,sí
+sobreentrega_ilimitada,Sobreentrega ilimitada,Orden y posición,categórica,—,Marca «X» si la posición acepta recibir sin límite más de lo pedido.,sí
+peso_neto,Tiene peso neto declarado,Orden y posición,binaria,—,"Peso neto registrado en la posición, que en la práctica solo toma los valores 0 y 1 (casi siempre un marcador), por lo que se lee como bandera (por verificar).",sí
+unidad_peso,Unidad de peso,Orden y posición,categórica,—,Unidad del peso de la posición: kilogramos o vacío.,sí
+tipo_consumo,Tipo de consumo,Imputación,categórica,—,"Indicador de consumo de la posición: V si la compra se consume, A si va a un activo, vacío si va a inventario.",sí
+ultimo_liberador,Último liberador,Personas,entidad,—,Código anonimizado del usuario que dio la última aprobación; es «(sin)» si la orden no tiene aprobación. Los poco frecuentes se agrupan por estrategia.,sí
+n_liberadores,Número de liberadores,Liberación,numérica,conteo,Cantidad de personas distintas que aprobaron la orden antes de salir hacia el proveedor.,sí
+con_liberacion,Tiene liberación,Liberación,binaria,—,Vale 1 si la orden pasó por una estrategia de aprobación y 0 si salió sin ella.,sí
+cambiada_antes_de_liberar,Fecha cambiada antes de liberar,Liberación,binaria,—,"Vale 1 si la fecha de entrega se modificó entre la creación y la liberación, de modo que la prometida difiere de la original.",sí
+familia_texto,Familia del texto de cabecera,Clasificación,categórica,—,"Tipo de orden según el texto libre de su cabecera (cotización, corte de pago, semanal, importación, etc.); solo cuenta si el texto existía el día de la predicción.",sí
+plazo_prometido_dias,Plazo prometido,Plazo y calendario,numérica,días,Días calendario entre la creación de la orden y la fecha prometida de entrega.,sí
+dias_habiles_liberacion,Días hábiles de liberación,Liberación,numérica,días hábiles,"Días hábiles que tardó la aprobación interna, desde la creación de la orden hasta su última liberación.",sí
+plazo_habil_al_liberar,Plazo hábil al liberar,Plazo y calendario,numérica,días hábiles,"Días hábiles que le quedan al proveedor, el día que sale la orden, hasta la fecha prometida; negativo si la orden ya nace vencida.",sí
+nace_vencida,Nace vencida,Plazo y calendario,binaria,—,Vale 1 si la fecha de entrega con que se creó la orden ya había pasado el día en que se liberó.,sí
+plazo_al_crear_dias,Plazo original al crear,Plazo y calendario,numérica,días,"Días calendario entre la creación de la orden y la fecha de entrega que tenía al crearse, antes de cualquier cambio.",sí
+clase_compras,Clase de compras,Clasificación,categórica,—,"Clasificación interna de la compra: generales, servicios, activos fijos, materia prima o producción del clúster.",sí
+precio_unitario,Precio unitario,Orden y posición,numérica,moneda de la orden por unidad,"Precio neto por unidad de la posición, en la moneda de la orden.",sí
+valor_cop,Valor de la posición,Orden y posición,numérica,COP,Valor neto de la posición convertido a pesos colombianos con la tasa de la orden.,sí
+n_posiciones_oc,Posiciones de la orden,Orden y posición,numérica,conteo,Número de posiciones que tiene la orden de compra a la que pertenece la fila.,sí
+valor_oc_cop,Valor de la orden,Orden y posición,numérica,COP,"Valor total de la orden de compra, sumando todas sus posiciones, en pesos colombianos.",sí
+mes,Mes de creación,Plazo y calendario,categórica,mes (1-12),Mes calendario en que se creó la orden.,sí
+dia_semana,Día de la semana de creación,Plazo y calendario,categórica,día (0 = lunes),"Día de la semana en que se creó la orden, de 0 (lunes) a 6 (domingo).",sí
+mes_prometido,Mes de la fecha prometida,Plazo y calendario,categórica,mes (1-12),Mes calendario de la fecha prometida de entrega.,sí
+importacion,Importación,Orden y posición,binaria,—,"Vale 1 si el proveedor está registrado fuera de Colombia, es decir, si la compra es una importación.",sí
+prov_n_previas,Posiciones previas del proveedor,Historial del proveedor,numérica,conteo,"Posiciones del proveedor ya recibidas antes de la creación de la orden, que respaldan su tasa de retraso. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.",sí
+prov_tasa_tarde_previa,Tasa de retraso previa del proveedor,Historial del proveedor,numérica,proporción (0-1),Proporción de las posiciones previas del proveedor que llegaron tarde; vacía si no tiene historial. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+mat_n_previas,Posiciones previas del material,"Historial de material, comprador y solicitante",numérica,conteo,Posiciones previas del mismo material ya recibidas antes de la creación de la orden. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+mat_tasa_tarde_previa,Tasa de retraso previa del material,"Historial de material, comprador y solicitante",numérica,proporción (0-1),Proporción de las posiciones previas del mismo material que llegaron tarde; vacía si no hay historial. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+cmp_n_previas,Posiciones previas del comprador,"Historial de material, comprador y solicitante",numérica,conteo,Posiciones previas creadas por el mismo comprador y ya recibidas antes de la creación de la orden. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+cmp_tasa_tarde_previa,Tasa de retraso previa del comprador,"Historial de material, comprador y solicitante",numérica,proporción (0-1),Proporción de las posiciones previas del comprador que llegaron tarde; vacía si no hay historial. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+sol_n_previas,Posiciones previas del solicitante,"Historial de material, comprador y solicitante",numérica,conteo,Posiciones previas originadas en solicitudes del mismo creador de solicitud y ya recibidas antes de la creación de la orden. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+sol_tasa_tarde_previa,Tasa de retraso previa del solicitante,"Historial de material, comprador y solicitante",numérica,proporción (0-1),Proporción de las posiciones previas del solicitante que llegaron tarde; vacía si no hay historial. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+imp_n,Líneas de imputación,Imputación,numérica,conteo,"Cantidad de líneas de imputación contable de la posición, es decir, en cuántos cargos se reparte; vacía si no tiene imputación.",sí
+imp_cuenta,Cuenta contable,Imputación,entidad,—,Código anonimizado de la cuenta contable de la primera línea de imputación.,sí
+imp_tipo_ceco,Tipo de centro de costo,Imputación,categórica,—,"Clase del centro de costo al que se imputa (producción, administración, mantenimiento, etc.), según su tabla maestra en SAP (por verificar).",sí
+imp_clase_orden,Clase de orden interna,Imputación,categórica,—,Código anonimizado de la clase de orden interna a la que se carga la compra; «(sin)» si no tiene orden.,sí
+imp_categoria_orden,Categoría de orden interna,Imputación,categórica,—,Categoría de la orden interna de la imputación; casi siempre vacía (por verificar).,sí
+imp_a_activo,Imputada a activo fijo,Imputación,binaria,—,Vale 1 si la primera línea de imputación apunta a un activo fijo; vacía si no hay imputación.,sí
+imp_a_proyecto,Imputada a proyecto,Imputación,binaria,—,Vale 1 si la primera línea de imputación apunta a un proyecto; en los datos solo aparece el valor 0.,sí
+sp_origen,Origen de la solicitud,Solicitud de pedido,categórica,—,Indicador de cómo se creó la solicitud de pedido (R o F); «(no aplica)» si la posición no tiene solicitud (por verificar).,sí
+sp_prioridad_urgencia,Prioridad de urgencia,Solicitud de pedido,binaria,—,Prioridad de urgencia registrada en la solicitud de pedido; en los datos siempre vale 0 cuando existe.,sí
+sp_prioridad_pedido,Prioridad del pedido,Solicitud de pedido,binaria,—,Prioridad del requerimiento registrada en la solicitud de pedido; en los datos siempre vale 0 cuando existe.,sí
+sp_clase,Clase de solicitud,Solicitud de pedido,categórica,—,"Clase de documento de la solicitud de pedido (estándar, materiales, servicios, mantenimiento).",sí
+sp_precio,Precio de la solicitud,Solicitud de pedido,numérica,moneda de la solicitud,Precio estimado que el solicitante registró en la solicitud de pedido.,sí
+sp_por,Cantidad base del precio,Solicitud de pedido,numérica,unidades,"Cantidad a la que se refiere el precio de la solicitud (por 1, por 100, por 1.000 unidades).",sí
+sp_con_reserva,Solicitud con reserva,Solicitud de pedido,binaria,—,Vale 1 si la solicitud de pedido está ligada a una reserva de material.,sí
+sp_creador,Creador de la solicitud,Personas,entidad,—,Código anonimizado del usuario que creó la solicitud de pedido; los poco frecuentes se agrupan por grupo de compras.,sí
+mc_tipo_mrp,Tipo de planificación (MRP),Maestros,categórica,—,"Tipo de planificación de necesidades del material en el centro: automática por consumo, manual u otra. Es una foto actual del maestro, no su valor el día de la orden.",sí
+mc_tipo_aprov,Tipo de aprovisionamiento,Maestros,categórica,—,"Cómo se obtiene el material en el centro: F compra externa, E producción propia, X ambos. Es una foto actual del maestro, no su valor el día de la orden.",sí
+mc_aprov_especial,Aprovisionamiento especial,Maestros,categórica,—,"Clave de aprovisionamiento especial del material en el centro (por ejemplo subcontratación o traslado); casi siempre vacía. Es una foto actual del maestro, no su valor el día de la orden.",sí
+mc_control_precio,Control de precio,Maestros,categórica,—,"Cómo se valora el material: V precio medio móvil, S precio estándar. Es una foto actual del maestro, no su valor el día de la orden.",sí
+mc_clase_valoracion,Clase de valoración,Maestros,categórica,—,"Clase de valoración contable del material, que lo asigna a una cuenta de inventario. Es una foto actual del maestro, no su valor el día de la orden.",sí
+m_peso_bruto,Tiene peso bruto declarado,Maestros,binaria,—,"Peso bruto del material en su maestro, que en la práctica solo toma los valores 0 y 1 (casi siempre un marcador), por lo que se lee como bandera (por verificar). Es una foto actual del maestro, no su valor el día de la orden.",sí
+m_sector,Sector del material,Maestros,categórica,—,"Sector o división del material en su maestro, que lo agrupa por negocio (por verificar). Es una foto actual del maestro, no su valor el día de la orden.",sí
+m_material_base,Material base,Maestros,categórica,—,"Producto de referencia del maestro del material (por ejemplo, aceite crudo de palma u oleína); la mayoría de materiales no lo tiene. Es una foto actual del maestro, no su valor el día de la orden.",sí
+pv_region,Región del proveedor,Maestros,categórica,—,"Código del departamento donde está registrado el proveedor. Es una foto actual del maestro, no su valor el día de la orden.",sí
+pv_grupo_cuentas,Grupo de cuentas del proveedor,Maestros,categórica,—,"Grupo de cuentas del proveedor en SAP, que lo clasifica (nacional, extranjero, persona natural, de servicios, etc.). Es una foto actual del maestro, no su valor el día de la orden.",sí
+pv_sector,Tamaño del proveedor,Maestros,categórica,—,"Clave de ramo del proveedor en SAP, que aquí indica su tamaño: micro, pequeño, mediano o grande. Es una foto actual del maestro, no su valor el día de la orden.",sí
+pv_persona_natural,Proveedor persona natural,Maestros,categórica,—,"Marca «X» si el proveedor es una persona natural y no una empresa. Es una foto actual del maestro, no su valor el día de la orden.",sí
+ps_cond_pago,Condición de pago del proveedor,Maestros,categórica,—,"Condición de pago registrada para el proveedor en la sociedad, que puede diferir de la de la orden. Es una foto actual del maestro, no su valor el día de la orden.",sí
+ps_vias_pago,Vías de pago del proveedor,Maestros,categórica,—,"Combinación de vías de pago (transferencia, cheque, etc.) habilitadas para el proveedor en la sociedad (por verificar). Es una foto actual del maestro, no su valor el día de la orden.",sí
+ce_region,Región del centro,Maestros,categórica,—,"Código del departamento donde está el centro que recibe la compra. Es una foto actual del maestro, no su valor el día de la orden.",sí
+sp_dias_solped_a_oc,Días de solicitud a orden,Solicitud de pedido,numérica,días,Días calendario entre la solicitud de pedido y la creación de la orden; vacía si no hay solicitud.,sí
+sp_dias_liberacion_a_oc,Días de liberación de solicitud a orden,Solicitud de pedido,numérica,días,Días calendario entre la liberación de la solicitud y la creación de la orden; vacía si no hay solicitud.,sí
+sp_holgura_deseada,Holgura hasta la fecha deseada,Solicitud de pedido,numérica,días,Días entre la creación de la orden y la fecha de entrega que pidió el solicitante; negativo si esa fecha ya había pasado.,sí
+sp_prometida_menos_deseada,Prometida menos deseada,Solicitud de pedido,numérica,días,Diferencia entre la fecha prometida por el proveedor y la deseada por el solicitante; positivo si el proveedor promete más tarde.,sí
+sp_razon_cantidad,Razón cantidad orden/solicitud,Solicitud de pedido,numérica,proporción,Cantidad de la orden dividida por la cantidad de la solicitud; 1 indica que se pidió lo mismo.,sí
+sp_razon_precio,Razón precio orden/solicitud,Solicitud de pedido,numérica,proporción,Precio unitario de la orden dividido por el precio estimado en la solicitud; 1 indica que coinciden.,sí
+dias_documento_a_creacion,Días de fecha del documento a creación,Plazo y calendario,numérica,días,Días entre la fecha del documento de la orden y su creación en SAP; negativo si el documento lleva fecha posterior.,sí
+pv_antiguedad_dias,Antigüedad del proveedor,Maestros,numérica,días,Días entre el alta del proveedor en SAP y la creación de la orden.,sí
+ps_antiguedad_dias,Antigüedad del proveedor en la sociedad,Maestros,numérica,días,Días entre el alta del proveedor en la sociedad compradora y la creación de la orden; puede ser negativa si el alta es posterior.,sí
+misma_region,Proveedor en la misma región,Maestros,binaria,—,"Vale 1 si el proveedor y el centro que recibe están en el mismo departamento. Es una foto actual del maestro, no su valor el día de la orden.",sí
+misma_ciudad,Proveedor en la misma ciudad,Maestros,binaria,—,"Vale 1 si el proveedor y el centro que recibe están en la misma ciudad. Es una foto actual del maestro, no su valor el día de la orden.",sí
+festivos_en_plazo,Festivos en el plazo,Plazo y calendario,numérica,conteo,Festivos de Colombia entre la creación de la orden y la fecha prometida.,sí
+dia_mes,Día del mes de creación,Plazo y calendario,numérica,día (1-31),Día del mes en que se creó la orden.,sí
+dia_semana_prometido,Día de la semana prometido,Plazo y calendario,categórica,día (0 = lunes),"Día de la semana de la fecha prometida, de 0 (lunes) a 6 (domingo).",sí
+prometida_en_festivo_o_finde,Prometida en festivo o fin de semana,Plazo y calendario,binaria,—,"Vale 1 si la fecha prometida cae en sábado, domingo o festivo, días en que normalmente no se recibe mercancía.",sí
+prov_pos_abiertas,Posiciones abiertas del proveedor,Historial del proveedor,numérica,conteo,Posiciones del proveedor creadas antes y sin primera entrada de mercancía a la fecha de creación; puede salir negativa por entradas anteriores a la creación de su orden. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+prov_pos_vencidas_abiertas,Posiciones vencidas abiertas (proveedor),Historial del proveedor,numérica,conteo,Posiciones del proveedor que a la fecha de creación ya habían pasado su fecha prometida y seguían sin entrada. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+prov_oc_30d,Órdenes del proveedor en 30 días,Historial del proveedor,numérica,conteo,Órdenes distintas creadas al proveedor en los 30 días anteriores a la creación. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+cmp_pos_abiertas,Posiciones abiertas del comprador,"Historial de material, comprador y solicitante",numérica,conteo,Posiciones del comprador creadas antes y sin primera entrada a la fecha de creación; mide su carga de trabajo pendiente y puede salir negativa. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+cmp_oc_7d,Órdenes del comprador en 7 días,"Historial de material, comprador y solicitante",numérica,conteo,Órdenes distintas creadas por el comprador en los 7 días anteriores. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+grupo_compras_oc_7d,Órdenes del grupo de compras en 7 días,"Historial de material, comprador y solicitante",numérica,conteo,Órdenes distintas creadas por el grupo de compras en los 7 días anteriores. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+centro_oc_7d,Órdenes del centro en 7 días,"Historial de material, comprador y solicitante",numérica,conteo,Órdenes distintas creadas para el centro en los 7 días anteriores. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+prov_mat_oc_previas,Órdenes previas proveedor-material,Historial del proveedor,numérica,conteo,Posiciones previas en que este proveedor ya había vendido este mismo material. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+prov_centro_oc_previas,Órdenes previas proveedor-centro,Historial del proveedor,numérica,conteo,Posiciones previas en que este proveedor ya había entregado a este mismo centro. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+mat_razon_ultimo_precio,Razón al último precio del material,"Historial de material, comprador y solicitante",numérica,proporción,Precio unitario actual dividido por el de la compra anterior del mismo material; vacía si no hay compra previa. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+prov_retraso_medio_previo,Retraso medio previo del proveedor,Historial del proveedor,numérica,días hábiles,Promedio de días hábiles de retraso (negativo si llegó antes) de las posiciones previas del proveedor. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+prov_tasa_devolucion_previa,Tasa de devolución previa del proveedor,Historial del proveedor,numérica,proporción (0-1),Devoluciones de mercancía al proveedor dividido entre sus entradas previas; vacía si no tiene entradas. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+prov_lotes_inspeccion_365d,Lotes inspeccionados del proveedor 365 d,Historial del proveedor,numérica,conteo,Lotes de mercancía del proveedor enviados a inspección de calidad en el último año. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+pago_facturas_vencidas_sin_pagar,Facturas vencidas sin pagar al proveedor,Pagos al proveedor,numérica,conteo,Facturas del proveedor ya vencidas que el grupo aún no había pagado a la fecha de creación de la orden. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+pago_mora_media_180d,Mora media de pago en 180 días,Pagos al proveedor,numérica,días,Promedio de días entre el vencimiento y el pago efectivo de las facturas del proveedor pagadas en los 180 días anteriores; negativo si se pagó antes. Se calcula solo con lo ocurrido antes de la fecha de creación de la orden.,sí
+stock_mes_anterior,Stock al mes anterior,Stock y tasa de cambio,numérica,unidades del material,"Existencias del material en el centro al cierre del mes anterior a la creación de la orden, en la unidad base del material; vacía en los servicios.",sí
+stock_variacion_3m,Variación del stock en 3 meses,Stock y tasa de cambio,numérica,unidades del material,Existencias del mes anterior menos las de tres meses antes; negativa si el inventario bajó.,sí
+razon_cantidad_stock,Cantidad pedida sobre stock,Stock y tasa de cambio,numérica,proporción,Cantidad pedida dividida por el stock del mes anterior; vacía si el stock es cero o desconocido.,sí
+trm_usd,Tasa del dólar,Stock y tasa de cambio,numérica,USD/COP,Última tasa de cambio del dólar en pesos registrada antes de la creación de la orden.,sí
+trm_usd_var30,Variación del dólar a 30 días,Stock y tasa de cambio,numérica,proporción,Cambio relativo de la tasa del dólar frente a 30 días antes de la creación de la orden.,sí
+trm_usd_var90,Variación del dólar a 90 días,Stock y tasa de cambio,numérica,proporción,Cambio relativo de la tasa del dólar frente a 90 días antes de la creación de la orden.,sí
+trm_eur,Tasa del euro,Stock y tasa de cambio,numérica,EUR/COP,Última tasa de cambio del euro en pesos registrada antes de la creación de la orden.,sí
+trm_eur_var30,Variación del euro a 30 días,Stock y tasa de cambio,numérica,proporción,Cambio relativo de la tasa del euro frente a 30 días antes de la creación de la orden.,sí
+trm_eur_var90,Variación del euro a 90 días,Stock y tasa de cambio,numérica,proporción,Cambio relativo de la tasa del euro frente a 90 días antes de la creación de la orden.,sí
+trm_usd_vol30,Volatilidad del dólar a 30 días,Stock y tasa de cambio,numérica,desv. del log-retorno diario,Desviación estándar de los cambios diarios (en logaritmo) de la tasa del dólar en los 30 días anteriores a la creación.,sí
+moneda_oc_var30,Variación 30 d de la moneda de la orden,Stock y tasa de cambio,numérica,proporción,"Variación a 30 días de la tasa de la moneda de la orden: la del dólar o la del euro, y 0 si la orden es en pesos.",sí
+linea,Línea de negocio,Marcas de estructura,categórica,—,"Línea de negocio de la sociedad: palma, transporte, industrial, banano, puerto o ganadería.",sí
+proveedor,Proveedor,Historial del proveedor,entidad,—,Código anonimizado del proveedor al que se le hace la orden.,sí
+material,Material,Clasificación,entidad,—,Código anonimizado del material pedido; «(sin)» en los servicios.,sí
+imp_ceco,Centro de costo,Imputación,entidad,—,Código anonimizado del centro de costo de la primera línea de imputación; «(sin)» si no hay imputación.,sí
+tiene_imputacion,Tiene imputación,Marcas de estructura,binaria,—,"Vale 1 si la posición tiene líneas de imputación contable; cuando vale 0, las columnas imp_ quedan vacías.",sí
+tiene_solped,Tiene solicitud de pedido,Marcas de estructura,binaria,—,"Vale 1 si se encontró la solicitud de pedido de la posición; cuando vale 0, las columnas sp_ quedan vacías.",sí
+tiene_material,Tiene material,Marcas de estructura,binaria,—,"Vale 1 si la posición tiene un material de inventario; vale 0 en los servicios, que no lo tienen.",sí
+es_servicio,Es servicio,Marcas de estructura,binaria,—,Vale 1 si la posición es un servicio y no un bien (tipo de posición 9).,sí
+y_tarde,Llegó tarde,Objetivo,objetivo,—,Objetivo del modelo: vale 1 si la primera entrada de mercancía llegó más de un día hábil después de la fecha prometida.,no
+y_otif_falla,Falla OTIF,Objetivo,objetivo,—,Vale 1 si la posición no estaba completa un día hábil después de la fecha prometida (entrega a tiempo y completa); vacía si se recibió en otra unidad.,no
+dias_retraso,Días de retraso,Objetivo,objetivo,días hábiles,Días hábiles entre la fecha prometida y la primera entrada de mercancía; negativo si llegó antes.,no
+particion,Partición,Identificación y fechas,identificador,—,"Conjunto al que pertenece la fila según el año de la orden: entrenamiento (2021-2024), validación (2025) o prueba (2026).",referencia

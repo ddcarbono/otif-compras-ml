@@ -1,0 +1,21 @@
+{
+ "filas": 406126,
+ "ordenes": 104614,
+ "proveedores": 3717,
+ "materiales": 32059,
+ "predictoras": 136,
+ "tasa_total": 0.3301118372130816,
+ "filas_entrenamiento": 271391,
+ "tasa_entrenamiento": 0.3395580546149283,
+ "periodo": [
+  "2021-01-04",
+  "2026-10-01"
+ ],
+ "particion": {
+  "entrenamiento": "2021-2024",
+  "validacion": "2025",
+  "prueba": "2026"
+ },
+ "muestra": 30001,
+ "semilla": 2026
+}

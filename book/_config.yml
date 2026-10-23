@@ -1,0 +1,20 @@
+title: Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite
+author: Daniel Carbonó y Luis Pérez
+copyright: "2026"
+execute:
+  execute_notebooks: 'off'     # los .ipynb se ejecutan con compilar.py y se publican con sus salidas
+only_build_toc_files: true
+exclude_patterns: [fuentes/*, _build/*]
+bibtex_bibfiles:
+  - references.bib
+sphinx:
+  config:
+    language: es
+    html_show_copyright: false
+    html_static_path: ['_static']
+    html_css_files: ['identidad.css']
+    html_js_files:
+      - https://cdn.plot.ly/plotly-2.32.0.min.js
+    html_context:
+      default_mode: light
+    bibtex_reference_style: author_year

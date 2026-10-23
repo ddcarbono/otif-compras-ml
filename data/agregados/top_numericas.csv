@@ -1,0 +1,13 @@
+variable
+plazo_habil_al_liberar
+prov_retraso_medio_previo
+prov_tasa_tarde_previa
+plazo_prometido_dias
+mat_tasa_tarde_previa
+dias_habiles_liberacion
+sp_prometida_menos_deseada
+nace_vencida
+plazo_al_crear_dias
+sol_tasa_tarde_previa
+cmp_tasa_tarde_previa
+prov_centro_oc_previas
