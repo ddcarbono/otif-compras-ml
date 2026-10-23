@@ -69,6 +69,7 @@ ESPACIOS = {
 }
 MODELOS = list(ESPACIOS)
 # orden de lanzamiento: lo caro primero, para que el final no quede esperando un trabajo largo
+MEMORIA_MIN_GB = float(os.environ.get("OTIF_MEMORIA_MIN_GB", 6))  # memoria libre para arrancar un trabajo
 COSTO = {"knn": 5, "random_forest": 6, "xgboost": 7, "svm": 3, "logistica": 3, "arbol": 1, "naive_bayes": 0}
 
 
@@ -143,7 +144,7 @@ def trabajo(modelo, balanceo, opt, bloque, E, destino=TRABAJOS):
     """Corre un trabajo y escribe su JSON. Devuelve el nombre y los segundos."""
     t0 = time.time()
     archivo = destino / f"{nombre_trabajo(modelo, balanceo, opt, bloque)}.json"
-    while psutil.virtual_memory().available < 6 * 2 ** 30:  # no arrancar sin memoria para el trabajo
+    while psutil.virtual_memory().available < MEMORIA_MIN_GB * 2 ** 30:  # no arrancar sin memoria para el trabajo
         time.sleep(30)
     Xi, yi, Xv, yv = validacion.cargar(bloque, "interno", balanceo)
     mejor = {"valor": -1.0, "s": None}

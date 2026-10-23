@@ -1,0 +1,8 @@
+modelo,rango_medio,balanceo,optimizador,AUC
+xgboost,1.0,ninguno,deap,0.8510112699681838
+logistica,2.625,pesos,deap,0.8390294674031168
+random_forest,2.625,pesos,optuna,0.8401325906892925
+svm,3.75,pesos,deap,0.8368847901584288
+arbol,5.125,ninguno,optuna,0.8099771695198333
+knn,5.875,smote,deap,0.7806023270081274
+naive_bayes,7.0,adasyn,deap,0.7317601855969824

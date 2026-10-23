@@ -9,7 +9,7 @@ from src.data import diccionario, es, pct, resumen
 dash.register_page(__name__, path="/", name="Contexto", order=0, title="Contexto · órdenes de compra")
 
 R = resumen()
-VERSION, ACTUALIZADO = "0.2", "2026-10-22"
+VERSION, ACTUALIZADO = "0.3", "2026-10-23"
 
 
 def cifra(valor, texto, nota=None):

@@ -7,7 +7,7 @@ toma de ``resultados/eda/`` las tablas que el libro ya calculó (la cifra del ta
   del tablero se filtran y se suman desde aquí, no desde la muestra).
 - ``data/agregados/*.csv``: copias de las tablas del libro que el tablero muestra sin recalcular.
 - ``data/resumen.json``: las cifras de la portada.
-- ``data/modelos/*.csv``: las tablas del modelo base (``resultados/modelo_base``), si ya se corrió ``src.modelo_base``.
+- ``data/modelos/*.csv``: las tablas del modelo base (``resultados/modelo_base``), si ya se corrió ``src.modelo_base``, y las de los 112 (``resultados/experimentos``, de ``src.comparar``).
 
 Uso: ``python -m src.preparar`` desde la raíz del repositorio, con ``OTIF_CSV`` apuntando al dataset completo.
 """
@@ -62,6 +62,12 @@ def main():
             shutil.copy(mb / f"{f}.csv", sal / "modelos" / f"{f}.csv")
         pd.read_csv(mb / "coeficientes.csv").head(40).to_csv(sal / "modelos" / "coeficientes.csv", index=False)
         shutil.copy(mb / "resumen.json", sal / "modelos" / "resumen.json")
+
+    ex = datos.RAIZ / "resultados" / "experimentos"
+    if (ex / "lideres.csv").exists():
+        (sal / "modelos").mkdir(exist_ok=True)
+        for f in ["lideres", "rangos", "friedman", "wilcoxon", "auc_por_bloque_modelos", "curvas_optimizador"]:
+            shutil.copy(ex / f"{f}.csv", sal / "modelos" / f"{f}.csv")
 
     # privacidad: la muestra no lleva identificadores ni entidades de personas o terceros
     prohibidas = set(datos.ENTIDADES) - {"sociedad"} | {"oc_id", "posicion"}

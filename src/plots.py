@@ -274,3 +274,81 @@ def validacion_c(t):
     fig.update_layout(title="Elección de C: AUC medio en los tres pliegues temporales (± desviación)",
                       xaxis_title="C (inverso de la penalización L2)", yaxis_title="ROC-AUC", xaxis_type="log")
     return fig
+
+
+# --- los 112 -----------------------------------------------------------------------------------------------------------
+MODELO = {"xgboost": "XGBoost", "random_forest": "Random Forest", "logistica": "Logística (SGD)",
+          "svm": "SVM lineal (SGD)", "arbol": "Árbol", "knn": "KNN (PCA 30)", "naive_bayes": "Naive Bayes"}
+BALANCEO = {"ninguno": "ninguno", "smote": "SMOTE", "adasyn": "ADASYN", "pesos": "pesos de clase"}
+OPTIMIZADOR = {"grid": "Grid", "random": "Random", "optuna": "Optuna (TPE)", "deap": "DEAP (genético)"}
+COLOR_OPT = {"grid": GRIS, "random": AZUL, "optuna": ORO, "deap": VERDE}
+COLOR_MOD = {"xgboost": ORO, "random_forest": VERDE, "logistica": AZUL, "svm": "#8FB3CC", "arbol": MARRON,
+             "knn": GRIS, "naive_bayes": "#BBBBBB"}
+
+
+def auc_por_bloque(m, nombres):
+    """AUC externo por bloque semestral de la mejor combinación de cada modelo (``auc_por_bloque_modelos.csv``)."""
+    fig = go.Figure()
+    orden = m.drop(columns="bloque").mean().sort_values(ascending=False).index
+    for c in orden:
+        fig.add_trace(go.Scatter(x=m.bloque, y=m[c], mode="lines+markers", name=nombres.get(c, c),
+                                 line=dict(color=COLOR_MOD.get(c, AZUL)),
+                                 hovertemplate="%{x}: AUC %{y:.3f}<extra>" + nombres.get(c, c) + "</extra>"))
+    fig.update_layout(title="ROC-AUC por bloque externo (mejor combinación de cada modelo)", xaxis_title="bloque evaluado",
+                      yaxis_title="ROC-AUC")
+    return fig
+
+
+def mapa_combinaciones(t, modelo, nombres_bal, nombres_opt):
+    """AUC medio de un modelo en la rejilla balanceo × optimizador (``lideres.csv``)."""
+    d = t[t.modelo == modelo].pivot(index="balanceo", columns="optimizador", values="AUC")
+    d = d.loc[[b for b in nombres_bal if b in d.index], [o for o in nombres_opt if o in d.columns]]
+    fig = go.Figure(go.Heatmap(z=d.values, x=[nombres_opt[o] for o in d.columns], y=[nombres_bal[b] for b in d.index],
+                               text=[[f"{v:.4f}".replace(".", ",") for v in fila] for fila in d.values],
+                               texttemplate="%{text}", colorscale=[[0, "#FFFFFF"], [1, AZUL]], showscale=False,
+                               hovertemplate="%{y} · %{x}: AUC %{z:.4f}<extra></extra>"))
+    fig.update_layout(title="AUC medio por balanceo y optimizador", height=320, yaxis_autorange="reversed")
+    return fig
+
+
+def arrepentimiento(c, x, nombres_opt, titulo, eje):
+    """Distancia al mejor AUC interno conocido contra evaluaciones o contra tiempo (``curvas_optimizador*.csv``)."""
+    fig = go.Figure()
+    y = "mean" if "mean" in c.columns else "arrepentimiento"
+    for o in nombres_opt:
+        d = c[c.optimizador == o]
+        fig.add_trace(go.Scatter(x=d[x], y=d[y], mode="lines", name=nombres_opt[o], line=dict(color=COLOR_OPT[o]),
+                                 hovertemplate="%{x:.0f}: %{y:.4f}<extra>" + nombres_opt[o] + "</extra>"))
+    fig.update_layout(title=titulo, xaxis_title=eje, yaxis_title="AUC perdido frente al mejor conocido",
+                      yaxis_type="log", xaxis_type="log" if x == "segundos" else None)
+    return fig
+
+
+def rangos_cd(r, cd, nombres):
+    """Rango medio de cada modelo en los 8 bloques (1 = mejor) y la diferencia crítica de Nemenyi desde el mejor."""
+    r = r.sort_values("rango_medio")
+    et = [nombres.get(m, m) for m in r.modelo]
+    fig = go.Figure(go.Scatter(x=r.rango_medio, y=et, mode="markers+text", text=[f"{v:.2f}".replace(".", ",") for v in r.rango_medio],
+                               textposition="middle right", marker=dict(size=12, color=[COLOR_MOD.get(m, AZUL) for m in r.modelo]),
+                               hovertemplate="%{y}: rango medio %{x:.3f}<extra></extra>"))
+    x0 = r.rango_medio.iloc[0]
+    fig.add_shape(type="rect", x0=x0, x1=x0 + cd, y0=-0.5, y1=len(r) - 0.5, fillcolor=ORO, opacity=0.12, line_width=0)
+    fig.add_annotation(x=x0 + cd, y=len(r) - 0.5, text=f"diferencia crítica {cd:.2f}".replace(".", ","), showarrow=False,
+                       yanchor="bottom", xanchor="right")
+    fig.update_layout(title="Rango medio en los 8 bloques (Friedman) y diferencia crítica de Nemenyi (α = 0,05)",
+                      xaxis_title="rango medio (1 = mejor)", xaxis_range=[0.5, 7.5], yaxis_autorange="reversed",
+                      showlegend=False, height=380, margin=dict(l=150))
+    return fig
+
+
+def costo(df, nombres, nombres_bal):
+    """Horas de CPU por modelo, apiladas por balanceo (``por_bloque.csv``)."""
+    h = df.groupby(["modelo", "balanceo"]).segundos_total.sum().div(3600).unstack()
+    h = h.loc[h.sum(axis=1).sort_values().index]
+    fig = go.Figure()
+    for b, color in zip(nombres_bal, [AZUL, ORO, MARRON, VERDE]):
+        fig.add_trace(go.Bar(y=[nombres.get(m, m) for m in h.index], x=h[b], name=nombres_bal[b], orientation="h",
+                             marker_color=color, hovertemplate="%{y}: %{x:.1f} h<extra>" + nombres_bal[b] + "</extra>"))
+    fig.update_layout(barmode="stack", title="Horas de CPU de los 112 por modelo y balanceo",
+                      xaxis_title="horas de CPU (un núcleo)", height=380, margin=dict(l=150))
+    return fig

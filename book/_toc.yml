@@ -12,3 +12,4 @@ parts:
   - caption: Modelos
     chapters:
       - file: 03a_modelo_base
+      - file: 03b_112_combinaciones
