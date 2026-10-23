@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Sustentacion del proyecto OTIF (Entregable 2) con la plantilla Uninorte de las sustentaciones de GLM.
+"""Sustentacion del proyecto OTIF con la plantilla Uninorte de las sustentaciones de GLM, para la rubrica de 20 minutos.
 
-Ordenada por los siete criterios de la rubrica (entregables/diapositivas.md): problema y formulacion, EDA y fuga,
-fundamentos teoricos del mejor benchmark (XGBoost), diseno experimental, resultados y errores, conclusiones, preguntas.
-Las cifras se leen de resultados/ y data/modelos/ al construir; las figuras y formulas son PNG de figuras.py.
-Lo que depende de la evaluacion final en 2026 (la 2x2) sale en una caja gris "pendiente".
+Sigue la tabla de 18 minutos de entregables/diapositivas.md con el mejor benchmark (XGBoost) en la teoria: criterio 1
+(2 min), 2 (3), 3 (5), 4 (3), 5 (3), 6 (2) y 2 de preguntas. Tres diapositivas son pantallas del tablero en vivo, con
+su captura como respaldo (capturar_tablero.py). Las cifras se leen de resultados/ y data/modelos/ al construir; las
+figuras y formulas son PNG de figuras.py. Lo que depende de la evaluacion final en 2026 sale en una caja "pendiente".
 
 Uso (Python base, que tiene python-pptx):
     python presentacion/construir.py [salida.pptx]      # por defecto presentacion/sustentacion_otif.pptx
@@ -16,6 +16,7 @@ import json
 import os
 import sys
 
+import numpy as np
 import pandas as pd
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -26,7 +27,6 @@ from plantilla_uninorte import *  # noqa: E402,F401,F403
 RAIZ = os.path.dirname(AQUI)
 R, MOD = os.path.join(RAIZ, 'resultados'), os.path.join(RAIZ, 'data', 'modelos')
 SAL = sys.argv[1] if len(sys.argv) > 1 else os.path.join(AQUI, 'sustentacion_otif.pptx')
-PIE_OTIF = 'Daniel Carbonó y Luis Pérez   •   Maestría en Estadística Aplicada   •   Universidad del Norte'
 URL = {'repo': 'github.com/ddcarbono/otif-compras-ml', 'libro': 'ddcarbono.github.io/otif-compras-ml',
        'tablero': 'otif-compras-ml.onrender.com'}
 
@@ -47,9 +47,11 @@ def pc(v, d=1):
 tam = leer(R, 'eda', 'tamano.csv').set_index('partición')
 aso = leer(R, 'eda', 'asociacion.csv')
 falt = leer(R, 'eda', 'faltantes.csv')
+uni = leer(R, 'eda', 'univariado_numericas.csv')
 ati = leer(R, 'eda', 'atipicos_if.csv').set_index('grupo')['tasa de tarde']
 est = leer(R, 'eda', 'estacionariedad.csv').set_index('prueba')['p']
 nue = leer(R, 'eda', 'entidades_nuevas.csv').set_index('variable')
+lin = leer(R, 'eda', 'tasa_linea.csv').sort_values('tasa')
 adv = leer(R, 'similitud', 'auc.csv').AUC.tolist()
 lid = leer(MOD, 'lideres.csv')
 mejor = lid.sort_values('AUC', ascending=False).groupby('modelo').head(1)
@@ -65,22 +67,26 @@ pb = leer(R, 'experimentos', 'por_bloque.csv')
 xb = pb[(pb.modelo == top.modelo) & (pb.balanceo == top.balanceo) & (pb.optimizador == top.optimizador)]
 cx = leer(R, 'complejidad.csv')
 cxx = cx[cx.modelo == 'xgboost'].sort_values('filas')
-import numpy as np  # noqa: E402
 expo = np.polyfit(np.log(cxx.filas), np.log(cxx.segundos_ajuste), 1)[0]
 horas = pb.segundos_total.sum() / 3600
+elegidos = pd.DataFrame([json.load(open(os.path.join(R, 'experimentos', 'trabajos',
+                                                     f'{top.modelo}__{top.balanceo}__{top.optimizador}__{b}.json'),
+                                        encoding='utf-8'))['params'] for b in xb.bloque])
 NOMBRE = {'xgboost': 'XGBoost', 'random_forest': 'Random Forest', 'logistica': 'Logística (SGD)',
           'svm': 'SVM lineal (SGD)', 'arbol': 'Árbol', 'knn': 'KNN (PCA 30)', 'naive_bayes': 'Naive Bayes'}
 BAL = {'ninguno': 'sin balanceo', 'smote': 'SMOTE', 'adasyn': 'ADASYN', 'pesos': 'pesos'}
 OPT = {'grid': 'Grid', 'random': 'Random', 'optuna': 'Optuna', 'deap': 'DEAP'}
 
-N_TOTAL = 13
+N_TOTAL = 20
 NOTAS = []
+_k = [0]
 
 
-def pie(s, k, fuente):
+def pie(s, fuente):
+    _k[0] += 1
     filete(s, 1.3, 13.45, 22.9, LINEA, alto=0.04)
     texto(s, 1.3, 13.6, 16.5, 0.5, f'Fuente: {fuente}', tam=8.5, color=GRIS_CL)
-    texto(s, 17.8, 13.6, 6.4, 0.5, f'{k} / {N_TOTAL}', tam=8.5, color=GRIS_CL, alineacion=PP_ALIGN.RIGHT)
+    texto(s, 17.8, 13.6, 6.4, 0.5, f'{_k[0] + 1} / {N_TOTAL}', tam=8.5, color=GRIS_CL, alineacion=PP_ALIGN.RIGHT)
 
 
 def notas(s, minutos, expone, criterio, txt):
@@ -101,6 +107,20 @@ def lista(s, x, y, w, items, tam=11.5, paso=1.15, alto=1.1):
     return y
 
 
+def en_vivo(s, x, y, w, h, pasos):
+    """Recuadro de una pantalla del tablero: lo que se hace en vivo, paso a paso."""
+    caja(s, x, y, w, h, VERDE)
+    texto(s, x + 0.45, y + 0.3, w - 0.9, 0.7, 'EN VIVO', tam=11, color=ORO_CL, negrita=True)
+    texto(s, x + 0.45, y + 1.0, w - 0.9, 0.7, URL['tablero'], tam=10, color=PALIDO)
+    texto(s, x + 0.45, y + 1.8, w - 0.9, h - 2.0, [f'{k}. {p}' for k, p in enumerate(pasos, 1)], tam=10.5,
+          color=BLANCO, espacio=6)
+
+
+def captura(s, nombre, x, y, w):
+    figura(s, nombre, x, y, w=w)
+    texto(s, x, y - 0.5, w, 0.45, 'captura de respaldo, por si el tablero no carga', tam=8.5, color=GRIS_CL)
+
+
 # ============================================================== 1 PORTADA
 s = nueva()
 caja(s, 0, 0, 8.8, 14.29, VERDE)
@@ -110,7 +130,7 @@ texto(s, 1.3, 6.0, 6.8, 1.6, ['Maestría en Estadística Aplicada', 'Machine Lea
 filete(s, 1.3, 10.6, 1.8)
 texto(s, 1.3, 11.1, 6.8, 1.6, ['Daniel Carbonó Domínguez', 'Luis Pérez'], tam=11.5, color=BLANCO, negrita=True, espacio=4)
 texto(s, 1.3, 12.6, 6.8, 0.8, 'Octubre de 2026', tam=10.5, color=PALIDO)
-texto(s, 10.0, 2.6, 13.5, 0.8, 'ENTREGABLE 2  ·  CLASIFICACIÓN BINARIA SUPERVISADA', tam=13, color=VERDE, negrita=True)
+texto(s, 10.0, 2.6, 13.5, 0.8, 'CLASIFICACIÓN BINARIA SUPERVISADA', tam=13, color=VERDE, negrita=True)
 texto(s, 10.0, 3.7, 14.4, 4.2, ['Predicción del incumplimiento de órdenes de compra en la agroindustria de la palma '
                                 'de aceite'], tam=24, color=TINTA, negrita=True)
 filete(s, 10.0, 8.1, 2.3)
@@ -118,35 +138,76 @@ texto(s, 10.0, 8.6, 14.0, 1.2, f'{n(tam.loc["total", "filas"])} posiciones de {n
       'órdenes de compra, 2021-2026', tam=15, color=GRIS)
 texto(s, 10.0, 10.4, 14.0, 2.4, [f'Repositorio   {URL["repo"]}', f'Libro            {URL["libro"]}',
                                  f'Tablero         {URL["tablero"]}'], tam=12, color=GRIS_CL, espacio=4)
-notas(s, '0:30', 'A', 'criterio 1', 'Presentarse los dos. Una frase: el día en que la orden se libera, predecir si cada '
-      'posición llegará tarde. Las tres direcciones quedan en pantalla; el tablero se abre al final si hay tiempo.')
+notas(s, '0:15', 'A', 'criterio 1', 'Presentarse los dos y dejar las tres direcciones en pantalla. Render ya abierto '
+      'desde antes: el plan gratuito se duerme.')
 
-# ============================================================== 2 PROBLEMA Y FORMULACION
+# ============================================================== 2 PROBLEMA
 s = nueva()
-cabecera(s, 'Uno de cada tres pedidos llega tarde, y se sabe cuando ya pasó', 'CRITERIO 1  ·  PROBLEMA Y FORMULACIÓN')
+cabecera(s, 'Uno de cada tres pedidos llega tarde, y se sabe cuando ya pasó', 'CRITERIO 1  ·  EL PROBLEMA')
 cifra(s, 1.3, 3.4, 5.4, 2.7, pc(tam.loc['total', 'tasa de tarde']), 'de las posiciones llega tarde')
-cifra(s, 1.3, 6.4, 5.4, 2.7, '1 día', 'hábil de tolerancia sobre la fecha prometida', CREMA)
-tarjeta(s, 1.3, 9.4, 5.4, 3.7, 'Objetivo', 'Ordenar las posiciones por riesgo el día de la liberación y señalar cuáles '
-        'seguir primero.', NIEBLA, tam_c=10.5)
-texto(s, 7.6, 3.3, 9.0, 0.6, 'Unidad: la posición i de una orden', tam=12, color=VERDE, negrita=True)
-figura(s, 'f_x.png', 7.7, 4.1, h=0.75)
-texto(s, 7.6, 4.95, 9.0, 1.8, 'x: 136 predictoras conocidas el día t en que la orden sale al proveedor. '
-      'y = 1 si la primera entrada llega más de 1 día hábil después de la fecha prometida.', tam=10.5, color=GRIS)
-figura(s, 'f_p.png', 7.7, 6.9, h=0.75)
-texto(s, 7.6, 7.8, 9.0, 1.4, 'Se estima la probabilidad p(x) y se decide con un umbral τ, elegido en la '
-      'validación 2025 maximizando F1; la prueba 2026 no elige nada.', tam=10.5, color=GRIS)
-texto(s, 7.6, 9.5, 9.0, 0.6, 'Por qué clasificación binaria', tam=12, color=VERDE, negrita=True)
-texto(s, 7.6, 10.2, 9.0, 2.9, 'La decisión del comprador es una sola: hacerle seguimiento a la orden o no. Los días '
-      'de retraso tienen colas largas y se usan como contexto, no como objetivo.', tam=10.5)
-tarjeta(s, 17.4, 3.4, 6.8, 9.7, 'Objetivos específicos',
-        ['1. Comparar 7 modelos × 4 formas de balancear × 4 optimizadores con el mismo presupuesto.',
-         '2. Medir cuánto cuesta decidir con entidades nuevas: proveedor o material sin historia.',
-         '3. Dejar el modelo servido en un tablero con la predicción en vivo.'], VERDECL, tam_c=11)
-pie(s, 2, 'libro, capítulos 1 y 2a (definición de la etiqueta y de la población)')
-notas(s, '0:50', 'A', 'criterio 1', 'Problema, unidad, x, y, p(x) y el umbral. Insistir: el umbral sale de 2025; la '
-      'prueba 2026 se mira una vez. Por qué binaria: la decisión es binaria.')
+cifra(s, 1.3, 6.4, 5.4, 2.7, pc(lin.tasa.max(), 0), f'en {lin.linea.iloc[-1]}; {pc(lin.tasa.min(), 0)} en {lin.linea.iloc[0]}', CREMA)
+cifra(s, 1.3, 9.4, 5.4, 2.7, pc(lb.sensibilidad, 0), f'de las tardías de 2026, marcando el {pc(lb.marcadas, 0)}', NIEBLA)
+texto(s, 7.6, 3.3, 9.2, 0.6, 'Por qué importa', tam=12.5, color=VERDE, negrita=True)
+texto(s, 7.6, 4.0, 9.2, 3.6, 'El comprador hoy se entera del retraso cuando la mercancía no llega. Con miles de '
+      'posiciones abiertas, no puede seguirlas todas: necesita saber, el día en que libera la orden, cuáles vigilar.',
+      tam=11)
+texto(s, 7.6, 7.3, 9.2, 0.6, 'Qué dice la literatura', tam=12.5, color=VERDE, negrita=True)
+texto(s, 7.6, 8.0, 9.2, 5.0, ['En fabricantes de maquinaria y equipos llega tarde del 13 % al 14 % de los pedidos '
+                              '(Brintrup y otros, 2020; Steinberg y otros, 2023): aquí es más del doble.',
+                              ('Una revisión de 26 estudios encuentra que 16 parten las filas al azar; reevaluado sin '
+                               'fuga y en el tiempo, un AUC de 0,96 baja a 0,73 (Raval, 2026). Este trabajo evalúa '
+                               'siempre hacia adelante.', {'antes': 6})], tam=10.5, color=GRIS)
+tarjeta(s, 17.4, 3.4, 6.8, 9.7, 'Objetivos',
+        ['General: ordenar las posiciones por riesgo de retraso el día de la liberación y señalar cuáles seguir.',
+         'Específico 1: comparar 7 modelos × 4 balanceos × 4 optimizadores con el mismo presupuesto.',
+         'Específico 2: medir cuánto cuesta decidir con entidades nuevas (proveedor o material sin historia).',
+         'Específico 3: dejar el modelo servido en un tablero con predicción en vivo.'], VERDECL, tam_c=10.5)
+pie(s, 'libro, introducción y literatura; capítulo 4 (modelo base): data/modelos/metricas.csv')
+notas(s, '0:45', 'A', 'criterio 1', 'El problema en una frase y su magnitud. La tercera cifra es del modelo base en '
+      '2026 y ya está en el libro: marcando poco más de un tercio, se ven venir siete de cada diez tardías.')
 
-# ============================================================== 3 DATOS
+# ============================================================== 3 FORMULACION
+s = nueva()
+cabecera(s, 'Estimar la probabilidad de llegar tarde y decidir con un umbral', 'CRITERIO 1  ·  FORMULACIÓN '
+         'MATEMÁTICA')
+texto(s, 1.3, 3.2, 14.0, 0.6, 'Unidad: la posición i, el día t en que se libera su orden',
+      tam=12, color=VERDE, negrita=True)
+figura(s, 'f_x.png', 1.4, 4.0, h=0.75)
+texto(s, 1.3, 4.95, 14.0, 1.2, 'x: 136 predictoras conocidas en t. y = 1 si la primera entrada de mercancía llega más '
+      'de 1 día hábil después de la fecha prometida vigente al liberar.', tam=10.5, color=GRIS)
+texto(s, 1.3, 6.4, 14.0, 0.6, 'El modelo estadístico: y | x es Bernoulli con probabilidad p(x)', tam=12, color=VERDE,
+      negrita=True)
+figura(s, 'f_p.png', 1.4, 7.15, h=0.75)
+texto(s, 1.3, 8.1, 14.0, 1.4, 'Se estima p(x) minimizando la log-pérdida, que es menos la log-verosimilitud de '
+      'Bernoulli; la decisión ŷ compara p̂ con un umbral τ.', tam=10.5, color=GRIS)
+figura(s, 'f_bern.png', 1.4, 9.6, h=0.75)
+texto(s, 1.3, 10.7, 14.0, 2.4, [('El umbral τ se elige en la validación 2025, maximizando F1; la prueba 2026 se usa una '
+                                 'sola vez y no elige nada.', {'negrita': True}),
+                                ('Métricas: AUC para ordenar por riesgo (no depende de τ) y F1 para la decisión.', {})],
+      tam=10.5, espacio=4)
+tarjeta(s, 16.0, 3.3, 8.2, 4.6, 'Tarea', 'Clasificación binaria supervisada: la etiqueta se observa después, cuando '
+        'entra la mercancía, y el modelo aprende de las órdenes ya cerradas.', VERDECL, tam_c=10.5)
+tarjeta(s, 16.0, 8.2, 8.2, 4.9, 'Por qué no regresión', 'La decisión del comprador es binaria: seguir la orden o no. '
+        'Los días de retraso tienen colas muy largas y se usan como contexto; el modelo original del Entregable 3 los '
+        'aprovecha con cortes ordenados.', CREMA, tam_c=10.5)
+pie(s, 'libro, capítulos 1 y 2a (definición de la etiqueta y de la población)')
+notas(s, '1:00', 'A', 'criterio 1', 'x, y, el modelo Bernoulli, la log-pérdida como menos log-verosimilitud y el '
+      'umbral. Insistir: τ sale de 2025 y 2026 no elige nada.')
+
+# ============================================================== 4 TABLERO: CONTEXTO Y EDA
+s = nueva()
+cabecera(s, 'Tablero: el contexto y la exploración, con filtros', 'CRITERIO 2  ·  PANTALLA EN VIVO')
+captura(s, 'tablero_eda.png', 1.3, 3.6, 15.6)
+en_vivo(s, 17.6, 3.3, 6.6, 9.8, ['Contexto: la fuente (SAP, 2021-2026), la población y la etiqueta.',
+                                 'EDA: el objetivo por clase y la tasa por mes.',
+                                 'Filtrar una línea de negocio: todo cambia con ella (de '
+                                 f'{pc(lin.tasa.min(), 0)} a {pc(lin.tasa.max(), 0)} de tarde).',
+                                 'Bajar a distribuciones y atípicos.'])
+pie(s, f'tablero, páginas Contexto y EDA ({URL["tablero"]})')
+notas(s, '0:45', 'A', 'criterio 2', 'Pantalla en vivo. Si el tablero no carga, la captura queda en la diapositiva. '
+      'Mostrar el filtro por línea: industrial y palma llegan tarde más que banano y ganadería.')
+
+# ============================================================== 5 DATOS
 s = nueva()
 cabecera(s, f'De SAP a {n(tam.loc["total", "filas"])} posiciones con una etiqueta y 136 predictoras',
          'CRITERIO 2  ·  FUENTE, ESTRUCTURA Y PARTICIÓN')
@@ -171,93 +232,130 @@ tarjeta(s, 15.0, 5.8, 9.2, 7.2, 'Las 136 predictoras',
 texto(s, 1.3, 9.8, 13.0, 3.4, [('Las órdenes son la unidad independiente: '
                                 f'{n(tam.loc["total", "filas"] / tam.loc["total", "órdenes"], 1)} posiciones por orden. '
                                 'Ninguna orden cruza particiones y toda validación cruzada agrupa por orden.', {}),
-                               ('La partición es por la fecha de la orden, no al azar (lámina 5).', {'color': GRIS})],
+                               ('La partición es por la fecha de la orden, no al azar (diapositiva 8).', {'color': GRIS})],
       tam=11, espacio=6)
-pie(s, 3, 'libro, capítulo 2a (datos); diccionario de variables en data/diccionario.csv')
-notas(s, '0:40', 'A', 'criterio 2', 'Fuente y estructura. La unidad independiente es la orden: por eso los pliegues '
+pie(s, 'libro, capítulo 2a (datos); diccionario de variables en data/diccionario.csv')
+notas(s, '0:45', 'A', 'criterio 2', 'Fuente y estructura. La unidad independiente es la orden: por eso los pliegues '
       'se agrupan por orden. La partición es cronológica.')
 
-# ============================================================== 4 EDA
+# ============================================================== 6 DESCRIPTIVA Y CALIDAD
 s = nueva()
-cabecera(s, 'Ninguna variable sola pasa de 0,75 de AUC', 'CRITERIO 2  ·  DESCRIPTIVA, '
-         'FALTANTES, ATÍPICOS Y RELACIONES')
-figura(s, 'auc_univariado.png', 1.2, 3.2, w=12.2)
-y = 3.3
-for tit, cuerpo, rell in [
-        ('Faltantes estructurales', f'{int((falt["vacíos (%)"] > 50).sum())} variables con más de 50 % de vacíos, y no '
-         'son azar: faltan porque la orden no tiene solicitud o no tiene imputación. Se marcan con indicadores tiene_* y '
-         'se imputa la mediana.', VERDECL),
-        ('Atípicos (Isolation Forest)', f'{pc(ati["atípicas"])} de tarde en las atípicas contra {pc(ati["resto"])} en el '
-         'resto: son señal, no ruido, y no se borran.', CREMA),
-        ('Colas largas', 'Valor, cantidad y plazos son muy asimétricos: signo(x)·log(1 + |x|) antes de los modelos '
-         'lineales; a los árboles no les cambia nada.', NIEBLA)]:
-    tarjeta(s, 14.3, y, 9.9, 3.1, tit, cuerpo, rell, tam_t=12, tam_c=10)
-    y += 3.3
-texto(s, 1.3, 11.0, 12.7, 1.2, f'El plazo hábil al liberar separa más ({n(aso.AUC.max(), 3)}): es la causa más directa '
-      'del retraso y se conoce al liberar; no es fuga.', tam=10.5, color=GRIS)
-pie(s, 4, 'libro, capítulo 2b (EDA): resultados/eda/asociacion.csv, faltantes.csv, atipicos_if.csv')
-notas(s, '0:40', 'A', 'criterio 2', 'Lo más importante: ninguna variable sola es sospechosa (máximo 0,732) y los '
-      'vacíos son estructurales, con su mecanismo. Los atípicos llegan más tarde: son información.')
+cabecera(s, 'Colas largas, vacíos con causa y atípicos que llegan más tarde', 'CRITERIO 2  ·  DESCRIPTIVA, FALTANTES '
+         'Y ATÍPICOS')
+asim = uni.sort_values('asimetría', ascending=False).head(6)
+filas_a = [['variable', 'mediana', 'p99', 'asimetría']]
+for _, r in asim.iterrows():
+    filas_a.append([r.nombre, n(r.mediana, 1), n(r.p99, 0), n(r['asimetría'], 1)])
+tabla(s, 1.3, 3.3, 12.8, 4.6, filas_a, anchos=[5.4, 2.0, 2.4, 2.0], tam=10)
+texto(s, 1.3, 8.2, 12.8, 1.6, 'Por eso signo(x)·log(1 + |x|) antes de los modelos lineales: comprime las colas sin '
+      'cambiar el orden. A los árboles no les cambia nada, porque solo usan el orden.', tam=10.5, color=GRIS)
+tarjeta(s, 1.3, 10.0, 12.8, 3.1, 'Atípicos multivariados (Isolation Forest)', f'{pc(ati["atípicas"])} de tarde en las '
+        f'atípicas contra {pc(ati["resto"])} en el resto: son señal, no ruido, y no se borran.', CREMA, tam_t=12,
+        tam_c=10.5)
+fv = falt.sort_values('vacíos (%)', ascending=False).head(6)
+filas_f = [['variable', 'vacíos', 'Δ tasa (pp)']] + [[r.variable, n(r['vacíos (%)'], 1) + ' %',
+                                                      n(r['diferencia (pp)'], 1)] for _, r in fv.iterrows()]
+tabla(s, 14.8, 3.3, 9.4, 4.6, filas_f, anchos=[4.6, 1.8, 1.8], tam=9.5)
+tarjeta(s, 14.8, 8.2, 9.4, 4.9, 'Faltantes estructurales', f'{int((falt["vacíos (%)"] > 50).sum())} variables con más '
+        'de 50 % de vacíos, y no son azar: faltan porque la orden no tiene solicitud o no tiene imputación. Se marcan '
+        'con indicadores tiene_* y se imputa la mediana; Δ tasa es la diferencia de retraso entre filas con y sin dato.',
+        VERDECL, tam_t=12, tam_c=10)
+pie(s, 'libro, capítulo 2b (EDA): resultados/eda/univariado_numericas.csv, faltantes.csv, atipicos_if.csv')
+notas(s, '0:30', 'A', 'criterio 2', 'Distribuciones: colas largas, transformación justificada. Faltantes: el mecanismo '
+      'es estructural, no aleatorio. Atípicos: tienen más retraso, se quedan.')
 
-# ============================================================== 5 TIEMPO Y FUGA
+# ============================================================== 7 RELACIONES Y FUGA
 s = nueva()
-cabecera(s, 'El tiempo importa: partir al azar mediría con datos ya vistos',
-         'CRITERIO 2  ·  TIEMPO Y FUGA')
+cabecera(s, 'Ninguna variable sola pasa de 0,75 de AUC, y ninguna es fuga', 'CRITERIO 2  ·  RELACIONES Y FUGA')
+figura(s, 'auc_univariado.png', 1.2, 3.2, w=12.2)
+texto(s, 1.3, 11.9, 12.2, 1.3, f'El plazo hábil al liberar separa más ({n(aso.AUC.max(), 3)}): es la causa más directa '
+      'del retraso y se conoce al liberar.', tam=10.5, color=GRIS)
+tarjeta(s, 14.0, 3.3, 10.2, 4.6, 'Auditoría de fuga', ['Cada grupo de variables, revisado contra el día de la '
+                                                       'liberación.',
+                                                       'Retiradas: los días de retraso, las fechas de entrada y de '
+                                                       'factura, los cambios de fecha posteriores y los maestros que el '
+                                                       'planificador ajusta después de ver retrasos.'], CREMA, tam_t=12,
+        tam_c=10)
+texto(s, 14.0, 8.2, 10.2, 0.6, 'Entidades: tasa encogida hacia su nivel superior', tam=11, color=VERDE, negrita=True)
+figura(s, 'f_te.png', 14.1, 8.9, w=9.8)
+texto(s, 14.0, 10.9, 10.2, 2.2, 'Se calcula fuera de pliegue y agrupada por orden: una posición no ve su propio '
+      'objetivo ni el de su orden. Un valor nuevo recibe la tasa de su padre (el proveedor, la de su región).',
+      tam=10, color=GRIS)
+pie(s, 'libro, capítulos 2b y 2c: resultados/eda/asociacion.csv; src/datos.py')
+notas(s, '0:30', 'A', 'criterio 2', 'Relaciones: la señal está repartida. Fuga: lo que se retiró y por qué, y la '
+      'codificación por objetivo fuera de pliegue, que es la fuga más fácil de cometer aquí.')
+
+# ============================================================== 8 TIEMPO
+s = nueva()
+cabecera(s, 'El tiempo importa: partir al azar mediría con datos ya vistos', 'CRITERIO 2  ·  DERIVA Y PARTICIÓN')
 figura(s, 'serie.png', 1.2, 3.2, w=11.6)
-texto(s, 1.3, 9.0, 11.6, 1.6, f'No es estacionaria: ADF no rechaza la raíz unitaria (p = {n(est["ADF"], 2)}) y KPSS '
-      f'rechaza la estacionariedad (p = {n(est["KPSS"], 3)}). Proveedores nuevos: {n(nue.loc["proveedor", "nuevo en validacion (%)"], 1)} '
-      f'% en 2025 y {n(nue.loc["proveedor", "nuevo en prueba (%)"], 1)} % en 2026.', tam=10.5, color=GRIS)
-texto(s, 1.3, 10.8, 11.6, 0.6, 'Entidades: codificación fuera de pliegue, por orden', tam=11,
-      color=VERDE, negrita=True)
-figura(s, 'f_te.png', 1.4, 11.5, h=1.5)
+texto(s, 1.3, 9.0, 11.6, 2.4, f'No es estacionaria: ADF no rechaza la raíz unitaria (p = {n(est["ADF"], 2)}) y KPSS '
+      f'rechaza la estacionariedad (p = {n(est["KPSS"], 3)}). Proveedores nuevos: '
+      f'{n(nue.loc["proveedor", "nuevo en validacion (%)"], 1)} % en 2025 y '
+      f'{n(nue.loc["proveedor", "nuevo en prueba (%)"], 1)} % en 2026.', tam=10.5, color=GRIS)
 figura(s, 'adversaria.png', 13.4, 3.2, w=10.8)
-texto(s, 13.4, 8.2, 10.8, 3.6, [
-    (f'Validación adversaria: un XGBoost intenta adivinar de qué conjunto viene cada posición.', {'negrita': True}),
+texto(s, 13.4, 8.2, 10.8, 4.9, [
+    ('Validación adversaria: un XGBoost intenta adivinar de qué conjunto viene cada posición.', {'negrita': True}),
     (f'Al azar no puede ({n(adv[2], 3)}). Por fecha acierta siempre ({n(adv[0], 3)}), y sigue en {n(adv[1], 3)} sin '
      'las variables que fechan la fila: muchas derivas pequeñas (IVA, región del centro, mezcla de líneas) bastan para '
      'reconocer el año.', {}),
     ('Por eso: partición cronológica, validación por ventanas crecientes y reentrenar con 2021-2025 antes de la prueba.',
      {'color': VERDE, 'negrita': True})], tam=10.5, espacio=5)
-pie(s, 5, 'libro, capítulo 2c (tiempo y fuga): resultados/eda/ y resultados/similitud/auc.csv')
-notas(s, '0:40', 'A', 'criterio 2', 'Tres pruebas de que el tiempo importa: la serie no es estacionaria, hay '
-      'entidades nuevas y la validación adversaria reconoce el año. Fuga: la codificación por objetivo va fuera de pliegue '
-      'y agrupada por orden, y se descartaron las variables registradas después de la liberación.')
+pie(s, 'libro, capítulo 2c (tiempo y fuga): resultados/eda/ y resultados/similitud/auc.csv')
+notas(s, '0:30', 'A', 'criterio 2', 'Tres pruebas de que el tiempo importa: la serie no es estacionaria, hay entidades '
+      'nuevas y la validación adversaria reconoce el año aun sin las variables de reloj.')
 
-# ============================================================== 6 TEORIA: OBJETIVO
+# ============================================================== 9 TEORIA I: MODELO Y PERDIDA
 s = nueva()
-cabecera(s, 'XGBoost suma árboles; cada uno es un paso de Newton', 'CRITERIO 3  ·  FORMULACIÓN, '
-         'PÉRDIDA Y OPTIMIZACIÓN')
-texto(s, 1.3, 3.2, 14.5, 0.6, 'El modelo: el log-odds es una suma de M árboles', tam=11.5, color=VERDE, negrita=True)
+cabecera(s, 'XGBoost: el log-odds como suma de árboles', 'CRITERIO 3  ·  FORMULACIÓN DEL ALGORITMO')
+texto(s, 1.3, 3.2, 14.5, 0.6, 'El modelo', tam=12, color=VERDE, negrita=True)
 figura(s, 'f_modelo.png', 1.4, 3.9, h=1.15)
-texto(s, 1.3, 5.35, 14.5, 0.6, 'La pérdida: log-pérdida (entropía cruzada binaria), convexa en F', tam=11.5,
+texto(s, 1.3, 5.3, 14.5, 1.6, 'Cada árbol f_m reparte el espacio de las predictoras en T hojas y da a cada hoja un peso '
+      'w_j. Los árboles se construyen en secuencia: el m corrige lo que los m − 1 anteriores todavía predicen mal.',
+      tam=10.5, color=GRIS)
+texto(s, 1.3, 7.1, 14.5, 0.6, 'La pérdida: menos la log-verosimilitud de Bernoulli', tam=12,
       color=VERDE, negrita=True)
-figura(s, 'f_perdida.png', 1.4, 6.0, h=0.62)
-texto(s, 1.3, 7.0, 14.5, 0.6, 'El objetivo del árbol m: pérdida más penalización de su complejidad', tam=11.5,
-      color=VERDE, negrita=True)
-figura(s, 'f_obj.png', 1.4, 7.7, h=1.15)
-texto(s, 1.3, 9.2, 14.5, 0.6, 'Taylor de segundo orden alrededor de la predicción actual', tam=11.5, color=VERDE,
+figura(s, 'f_perdida.png', 1.4, 7.8, h=0.62)
+texto(s, 1.3, 8.7, 14.5, 1.4, 'Es convexa en F y penaliza sin límite una probabilidad segura y equivocada: por eso '
+      'produce probabilidades, no solo un orden.', tam=10.5, color=GRIS)
+texto(s, 1.3, 10.3, 14.5, 0.6, 'El principio: descenso por gradiente en el espacio de funciones', tam=12, color=VERDE,
       negrita=True)
-figura(s, 'f_taylor.png', 1.4, 9.9, h=1.0)
-figura(s, 'f_gh.png', 1.4, 11.3, h=0.62)
-caja(s, 16.6, 3.3, 7.6, 9.8, VERDECL)
-texto(s, 17.1, 3.6, 6.6, 0.7, 'Qué es cada término', tam=12.5, color=VERDE, negrita=True)
-y = 4.6
-for t, c in [('f_m', 'un árbol de regresión: reparte x en T hojas con pesos w_j.'),
-             ('σ', 'la logística: pasa el log-odds F a probabilidad.'),
-             ('γ T', 'cobra por cada hoja; λ encoge los pesos hacia 0 (L2).'),
-             ('g_i', 'gradiente: el residuo con signo, p̂ − y.'),
-             ('h_i', 'hessiano: varianza de Bernoulli, alta donde el modelo duda.')]:
-    caja(s, 17.1, y + 0.14, 0.2, 0.2, VERDE)
-    texto(s, 17.7, y, 6.2, 1.5, [(t, {'negrita': True, 'color': VERDE}), (c, {'tam': 10})], tam=11)
-    y += 1.65
-pie(s, 6, 'libro, capítulo 7 (fundamentos de XGBoost); Chen y Guestrin (2016), Friedman (2001)')
-notas(s, '1:00', 'B', 'criterio 3', 'Boosting: descenso por gradiente en el espacio de funciones. Derivar en voz alta '
-      'g y h de la log-pérdida: dℓ/dF = p − y; d²ℓ/dF² = p(1 − p). Es lo que más preguntan.')
+texto(s, 1.3, 11.0, 14.5, 2.1, 'En vez de mover parámetros, cada iteración agrega una función (un árbol) en la '
+      'dirección que más baja la pérdida (Friedman, 2001). XGBoost usa además la curvatura: un paso de Newton '
+      '(Chen y Guestrin, 2016).', tam=10.5)
+tarjeta(s, 16.6, 3.3, 7.6, 4.7, 'Boosting', 'Árboles en secuencia, cada uno sobre los errores del anterior: baja el '
+        'sesgo. Pide regularización para no sobreajustar.', VERDECL, tam_t=12, tam_c=10.5)
+tarjeta(s, 16.6, 8.3, 7.6, 4.8, 'Bosque aleatorio', 'Árboles independientes y promediados: baja la varianza. Fue el '
+        'segundo de los 112; la diferencia está en corregir el error en vez de promediarlo.', CREMA, tam_t=12,
+        tam_c=10.5)
+pie(s, 'libro, capítulo 7 (fundamentos); Friedman (2001), Chen y Guestrin (2016)')
+notas(s, '1:15', 'B', 'criterio 3', 'Qué es el modelo, qué pérdida minimiza y por qué esa pérdida (Bernoulli). '
+      'Principio: gradiente en el espacio de funciones. Contraste con el bosque: sesgo contra varianza.')
 
-# ============================================================== 7 TEORIA: HOJAS Y CORTES
+# ============================================================== 10 TEORIA II: TAYLOR
 s = nueva()
-cabecera(s, 'Peso de hoja y ganancia de corte en forma cerrada', 'CRITERIO 3  ·  PRINCIPIO DE '
-         'OPTIMIZACIÓN')
+cabecera(s, 'Cada árbol minimiza una aproximación de segundo orden', 'CRITERIO 3  ·  PRINCIPIO DE OPTIMIZACIÓN')
+texto(s, 1.3, 3.2, 22.9, 0.6, 'El objetivo del árbol m: la pérdida más una penalización de su complejidad', tam=12,
+      color=VERDE, negrita=True)
+figura(s, 'f_obj.png', 1.4, 3.95, h=1.15)
+texto(s, 1.3, 5.4, 22.9, 0.6, 'Taylor de segundo orden alrededor de la predicción actual F_{m−1}', tam=12,
+      color=VERDE, negrita=True)
+figura(s, 'f_taylor.png', 1.4, 6.1, h=1.0)
+texto(s, 1.3, 7.5, 22.9, 0.6, 'Gradiente y hessiano de la log-pérdida: la derivación', tam=12, color=VERDE,
+      negrita=True)
+figura(s, 'f_deriv.png', 1.4, 8.25, w=21.5)
+figura(s, 'f_gh.png', 1.4, 9.75, h=0.62)
+tarjeta(s, 1.3, 10.8, 11.2, 2.3, 'g_i, el gradiente', 'El residuo con signo: positivo si el modelo sobreestima el '
+        'riesgo de una posición que llegó a tiempo.', VERDECL, tam_t=12, tam_c=10)
+tarjeta(s, 13.0, 10.8, 11.2, 2.3, 'h_i, el hessiano', 'La varianza de Bernoulli: grande donde el modelo duda (p̂ cerca '
+        'de 0,5) y pequeño donde ya está seguro.', CREMA, tam_t=12, tam_c=10)
+pie(s, 'libro, capítulo 7; Chen y Guestrin (2016)')
+notas(s, '1:15', 'B', 'criterio 3', 'Derivar en voz alta: σ′ = σ(1 − σ); dℓ/dF = σ − y; d²ℓ/dF² = σ(1 − σ). γ cobra por '
+      'hoja y λ encoge los pesos. Es la derivación que más preguntan.')
+
+# ============================================================== 11 TEORIA III: HOJAS Y CORTES
+s = nueva()
+cabecera(s, 'Peso de hoja y ganancia de corte en forma cerrada', 'CRITERIO 3  ·  CÓMO SE CONSTRUYE CADA ÁRBOL')
 texto(s, 1.3, 3.2, 11.0, 0.6, 'Peso óptimo de la hoja j', tam=11.5, color=VERDE, negrita=True)
 figura(s, 'f_w.png', 1.4, 3.95, h=1.35)
 texto(s, 1.3, 5.6, 11.0, 1.8, 'Con G_j y H_j la suma de g y h en la hoja, la aproximación es una parábola en w_j: su '
@@ -275,14 +373,14 @@ banda(s, 13.2, 10.2, 11.0, 2.8, [('Contraste: la logística  ', True, VERDE),
                                  ('minimiza la misma log-pérdida con una sola recta, convexa y con un único óptimo. No ve '
                                   'interacciones ni umbrales sin construirlos; XGBoost los encuentra con los cortes.',
                                   False, TINTA)], NIEBLA, tam=10.5)
-pie(s, 7, 'libro, capítulo 7; Chen y Guestrin (2016)')
-notas(s, '0:45', 'B', 'criterio 3', 'w* = −G/(H + λ) sale de derivar la parábola e igualar a cero. La ganancia compara '
+pie(s, 'libro, capítulo 7; Chen y Guestrin (2016)')
+notas(s, '1:15', 'B', 'criterio 3', 'w* = −G/(H + λ) sale de derivar la parábola e igualar a cero. La ganancia compara '
       'la pérdida óptima de las dos hojas hijas con la de la madre; γ es el costo de una hoja más.')
 
-# ============================================================== 8 TEORIA: REGULARIZACION Y COMPLEJIDAD
+# ============================================================== 12 TEORIA IV: REGULARIZACION Y COMPLEJIDAD
 s = nueva()
-cabecera(s, f'El ajuste crece casi lineal en n (exponente {n(expo, 2)})', 'CRITERIO 3  ·  '
-         'SUPUESTOS, REGULARIZACIÓN, COMPLEJIDAD Y GENERALIZACIÓN')
+cabecera(s, f'El ajuste crece casi lineal en n (exponente {n(expo, 2)})', 'CRITERIO 3  ·  SUPUESTOS, REGULARIZACIÓN, '
+         'COMPLEJIDAD Y GENERALIZACIÓN')
 filas_h = [['hiperparámetro', 'en la fórmula', 'qué controla'],
            ['n_estimators', 'M', 'capacidad y costo'],
            ['learning_rate', 'η', 'pasos cortos, mejor generalización'],
@@ -297,16 +395,16 @@ tarjeta(s, 1.3, 9.3, 7.4, 3.8, 'Supuestos', 'Filas independientes dado x (por es
 tarjeta(s, 9.0, 9.3, 7.4, 3.8, 'Complejidad', f'Ajuste O(M·D·n·d′) por histograma; predicción O(M·D). Medido: '
         f'{n(cxx.segundos_ajuste.iloc[-1])} s con {n(cxx.filas.iloc[-1])} filas; {n(cxx.ms_inferencia_por_1000.iloc[-1], 1)} ms '
         'por cada 1.000 predicciones.', CREMA, tam_t=12, tam_c=10)
-tarjeta(s, 16.7, 9.3, 7.5, 3.8, 'Generalización', 'Parada por presupuesto y validación por ventanas en el tiempo; una '
+tarjeta(s, 16.7, 9.3, 7.5, 3.8, 'Generalización', 'Regularización más validación por ventanas en el tiempo; una '
         'entidad nueva recibe la tasa de su nivel superior.', NIEBLA, tam_t=12, tam_c=10)
-pie(s, 8, 'libro, capítulo 7: resultados/complejidad.csv (tiempos medidos en srvgdai)')
-notas(s, '0:45', 'B', 'criterio 3', 'Cada hiperparámetro y dónde vive en la fórmula. Complejidad: teoría y medición '
-      f'coinciden; el exponente {n(expo, 2)} en log-log es casi lineal. Supuesto clave: independencia dado x.')
+pie(s, 'libro, capítulo 7: resultados/complejidad.csv (tiempos medidos en srvgdai)')
+notas(s, '1:15', 'B', 'criterio 3', 'Cada hiperparámetro y dónde vive en la fórmula. Complejidad: teoría y medición '
+      f'coinciden; el exponente {n(expo, 2)} en log-log es casi lineal. Supuesto clave: independencia dado x, que la '
+      'agrupación por orden protege.')
 
-# ============================================================== 9 DISENO
+# ============================================================== 13 DISENO
 s = nueva()
-cabecera(s, 'Hacia adelante en el tiempo, con el mismo presupuesto', 'CRITERIO 4  ·  '
-         'DISEÑO EXPERIMENTAL E IMPLEMENTACIÓN')
+cabecera(s, 'Hacia adelante en el tiempo, con el mismo presupuesto', 'CRITERIO 4  ·  DISEÑO EXPERIMENTAL')
 figura(s, 'f_112.png', 1.4, 3.4, w=12.8)
 bl = ['22-S1', '22-S2', '23-S1', '23-S2', '24-S1', '24-S2', '25-S1', '25-S2']
 for k, b in enumerate(bl):          # semestres desde 2021-S1: entrena k + 1, valida 1 adentro, evalúa el siguiente
@@ -317,39 +415,63 @@ for k, b in enumerate(bl):          # semestres desde 2021-S1: entrena k + 1, va
     texto(s, 1.3 + u * (k + 3) + 0.1, y + 0.03, 2.0, 0.45, b, tam=9.5, color=GRIS)
 rico(s, 1.3, 9.85, 13.0, 0.6, [('verde: entrena   ', True, VERDE), ('gris: valida adentro (elige hiperparámetros)   ',
                                 False, GRIS), ('oro: evalúa (bucle externo)', True, ORO)], tam=9.5)
-texto(s, 1.3, 10.9, 13.0, 2.2, f'4 balanceos: ninguno, SMOTE, ADASYN y pesos de clase, siempre dentro del pipeline y '
-      f'solo sobre el entrenamiento. 20 evaluaciones por optimizador y bloque. Total: {n(horas)} horas de CPU en un '
-      'servidor del grupo (srvgdai), con 30 trabajos a la vez.', tam=10.5)
-tarjeta(s, 15.0, 3.3, 9.2, 5.2, 'Reproducibilidad', ['Un script por paso en src/; semilla 2026 en todo.',
-                                                    'Preprocesador sin hiperparámetros, ajustado una vez por ventana.',
-                                                    '57 pruebas con pytest e integración continua en GitHub.',
-                                                    'Cada trabajo deja su JSON con parámetros y métricas.'],
-        VERDECL, tam_c=10.5)
-tarjeta(s, 15.0, 8.8, 9.2, 4.3, 'Decisiones computacionales', 'Matrices preprocesadas en float32 leídas con mmap, '
-        'para correr 30 trabajos a la vez; SMOTE y ADASYN calculados una vez por ventana; KNN sobre 30 componentes '
-        'principales.', CREMA, tam_c=10.5)
-pie(s, 9, 'libro, capítulo 5 (las 112): src/validacion.py, src/experimentos.py, tests/')
-notas(s, '0:45', 'B', 'criterio 4', 'Validación anidada: el externo mide, el interno elige. La prueba 2026 no entra. '
-      'Mismo presupuesto para comparar optimizadores de forma justa. Reproducibilidad: pruebas y CI.')
+texto(s, 1.3, 10.6, 13.0, 2.5, 'Bucle externo: 8 semestres, cada uno predicho con todo lo anterior. Bucle interno: el '
+      'último semestre de cada ventana elige los hiperparámetros. La prueba 2026 no entra en nada de esto.', tam=10.5)
+tarjeta(s, 15.0, 3.3, 9.2, 4.6, '4 balanceos', 'Ninguno, SMOTE, ADASYN y pesos de clase, siempre dentro del pipeline y '
+        'solo sobre el entrenamiento de cada ventana: lo sintético nunca llega a la evaluación.', VERDECL, tam_c=10.5)
+tarjeta(s, 15.0, 8.2, 9.2, 4.9, '4 optimizadores, mismo presupuesto', '20 evaluaciones por combinación y bloque para '
+        'Grid, Random, Optuna (TPE) y DEAP (genético). Medias y desviaciones salen de los 8 bloques externos.', CREMA,
+        tam_c=10.5)
+pie(s, 'libro, capítulo 5 (las 112): src/validacion.py, src/experimentos.py')
+notas(s, '1:00', 'B', 'criterio 4', 'Validación anidada: el externo mide, el interno elige. Mismo presupuesto para '
+      'comparar optimizadores de forma justa. La prueba 2026 se mira una vez, al final.')
 
-# ============================================================== 10 OPTIMIZADORES
+# ============================================================== 14 IMPLEMENTACION
 s = nueva()
-cabecera(s, 'Optuna llega antes; con 20 evaluaciones empatan los cuatro', 'CRITERIO 4  ·  '
-         'HIPERPARÁMETROS Y OPTIMIZADORES')
+cabecera(s, 'Implementación: un pipeline, un espacio de búsqueda y pruebas', 'CRITERIO 4  ·  IMPLEMENTACIÓN E '
+         'HIPERPARÁMETROS')
+rango = {'n_estimators': '100 a 600', 'learning_rate': '0,01 a 0,3 (log)', 'max_depth': '3 a 10',
+         'subsample': '0,5 a 1', 'colsample_bytree': '0,3 a 1', 'min_child_weight': '1 a 100 (log)'}
+filas_e = [['hiperparámetro', 'espacio', 'elegido (8 bloques)']]
+for c, rg in rango.items():
+    d = 0 if c in ('n_estimators', 'max_depth') else 2
+    filas_e.append([c, rg, f'{n(elegidos[c].min(), d)} a {n(elegidos[c].max(), d)}'])
+tabla(s, 1.3, 3.3, 12.6, 4.9, filas_e, anchos=[3.6, 3.2, 3.4], tam=10)
+texto(s, 1.3, 8.5, 12.6, 2.3, 'Con un semestre de entrenamiento gana un modelo de muchos árboles poco profundos; con '
+      'más datos la profundidad sube a 7-10 y el submuestreo baja. Cerca del óptimo la superficie es plana: '
+      'configuraciones distintas dan AUC a milésimas.', tam=10.5, color=GRIS)
+banda(s, 1.3, 11.0, 12.6, 2.1, [('Reproducible:  ', True, VERDE),
+                                (f'semilla 2026; un JSON por trabajo con parámetros y métricas; {n(horas)} horas de CPU '
+                                 'en el servidor del grupo, 30 trabajos a la vez.', False, TINTA)], NIEBLA, tam=10.5)
+tarjeta(s, 14.6, 3.3, 9.6, 4.8, 'Un solo pipeline de scikit-learn', ['preprocesador (log, imputación, one-hot, '
+                                                                    'codificación por objetivo) → balanceo → modelo;',
+                                                                    'el preprocesador se ajusta solo con el '
+                                                                    'entrenamiento de cada ventana.'], VERDECL,
+        tam_c=10.5)
+tarjeta(s, 14.6, 8.4, 9.6, 4.7, 'Pruebas e integración continua', '57 pruebas con pytest (codificación fuera de '
+        'pliegue, series, modelo servido, tablero, que no se publiquen identificadores) que corren en GitHub en cada '
+        'cambio.', CREMA, tam_c=10.5)
+pie(s, 'src/experimentos.py (ESPACIOS), resultados/experimentos/trabajos/*.json, tests/')
+notas(s, '1:00', 'B', 'criterio 4', 'Por qué ese espacio: rangos usuales de la literatura, escala logarítmica donde el '
+      'efecto es multiplicativo (tasa, peso mínimo). Decisiones computacionales: matrices preprocesadas en disco, SMOTE '
+      'calculado una vez por ventana.')
+
+# ============================================================== 15 TABLERO: LIDERES Y OPTIMIZADORES
+s = nueva()
+cabecera(s, 'Optuna llega antes; con 20 evaluaciones empatan los cuatro', 'CRITERIO 4  ·  PANTALLA EN VIVO: LAS 112')
 figura(s, 'optimizadores.png', 1.2, 3.2, w=12.6)
 filas_o = [['optimizador', 'AUC perdido a 5 evaluaciones', 'a 20']]
 for o in ['optuna', 'deap', 'random', 'grid']:
     filas_o.append([OPT[o], n(cur.loc[5, o], 4), n(cur.loc[20, o], 4)])
 tabla(s, 14.3, 3.4, 9.9, 3.3, filas_o, anchos=[2.6, 3.8, 1.8], tam=10.5)
-tarjeta(s, 14.3, 7.1, 9.9, 3.0, 'Optuna (TPE)', 'Modela qué zonas del espacio dieron buen AUC y propone donde la '
-        'mejora esperada es mayor: aprende de los ensayos anteriores.', VERDECL, tam_t=12, tam_c=10)
-tarjeta(s, 14.3, 10.3, 9.9, 2.8, 'DEAP (genético)', 'Selección, cruce, mutación y elitismo sobre una población de '
-        'configuraciones; llega tarde pero llega.', CREMA, tam_t=12, tam_c=10)
-pie(s, 10, 'libro, capítulo 5: data/modelos/curvas_optimizador.csv')
-notas(s, '0:45', 'B', 'criterio 4', 'Lectura: con poco presupuesto conviene Optuna; con 20 evaluaciones la superficie '
-      'es plana cerca del óptimo y los cuatro terminan a milésimas. El balanceo tampoco cambia el AUC.')
+en_vivo(s, 14.3, 7.1, 9.9, 6.0, ['Modelos → Las 112 combinaciones.', 'Tabla de líderes: las mejores combinaciones, con '
+                                 'media ± desviación del bucle externo.',
+                                 'Mapa balanceo × optimizador de XGBoost: el balanceo casi no mueve el AUC.'])
+pie(s, f'tablero, página Modelos ({URL["tablero"]}); data/modelos/curvas_optimizador.csv')
+notas(s, '1:00', 'A', 'criterio 4', 'Optuna (TPE) aprende de los ensayos y propone donde la mejora esperada es mayor; '
+      'DEAP llega tarde pero llega. Con poco presupuesto conviene Optuna; con 20 la superficie es plana.')
 
-# ============================================================== 11 RESULTADOS
+# ============================================================== 16 METRICAS Y COMPARACION
 s = nueva()
 cabecera(s, f'XGBoost gana los 8 bloques: AUC {n(top.AUC, 3)} contra {n(mejor.iloc[1].AUC, 3)}',
          'CRITERIO 5  ·  MÉTRICAS, LÍNEA BASE Y COMPARACIÓN')
@@ -358,26 +480,42 @@ for _, r in mejor.iterrows():
     filas_r.append([f'{NOMBRE[r.modelo]} · {BAL[r.balanceo]} · {OPT[r.optimizador]}',
                     f'{n(r.AUC, 3)} ± {n(r.AUC_desv, 3)}', n(r.PR_AUC, 3), n(r.F1, 3), n(r.ms_inferencia_por_1000, 1)])
 tabla(s, 1.3, 3.3, 13.6, 5.8, filas_r, anchos=[5.6, 2.6, 1.6, 1.4, 1.6], tam=10)
-figura(s, 'rangos_cd.png', 15.3, 3.2, w=8.9)
-wl = wil[wil.contra == 'logistica'].iloc[0]
-texto(s, 15.3, 9.35, 8.9, 1.6, [(f'Friedman: χ² = {n(fri.chi2, 1)}, p < 0,001.', {'negrita': True}),
-                               (f'Nemenyi no separa a XGBoost de la logística ni del bosque (diferencia crítica '
-                                f'{n(fri.CD, 2)}); Wilcoxon por pares sí: gana los 8 bloques, p de Holm = '
-                                f'{n(wl.p_holm, 3)}.', {})], tam=10, espacio=3)
-texto(s, 1.3, 9.4, 13.6, 1.1, 'Métricas: AUC ordena por riesgo (independiente del umbral), PR-AUC atiende a la '
-      'clase de interés, F1 mide la decisión al umbral; Brier y ECE, si la probabilidad es creíble.', tam=10,
-      color=GRIS)
+texto(s, 1.3, 9.4, 13.6, 1.1, 'AUC ordena por riesgo sin depender del umbral; PR-AUC atiende a la clase de interés; F1 '
+      'mide la decisión al umbral; Brier y ECE dicen si la probabilidad es creíble.', tam=10, color=GRIS)
 tabla(s, 1.3, 10.6, 13.6, 2.5, [['prueba 2026 (línea base)', 'AUC', 'F1', 'Brier'],
                                 ['regla del proveedor', n(rp['ROC-AUC'], 3), n(rp.F1, 3), n(rp.Brier, 3)],
                                 ['regresión logística', n(lb['ROC-AUC'], 3), n(lb.F1, 3), n(lb.Brier, 3)]],
       anchos=[5.6, 2.0, 2.0, 2.0], tam=10)
-pendiente(s, 15.3, 11.15, 8.9, 1.95, 'XGBoost en la prueba 2026 y la tabla de brecha validación-prueba de cada modelo.')
-pie(s, 11, 'libro, capítulos 4 y 5: data/modelos/lideres.csv, friedman.csv, wilcoxon.csv, metricas.csv')
-notas(s, '1:00', 'A', 'criterio 5', 'Media y desviación del bucle externo, 8 semestres. Ser precisos con las pruebas: '
-      'Friedman rechaza la igualdad; Nemenyi es conservador y no separa a los tres primeros; el Wilcoxon pareado con Holm '
-      'sí, porque XGBoost gana en cada bloque. La ganancia es de una centésima de AUC.')
+tarjeta(s, 15.6, 3.3, 8.6, 6.8, 'Cómo leer la tabla', ['Media y desviación de los 8 bloques externos: cada cifra se '
+                                                      'midió en un semestre que el modelo no vio.',
+                                                      'La línea base son la regla del proveedor (su tasa previa de '
+                                                      'retraso) y la logística, medidas en 2026.',
+                                                      'KNN predice 80 veces más lento que XGBoost: compara contra todo '
+                                                      'el entrenamiento.'], VERDECL, tam_c=10)
+pendiente(s, 15.6, 10.4, 8.6, 2.7, 'XGBoost en la prueba 2026 y la tabla de brecha validación-prueba de cada modelo.')
+pie(s, 'libro, capítulos 4 y 5: data/modelos/lideres.csv, metricas.csv')
+notas(s, '1:00', 'B', 'criterio 5', 'Por qué cada métrica. La ganancia de XGBoost es de una centésima de AUC frente al '
+      'bosque y la logística: real pero pequeña. La comparación en 2026 llega con la evaluación final.')
 
-# ============================================================== 12 ERRORES Y SOBREAJUSTE
+# ============================================================== 17 TABLERO: PREDICCION + CD
+s = nueva()
+wl = wil[wil.contra == 'logistica'].iloc[0]
+cabecera(s, 'Tablero: una predicción en vivo, y la prueba de diferencias', 'CRITERIO 5  ·  PANTALLA EN VIVO')
+captura(s, 'tablero_modelos.png', 1.3, 3.6, 11.4)
+banda(s, 1.3, 11.0, 11.4, 2.1, [('En vivo:  ', True, ORO_CL), ('cargar una posición real, cambiar el plazo hábil al liberar '
+                                 'y ver cómo se mueven el riesgo y sus contribuciones.', False, BLANCO)], VERDE, tam=10.5)
+figura(s, 'rangos_cd.png', 13.4, 3.2, w=10.8)
+texto(s, 13.4, 10.6, 10.8, 2.6, [(f'Friedman: χ² = {n(fri.chi2, 1)}, p < 0,001: los 7 modelos no rinden igual.',
+                                  {'negrita': True}),
+                                 (f'Nemenyi no separa a XGBoost de la logística ni del bosque (diferencia crítica '
+                                  f'{n(fri.CD, 2)}); Wilcoxon por pares sí: gana los 8 bloques, p de Holm = '
+                                  f'{n(wl.p_holm, 3)}.', {})], tam=10.5, espacio=4)
+pie(s, f'tablero, página Modelos; data/modelos/friedman.csv, wilcoxon.csv, rangos.csv')
+notas(s, '1:00', 'A', 'criterio 5', 'En vivo: la predicción la sirve hoy el modelo base (logística), con sus '
+      'contribuciones. Pruebas: Friedman rechaza la igualdad; Nemenyi es conservador con 8 bloques; el Wilcoxon pareado '
+      'con Holm separa porque XGBoost gana en cada bloque.')
+
+# ============================================================== 18 ERRORES Y SOBREAJUSTE
 s = nueva()
 gap = (xb.AUC_interno - xb.AUC).mean()
 cabecera(s, f'Sobreajuste bajo: {n(gap, 3)} de AUC entre interno y externo',
@@ -387,40 +525,65 @@ figura(s, 'aprendizaje.png', 12.6, 3.2, w=6.2)
 figura(s, 'calibracion.png', 19.0, 3.2, w=5.3)
 b25 = xb.set_index('bloque').loc['2025-S1']
 texto(s, 1.3, 9.3, 11.0, 1.6, f'El bloque 2025-S1 baja de {n(b25.AUC_interno, 3)} adentro a {n(b25.AUC, 3)} afuera: es el '
-      'semestre en que cambia la mezcla de 2025 (lámina 5), no un modelo que memoriza.', tam=10.5, color=GRIS)
+      'semestre en que cambia la mezcla de 2025 (diapositiva 8), no un modelo que memoriza.', tam=10.5, color=GRIS)
 texto(s, 12.6, 9.3, 11.6, 1.6, f'Logística (modelo base): {n(ca["AUC entrenamiento"], 3)} en entrenamiento y '
       f'{n(ca["AUC validación"], 3)} en validación con todas las filas; bien calibrada en 2026 (ECE {n(lb.ECE, 3)}).',
       tam=10.5, color=GRIS)
 pendiente(s, 1.3, 11.1, 22.9, 2.0, 'para el mejor modelo en 2026: matriz de confusión por línea de negocio, errores con '
           'entidades nuevas frente a conocidas, un falso negativo típico y SHAP (qué variables mueven cada predicción).')
-pie(s, 12, 'libro, capítulos 4 y 5: resultados/experimentos/por_bloque.csv, data/modelos/curva_aprendizaje.csv')
+pie(s, 'libro, capítulos 4 y 5: resultados/experimentos/por_bloque.csv, data/modelos/curva_aprendizaje.csv')
 notas(s, '1:00', 'B', 'criterio 5', 'Sobreajuste en dos vistas: interno contra externo por bloque y la curva de '
       'aprendizaje. Lo que falta del análisis de errores depende de la evaluación final en 2026; no se adelanta.')
 
-# ============================================================== 13 CONCLUSIONES
+# ============================================================== 19 CONCLUSIONES
 s = nueva()
-cabecera(s, 'El retraso se anticipa al liberar, con límites claros', 'CRITERIO 6  ·  CONCLUSIONES Y '
-         'LIMITACIONES')
-texto(s, 1.3, 3.2, 11.2, 0.6, 'Conclusiones', tam=13, color=VERDE, negrita=True)
-lista(s, 1.3, 4.0, 11.2, [
-    f'Se puede ordenar por riesgo al liberar: AUC {n(top.AUC, 3)} hacia adelante en el tiempo, contra '
+cabecera(s, 'El retraso se puede anticipar el día de la liberación', 'CRITERIO 6  ·  CONCLUSIONES')
+lista(s, 1.3, 3.4, 13.4, [
+    f'Se puede ordenar por riesgo al liberar: AUC {n(top.AUC, 3)} medido hacia adelante en el tiempo, contra '
     f'{n(rp["ROC-AUC"], 3)} de la regla del proveedor en 2026.',
     'La señal está en el plazo, el historial del proveedor y las entidades; ninguna variable sola basta.',
-    'XGBoost gana, pero por una centésima: la logística, más simple y calibrada, queda como alternativa defendible.',
-    'El optimizador importa con poco presupuesto; el balanceo casi no mueve el AUC.'], tam=11, paso=2.05, alto=1.9)
-texto(s, 13.2, 3.2, 11.0, 0.6, 'Limitaciones y mejoras', tam=13, color=TEJA, negrita=True)
-lista(s, 13.2, 4.0, 11.0, [
-    'Deriva: 2025 se distingue de 2021-2024 casi por completo; hay que reentrenar y vigilar.',
-    'La etiqueta de lo más reciente madura tarde (censura al final del periodo).',
-    'Maestros en foto actual, no con su vigencia histórica.',
-    'Una sola empresa: la generalización a otros grupos no está probada.',
-    f'Arranque en frío: {n(nue.loc["proveedor", "nuevo en prueba (%)"], 1)} % de proveedores nuevos en 2026.'],
-      tam=11, paso=1.75, alto=1.6)
-pie(s, 13, 'libro, capítulos 2 a 7')
-notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y decir los límites sin rodeos. Mejoras: el '
-      'modelo original del Entregable 3 ataca el arranque en frío y usa los días de retraso.')
+    'XGBoost gana, pero por una centésima: la logística, más simple y calibrada, es una alternativa defendible.',
+    'El optimizador importa con poco presupuesto; el balanceo casi no mueve el AUC.',
+    'La partición cronológica no es un detalle: al azar, el problema parecería más fácil de lo que es.'],
+      tam=11.5, paso=1.9, alto=1.8)
+filas_v = [['objetivo', 'cumplido'], ['comparar las 112 con el mismo presupuesto', 'sí'],
+           ['costo de las entidades nuevas', 'pendiente: 2026'], ['modelo servido en el tablero', 'sí, el modelo base']]
+tabla(s, 15.4, 3.4, 8.8, 4.0, filas_v, anchos=[5.0, 3.0], tam=10.5)
+banda(s, 15.4, 7.9, 8.8, 5.2, [('Para el negocio:  ', True, ORO_CL),
+                               (f'marcando el {pc(lb.marcadas, 0)} de las posiciones, el modelo base ve venir el '
+                                f'{pc(lb.sensibilidad, 0)} de las tardías de 2026. El comprador puede concentrar el '
+                                'seguimiento en un tercio de las órdenes.', False, BLANCO)], VERDE, tam=11.5)
+pie(s, 'libro, capítulos 2 a 7')
+notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo, sin adelantar '
+      'lo que depende de 2026.')
 
-# ============================================================== 14 PREGUNTAS
+# ============================================================== 20 LIMITACIONES Y MEJORAS
+s = nueva()
+cabecera(s, 'Límites: deriva, etiqueta que madura y una sola empresa', 'CRITERIO 6  ·  LIMITACIONES Y MEJORAS')
+tarjeta(s, 1.3, 3.3, 7.4, 9.8, 'Teóricas', ['Independencia dado x: las posiciones de una orden se parecen; se protege '
+                                           'agrupando, no se modela.',
+                                           'Estabilidad: el modelo supone que la relación de 2021-2025 vale en 2026.',
+                                           'Una sola etiqueta binaria desperdicia los días de retraso.'], VERDECL,
+        tam_t=12.5, tam_c=10.5)
+tarjeta(s, 9.0, 3.3, 7.4, 9.8, 'Empíricas', ['Deriva: 2025 se distingue de 2021-2024 casi por completo.',
+                                            'La etiqueta de lo más reciente madura tarde (censura al final del '
+                                            'periodo).',
+                                            'Maestros en foto actual, no con su vigencia histórica.',
+                                            f'Arranque en frío: {n(nue.loc["proveedor", "nuevo en prueba (%)"], 1)} % '
+                                            'de proveedores nuevos en 2026.',
+                                            'Una sola empresa: la generalización a otros grupos no está probada.'],
+        CREMA, tam_t=12.5, tam_c=10.5)
+tarjeta(s, 16.7, 3.3, 7.5, 9.8, 'Mejoras', ['Reentrenar por semestre y vigilar la deriva con la validación '
+                                           'adversaria.',
+                                           'Efectos aleatorios por proveedor y material para el arranque en frío.',
+                                           'Usar los días de retraso con cortes ordenados (el modelo original del '
+                                           'Entregable 3).',
+                                           'Maestros con vigencia por fecha.'], NIEBLA, tam_t=12.5, tam_c=10.5)
+pie(s, 'libro, capítulos 2c, 5 y 7')
+notas(s, '1:00', 'B', 'criterio 6', 'Separar lo teórico (supuestos del modelo) de lo empírico (los datos). Las mejoras '
+      'apuntan al modelo original.')
+
+# ============================================================== 21 PREGUNTAS
 s = nueva(VERDE)
 logo(s, 1.3, 1.4, 3.9, 3.0)
 texto(s, 1.3, 5.6, 22.0, 1.6, 'Preguntas', tam=40, color=BLANCO, negrita=True)
@@ -431,11 +594,13 @@ texto(s, 1.3, 12.2, 22.0, 0.8, 'Responden los dos autores (criterio 7: dominio i
 notas(s, '2:00', 'A y B', 'criterio 7', 'Preparar: derivar g, h y w*; por qué la codificación va fuera de pliegue; por '
       'qué la prueba no elige nada; por qué Nemenyi y Wilcoxon dicen cosas distintas; qué pasa con un proveedor nuevo.')
 
+assert _k[0] == N_TOTAL - 1, _k[0]
 prs.save(SAL)
 with open(os.path.join(AQUI, 'notas.md'), 'w', encoding='utf-8') as f:
     f.write('# Notas del expositor\n\nLas escribe `construir.py` (también van en las notas de cada diapositiva). '
-            'A = Daniel Carbonó, B = Luis Pérez; cada uno ensaya también lo del otro.\n\n'
-            '| # | min | criterio | expone | qué decir |\n|---|---|---|---|---|\n')
+            'A = Daniel Carbonó, B = Luis Pérez; cada uno ensaya también lo del otro. Rúbrica de 20 minutos: 18 de '
+            'exposición y 2 de preguntas.\n\n| # | min | criterio | expone | qué decir |\n|---|---|---|---|---|\n')
     for k, (m, e, c, t) in enumerate(NOTAS, 1):
         f.write(f'| {k} | {m} | {c} | {e} | {t} |\n')
-print(f'{len(prs.slides)} diapositivas en {SAL}')
+seg = sum(int(m.split(':')[0]) * 60 + int(m.split(':')[1]) for m, *_ in NOTAS[:-1])
+print(f'{len(prs.slides)} diapositivas en {SAL}; exposición {seg // 60}:{seg % 60:02d} más 2:00 de preguntas')

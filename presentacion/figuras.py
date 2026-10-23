@@ -63,6 +63,8 @@ FORMULAS = {
     'f_ganancia': r'\mathrm{ganancia} = \frac{1}{2}\left[\frac{G_L^2}{H_L+\lambda} + \frac{G_R^2}{H_R+\lambda} - \frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right] - \gamma',
     'f_eta': r'F_m = F_{m-1} + \eta\, f_m',
     'f_logit': r'\min_{\beta}\ \sum_i \ell(y_i,\, x_i^{\top}\beta) + \frac{1}{2C}\,\Vert\beta\Vert^2',
+    'f_bern': r'\ell(y, F) = -\log\left[\hat p^{\,y}(1-\hat p)^{1-y}\right],\qquad \hat p = \sigma(F)',
+    'f_deriv': r"\sigma\,'(F) = \sigma(1-\sigma)\ \Rightarrow\ \frac{\partial \ell}{\partial F} = -y(1-\sigma) + (1-y)\,\sigma = \sigma - y,\quad \frac{\partial^2 \ell}{\partial F^2} = \sigma(1-\sigma)",
     'f_112': r'7 \times 4 \times 4 = 112\ \mathrm{combinaciones} \times 8\ \mathrm{bloques} = 896\ \mathrm{trabajos}',
 }
 for k, v in FORMULAS.items():
