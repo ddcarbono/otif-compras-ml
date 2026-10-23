@@ -15,7 +15,7 @@ EDGE = next(p for p in (r'C:\Program Files (x86)\Microsoft\Edge\Application\msed
                         r'C:\Program Files\Microsoft\Edge\Application\msedge.exe') if os.path.exists(p))
 PERFIL = os.path.join(os.environ.get('TEMP', '.'), 'edge_captura_otif')   # perfil aparte: funciona con Edge abierto
 
-for nombre, ruta in [('contexto', '/'), ('eda', '/eda'), ('modelos', '/modelos')]:
+for nombre, ruta in [('contexto', '/'), ('eda', '/eda'), ('modelos', '/modelos?pestana=t-prediccion')]:
     salida = os.path.join(IMG, f'tablero_{nombre}.png')
     subprocess.run([EDGE, '--headless', '--disable-gpu', f'--user-data-dir={PERFIL}', '--hide-scrollbars',
                     '--window-size=1600,1000', '--virtual-time-budget=25000', f'--screenshot={salida}', URL + ruta],

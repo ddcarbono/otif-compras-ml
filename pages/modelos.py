@@ -208,106 +208,112 @@ def cifra(valor, texto):
                             className="h-100"), md=3, xs=6, className="mb-3")
 
 
-layout = html.Div([
-    html.H2("Modelos"),
-    dbc.Tabs([
-        dbc.Tab(html.Div([
-            html.H3("Modelo base: regresión logística"),
-            html.P("El modelo base es una regresión logística con penalización L2, con el mismo preprocesamiento que usarán los "
-                   "demás modelos: logaritmo con signo, imputación y estandarización en las numéricas, codificación one-hot en "
-                   "las categóricas y codificación jerárquica por objetivo en las entidades, todo dentro del pipeline. Se compara "
-                   "con dos líneas base: un clasificador que predice la tasa del entrenamiento y la regla de negocio de mirar la "
-                   "tasa previa de retraso del proveedor."),
-            dbc.Row([cifra(_n(LOG["ROC-AUC"]), "ROC-AUC de la logística en la prueba 2026"),
-                     cifra(_n(PRU.loc["Regla del proveedor", "ROC-AUC"]), "ROC-AUC de la regla del proveedor"),
-                     cifra(_n(LOG.F1), f"F1 al umbral {_n(LOG.umbral)}, fijado en la validación 2025"),
-                     cifra(_n(LOG.ECE), "error de calibración esperado (ECE)")]),
-            html.H4("Métricas en la prueba 2026"),
-            html.P(f"Intervalos al 95 % por bootstrap de órdenes ({RES['bootstrap']} remuestras): las posiciones de una misma "
-                   "orden no son independientes, así que se remuestrean órdenes completas. El umbral de cada modelo es el que "
-                   "maximiza el F1 en la validación 2025; la prueba se usó una sola vez.", className="small text-muted"),
-            tabla_metricas(),
-            html.H4("Discriminación", className="mt-4"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "ROC", PRU.reset_index()), config=CONFIG),
-                             lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "PR", PRU.reset_index()), config=CONFIG),
-                             lg=6)]),
-            html.P("Cómo leer: la curva ROC sube más rápido cuanto mejor ordena el modelo (la diagonal es el azar). La curva de precisión y sensibilidad dice, para cada fracción de las tardías que se quiera encontrar, qué fracción de las alertas acierta; su referencia es la prevalencia, no 0,5.", className="small text-muted"),
-            html.H4("Umbral y calibración"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.matriz_confusion(modelo("confusion"), LOG.umbral), config=CONFIG), lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.calibracion(modelo("calibracion")), config=CONFIG), lg=6)]),
-            html.P("Cómo leer: la matriz cuenta las posiciones de 2026 según lo que pasó (filas) y lo que dijo el modelo (columnas), con el porcentaje de cada fila. En la calibración, cada punto es un decil de probabilidad: si cae sobre la diagonal, «30 % de riesgo» quiere decir que llega tarde el 30 % de esas posiciones.", className="small text-muted"),
-            html.H4("Qué pesa en el modelo"),
-            html.P("Coeficientes del modelo final (entrenado con 2021-2025). Las numéricas están estandarizadas, así que el "
-                   "coeficiente es el cambio en log-odds por una desviación estándar; en las categóricas, frente a la media de "
-                   "las demás. El bloque de plazo es colineal (VIF de más de 300): sus coeficientes por separado no se leen como "
-                   "efectos, solo su suma.", className="small text-muted"),
-            html.Div([dbc.Label("Coeficientes a mostrar"),
-                      dcc.Slider(id="m-n-coef", min=10, max=40, step=10, value=20, marks={k: str(k) for k in (10, 20, 30, 40)})],
-                     style={"maxWidth": 360}),
-            dcc.Graph(id="m-coef", config=CONFIG),
-            html.H4("Hiperparámetro y tamaño de muestra"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.validacion_c(modelo("cv_C")), config=CONFIG), lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.curva_aprendizaje(modelo("curva_aprendizaje")), config=CONFIG), lg=6)]),
-            html.P(f"C = {RES['C']:g}, elegido con validación cruzada temporal dentro de 2021-2024 (entrena con los años "
-                   "anteriores y valida con el siguiente). La curva de aprendizaje mide el AUC en la validación 2025 con 10 %, "
-                   "25 %, 50 % y 100 % de las órdenes de entrenamiento.", className="small text-muted"),
-        ]), label="Línea base (logística)", tab_id="t-base", className="pt-3"),
-        dbc.Tab(html.Div([
-            html.H3("Las 112 combinaciones"),
-            html.P("Siete modelos × cuatro balanceos (ninguno, SMOTE, ADASYN, pesos de clase) × cuatro optimizadores (Grid, "
-                   "Random, Optuna, DEAP) con 20 evaluaciones cada uno, medidos en 8 bloques semestrales de 2022-S1 a 2025-S2: "
-                   "cada bloque entrena con todo lo anterior, elige hiperparámetros en el último semestre de su ventana y evalúa en "
-                   "el suyo. Son 896 ajustes; la prueba 2026 no se usa aquí."),
-            dbc.Row([cifra(f"{plots.MODELO[G.modelo]}", f"primero: {G.balanceo} · {plots.OPTIMIZADOR[G.optimizador]}"),
-                     cifra(f"{_n(G.AUC)} ± {_n(G.AUC_desv)}", "ROC-AUC medio en los 8 bloques"),
-                     cifra(f"{_n(G.F1)} ± {_n(G.F1_desv)}", "F1 medio en los 8 bloques"),
-                     cifra(f"{int(W.bloques_gana.min())} de 8", "bloques en que XGBoost le gana a cada uno de los otros modelos")]),
-            html.P("Escriba en la fila de filtro para buscar (por ejemplo, «SMOTE» en balanceo) y pulse los encabezados para "
-                   "ordenar.", className="small text-muted"),
-            tabla_lideres(),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.rangos_cd(modelo("rangos"), FR.CD, plots.MODELO), config=CONFIG), lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.auc_por_bloque(modelo("auc_por_bloque_modelos"), plots.MODELO),
-                                       config=CONFIG), lg=6)], className="mt-3"),
-            html.P("Cómo leer: a la izquierda, cada punto es el puesto medio de un modelo en los 8 bloques (1 = el mejor); los modelos dentro de la franja sombreada no se distinguen del primero según Nemenyi. A la derecha, el AUC de cada modelo en cada semestre: las líneas que suben y bajan juntas indican que la dificultad es del semestre, no del modelo.", className="small text-muted"),
-            html.P(f"Friedman sobre los 8 bloques con la mejor combinación de cada modelo (elegida por AUC interno): "
-                   f"χ² = {_n(FR.chi2, 1)}, p < 0,001. Nemenyi (diferencia crítica {_n(FR.CD, 2)}) solo separa a XGBoost del "
-                   f"árbol, KNN y Naive Bayes; la prueba de Wilcoxon pareada del mejor contra cada uno, con Holm, da p = "
-                   f"{_n(W.p_holm.max(), 3)} en las seis comparaciones: el mínimo posible con 8 bloques.", className="small text-muted"),
-            html.H4("Dentro de cada bloque: DeLong, intervalos BCa y delta de Cliff", className="mt-3"),
-            html.P("Con las predicciones de cada posición, la prueba de DeLong compara el AUC de XGBoost con el de cada rival en "
-                   "cada bloque (48 pruebas, con Holm). El intervalo BCa de la diferencia media remuestrea órdenes completas, "
-                   "porque las posiciones de una orden no son independientes (DeLong supone que sí). El delta de Cliff mide el "
-                   "tamaño: qué tan seguido el AUC de un bloque de XGBoost supera al de un bloque del rival. Combinaciones de "
-                   "la tabla de líderes.", className="small text-muted"),
-            tabla_pruebas(),
-            html.H4("XGBoost en validación: calibración y convergencia", className="mt-4"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=calibracion_xgb(), config=CONFIG), lg=6),
-                     dbc.Col(dcc.Graph(figure=plots.convergencia(modelo("convergencia_xgboost")), config=CONFIG), lg=6)]),
-            html.P("Cómo leer: a la izquierda, los puntos bajo la diagonal en los deciles altos y sobre ella en los bajos dicen "
-                   "que XGBoost exagera un poco en los extremos. A la derecha, el AUC de entrenamiento sigue subiendo con cada "
-                   "árbol mientras el del semestre externo se aplana: esa distancia es la brecha de sobreajuste.",
-                   className="small text-muted"),
-            dbc.Row([dbc.Col(dcc.Graph(figure=plots.arrepentimiento(modelo("curvas_optimizador"), "eval", plots.OPTIMIZADOR,
-                                                                    "Optimizadores: AUC perdido contra evaluaciones", "evaluación"),
-                                       config=CONFIG), lg=6),
-                     dbc.Col([dbc.Label("Mapa de un modelo"),
-                              dcc.Dropdown(id="m-mapa", options=[{"label": v, "value": k} for k, v in plots.MODELO.items()],
-                                           value="xgboost", clearable=False),
-                              dcc.Graph(id="m-mapa-fig", config=CONFIG)], lg=6)]),
-            html.P("Cómo leer: a la izquierda, cuánto AUC le falta a lo mejor encontrado hasta cada evaluación frente al mejor valor conocido (eje logarítmico: más abajo es mejor; la curva que baja antes llega antes). A la derecha, el AUC de cada combinación de balanceo y optimizador del modelo elegido: colores parejos quieren decir que esas decisiones no importan.", className="small text-muted"),
-            html.P("El modelo decide: dentro de cada modelo, sus 16 combinaciones de balanceo y optimizador no se separan más de "
-                   "0,012 de AUC, y entre modelos la diferencia llega a 0,12. Optuna y el genético se acercan antes al mejor "
-                   "valor conocido; con 20 evaluaciones los cuatro quedan a menos de 0,004.", className="small text-muted"),
-        ]), label="Las 112 combinaciones", tab_id="t-112", className="pt-3"),
-        dbc.Tab(pestana_2026(), label="Modelo óptimo", tab_id="t-2026", className="pt-3"),
-        dbc.Tab(pestana_original(), label="Modelo original", tab_id="t-original", className="pt-3"),
-        dbc.Tab(vista(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
-    ], active_tab="t-base"),
-    dbc.Alert("La predicción en vivo sirve XGBoost (el modelo óptimo de las 112) con Platt. El modelo original le gana "
-              "por 0,012 de AUC en 2026, pero necesita la historia de entregas de cada entidad, que no se publica.", color="light",
-              className="mt-3"),
-])
+PESTANAS = ("t-base", "t-112", "t-2026", "t-original", "t-prediccion")
+
+
+def layout(pestana="t-base", **_):
+    """La página; ``?pestana=t-prediccion`` abre otra pestaña (la usa ``presentacion/capturar_tablero.py``)."""
+    pestana = pestana if pestana in PESTANAS else "t-base"
+    return html.Div([
+        html.H2("Modelos"),
+        dbc.Tabs([
+            dbc.Tab(html.Div([
+                html.H3("Modelo base: regresión logística"),
+                html.P("El modelo base es una regresión logística con penalización L2, con el mismo preprocesamiento que usarán los "
+                       "demás modelos: logaritmo con signo, imputación y estandarización en las numéricas, codificación one-hot en "
+                       "las categóricas y codificación jerárquica por objetivo en las entidades, todo dentro del pipeline. Se compara "
+                       "con dos líneas base: un clasificador que predice la tasa del entrenamiento y la regla de negocio de mirar la "
+                       "tasa previa de retraso del proveedor."),
+                dbc.Row([cifra(_n(LOG["ROC-AUC"]), "ROC-AUC de la logística en la prueba 2026"),
+                         cifra(_n(PRU.loc["Regla del proveedor", "ROC-AUC"]), "ROC-AUC de la regla del proveedor"),
+                         cifra(_n(LOG.F1), f"F1 al umbral {_n(LOG.umbral)}, fijado en la validación 2025"),
+                         cifra(_n(LOG.ECE), "error de calibración esperado (ECE)")]),
+                html.H4("Métricas en la prueba 2026"),
+                html.P(f"Intervalos al 95 % por bootstrap de órdenes ({RES['bootstrap']} remuestras): las posiciones de una misma "
+                       "orden no son independientes, así que se remuestrean órdenes completas. El umbral de cada modelo es el que "
+                       "maximiza el F1 en la validación 2025; la prueba se usó una sola vez.", className="small text-muted"),
+                tabla_metricas(),
+                html.H4("Discriminación", className="mt-4"),
+                dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "ROC", PRU.reset_index()), config=CONFIG),
+                                 lg=6),
+                         dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("curvas"), "PR", PRU.reset_index()), config=CONFIG),
+                                 lg=6)]),
+                html.P("Cómo leer: la curva ROC sube más rápido cuanto mejor ordena el modelo (la diagonal es el azar). La curva de precisión y sensibilidad dice, para cada fracción de las tardías que se quiera encontrar, qué fracción de las alertas acierta; su referencia es la prevalencia, no 0,5.", className="small text-muted"),
+                html.H4("Umbral y calibración"),
+                dbc.Row([dbc.Col(dcc.Graph(figure=plots.matriz_confusion(modelo("confusion"), LOG.umbral), config=CONFIG), lg=6),
+                         dbc.Col(dcc.Graph(figure=plots.calibracion(modelo("calibracion")), config=CONFIG), lg=6)]),
+                html.P("Cómo leer: la matriz cuenta las posiciones de 2026 según lo que pasó (filas) y lo que dijo el modelo (columnas), con el porcentaje de cada fila. En la calibración, cada punto es un decil de probabilidad: si cae sobre la diagonal, «30 % de riesgo» quiere decir que llega tarde el 30 % de esas posiciones.", className="small text-muted"),
+                html.H4("Qué pesa en el modelo"),
+                html.P("Coeficientes del modelo final (entrenado con 2021-2025). Las numéricas están estandarizadas, así que el "
+                       "coeficiente es el cambio en log-odds por una desviación estándar; en las categóricas, frente a la media de "
+                       "las demás. El bloque de plazo es colineal (VIF de más de 300): sus coeficientes por separado no se leen como "
+                       "efectos, solo su suma.", className="small text-muted"),
+                html.Div([dbc.Label("Coeficientes a mostrar"),
+                          dcc.Slider(id="m-n-coef", min=10, max=40, step=10, value=20, marks={k: str(k) for k in (10, 20, 30, 40)})],
+                         style={"maxWidth": 360}),
+                dcc.Graph(id="m-coef", config=CONFIG),
+                html.H4("Hiperparámetro y tamaño de muestra"),
+                dbc.Row([dbc.Col(dcc.Graph(figure=plots.validacion_c(modelo("cv_C")), config=CONFIG), lg=6),
+                         dbc.Col(dcc.Graph(figure=plots.curva_aprendizaje(modelo("curva_aprendizaje")), config=CONFIG), lg=6)]),
+                html.P(f"C = {RES['C']:g}, elegido con validación cruzada temporal dentro de 2021-2024 (entrena con los años "
+                       "anteriores y valida con el siguiente). La curva de aprendizaje mide el AUC en la validación 2025 con 10 %, "
+                       "25 %, 50 % y 100 % de las órdenes de entrenamiento.", className="small text-muted"),
+            ]), label="Línea base (logística)", tab_id="t-base", className="pt-3"),
+            dbc.Tab(html.Div([
+                html.H3("Las 112 combinaciones"),
+                html.P("Siete modelos × cuatro balanceos (ninguno, SMOTE, ADASYN, pesos de clase) × cuatro optimizadores (Grid, "
+                       "Random, Optuna, DEAP) con 20 evaluaciones cada uno, medidos en 8 bloques semestrales de 2022-S1 a 2025-S2: "
+                       "cada bloque entrena con todo lo anterior, elige hiperparámetros en el último semestre de su ventana y evalúa en "
+                       "el suyo. Son 896 ajustes; la prueba 2026 no se usa aquí."),
+                dbc.Row([cifra(f"{plots.MODELO[G.modelo]}", f"primero: {G.balanceo} · {plots.OPTIMIZADOR[G.optimizador]}"),
+                         cifra(f"{_n(G.AUC)} ± {_n(G.AUC_desv)}", "ROC-AUC medio en los 8 bloques"),
+                         cifra(f"{_n(G.F1)} ± {_n(G.F1_desv)}", "F1 medio en los 8 bloques"),
+                         cifra(f"{int(W.bloques_gana.min())} de 8", "bloques en que XGBoost le gana a cada uno de los otros modelos")]),
+                html.P("Escriba en la fila de filtro para buscar (por ejemplo, «SMOTE» en balanceo) y pulse los encabezados para "
+                       "ordenar.", className="small text-muted"),
+                tabla_lideres(),
+                dbc.Row([dbc.Col(dcc.Graph(figure=plots.rangos_cd(modelo("rangos"), FR.CD, plots.MODELO), config=CONFIG), lg=6),
+                         dbc.Col(dcc.Graph(figure=plots.auc_por_bloque(modelo("auc_por_bloque_modelos"), plots.MODELO),
+                                           config=CONFIG), lg=6)], className="mt-3"),
+                html.P("Cómo leer: a la izquierda, cada punto es el puesto medio de un modelo en los 8 bloques (1 = el mejor); los modelos dentro de la franja sombreada no se distinguen del primero según Nemenyi. A la derecha, el AUC de cada modelo en cada semestre: las líneas que suben y bajan juntas indican que la dificultad es del semestre, no del modelo.", className="small text-muted"),
+                html.P(f"Friedman sobre los 8 bloques con la mejor combinación de cada modelo (elegida por AUC interno): "
+                       f"χ² = {_n(FR.chi2, 1)}, p < 0,001. Nemenyi (diferencia crítica {_n(FR.CD, 2)}) solo separa a XGBoost del "
+                       f"árbol, KNN y Naive Bayes; la prueba de Wilcoxon pareada del mejor contra cada uno, con Holm, da p = "
+                       f"{_n(W.p_holm.max(), 3)} en las seis comparaciones: el mínimo posible con 8 bloques.", className="small text-muted"),
+                html.H4("Dentro de cada bloque: DeLong, intervalos BCa y delta de Cliff", className="mt-3"),
+                html.P("Con las predicciones de cada posición, la prueba de DeLong compara el AUC de XGBoost con el de cada rival en "
+                       "cada bloque (48 pruebas, con Holm). El intervalo BCa de la diferencia media remuestrea órdenes completas, "
+                       "porque las posiciones de una orden no son independientes (DeLong supone que sí). El delta de Cliff mide el "
+                       "tamaño: qué tan seguido el AUC de un bloque de XGBoost supera al de un bloque del rival. Combinaciones de "
+                       "la tabla de líderes.", className="small text-muted"),
+                tabla_pruebas(),
+                html.H4("XGBoost en validación: calibración y convergencia", className="mt-4"),
+                dbc.Row([dbc.Col(dcc.Graph(figure=calibracion_xgb(), config=CONFIG), lg=6),
+                         dbc.Col(dcc.Graph(figure=plots.convergencia(modelo("convergencia_xgboost")), config=CONFIG), lg=6)]),
+                html.P("Cómo leer: a la izquierda, los puntos bajo la diagonal en los deciles altos y sobre ella en los bajos dicen "
+                       "que XGBoost exagera un poco en los extremos. A la derecha, el AUC de entrenamiento sigue subiendo con cada "
+                       "árbol mientras el del semestre externo se aplana: esa distancia es la brecha de sobreajuste.",
+                       className="small text-muted"),
+                dbc.Row([dbc.Col(dcc.Graph(figure=plots.arrepentimiento(modelo("curvas_optimizador"), "eval", plots.OPTIMIZADOR,
+                                                                        "Optimizadores: AUC perdido contra evaluaciones", "evaluación"),
+                                           config=CONFIG), lg=6),
+                         dbc.Col([dbc.Label("Mapa de un modelo"),
+                                  dcc.Dropdown(id="m-mapa", options=[{"label": v, "value": k} for k, v in plots.MODELO.items()],
+                                               value="xgboost", clearable=False),
+                                  dcc.Graph(id="m-mapa-fig", config=CONFIG)], lg=6)]),
+                html.P("Cómo leer: a la izquierda, cuánto AUC le falta a lo mejor encontrado hasta cada evaluación frente al mejor valor conocido (eje logarítmico: más abajo es mejor; la curva que baja antes llega antes). A la derecha, el AUC de cada combinación de balanceo y optimizador del modelo elegido: colores parejos quieren decir que esas decisiones no importan.", className="small text-muted"),
+                html.P("El modelo decide: dentro de cada modelo, sus 16 combinaciones de balanceo y optimizador no se separan más de "
+                       "0,012 de AUC, y entre modelos la diferencia llega a 0,12. Optuna y el genético se acercan antes al mejor "
+                       "valor conocido; con 20 evaluaciones los cuatro quedan a menos de 0,004.", className="small text-muted"),
+            ]), label="Las 112 combinaciones", tab_id="t-112", className="pt-3"),
+            dbc.Tab(pestana_2026(), label="Modelo óptimo", tab_id="t-2026", className="pt-3"),
+            dbc.Tab(pestana_original(), label="Modelo original", tab_id="t-original", className="pt-3"),
+            dbc.Tab(vista(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
+        ], active_tab=pestana),
+        dbc.Alert("La predicción en vivo sirve XGBoost (el modelo óptimo de las 112) con Platt. El modelo original le gana "
+                  "por 0,012 de AUC en 2026, pero necesita la historia de entregas de cada entidad, que no se publica.", color="light",
+                  className="mt-3"),
+    ])
 
 
 @callback(Output("m-mapa-fig", "figure"), Input("m-mapa", "value"))

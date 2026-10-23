@@ -65,6 +65,7 @@ d26 = leer(R, 'prueba_2026', 'diferencias.csv').iloc[0]
 s26 = leer(R, 'prueba_2026', 'segmentos.csv')
 s26 = s26[s26.modelo == 'XGBoost (las 112)'].set_index('valor')
 cr26 = leer(R, 'prueba_2026', 'criticas.csv').set_index('cifra')
+k26 = leer(R, 'prueba_2026', 'contrastes.csv').iloc[0]
 pub = pd.read_csv(os.path.join(AQUI, '..', 'original', 'publicos_otif_resumen.csv'))
 b26 = leer(R, 'prueba_2026', 'brecha.csv').set_index('modelo').loc['XGBoost (las 112)']
 f26 = leer(R, 'prueba_2026', 'confusion.csv').set_index(['real', 'predicho']).posiciones
@@ -523,7 +524,7 @@ wl = wil[wil.contra == 'logistica'].iloc[0]
 rb, rl = (pru.set_index('rival').loc[m] for m in ('random_forest', 'logistica'))
 cabecera(s, 'Tablero: una predicción en vivo, y la prueba de diferencias', 'CRITERIO 5  ·  PANTALLA EN VIVO')
 captura(s, 'tablero_modelos.png', 1.3, 3.6, 10.8)
-banda(s, 1.3, 11.0, 11.4, 2.1, [('En vivo:  ', True, ORO_CL), ('cargar una posición real, cambiar el plazo hábil al liberar '
+banda(s, 1.3, 11.0, 11.4, 2.1, [('En vivo (Modelos → Predicción):  ', True, ORO_CL), ('cargar una posición real, cambiar el plazo hábil al liberar '
                                  'y ver cómo se mueven el riesgo y sus contribuciones.', False, BLANCO)], VERDE, tam=10.5)
 figura(s, 'rangos_cd.png', 13.6, 2.7, w=10.4)
 texto(s, 13.4, 9.9, 10.8, 3.4, [(f'Friedman: χ² = {n(fri.chi2, 1)}, p < 0,001: los 7 modelos no rinden igual.',
@@ -591,7 +592,7 @@ tarjeta(s, 16.3, 3.3, 7.9, 6.4, 'Lectura', [f'Gana {(pub.veredicto == "K3 gana")
         VERDECL, tam_c=10)
 banda(s, 16.3, 10.0, 7.9, 3.1, [('Cuidado:  ', True, ORO_CL), ('esa separación se vio después de la segunda ronda; '
                                 'confirmarla pide una tercera fijada antes de correr.', False, BLANCO)], VERDE, tam=10.5)
-pie(s, 'libro, capítulo 10: original/publicos_otif_resumen.csv (OpenML)')
+pie(s, 'libro, capítulo 10: original/publicos_otif_resumen.csv (OpenML); tablero: Modelos → Modelo original')
 notas(s, '1:00', 'A', 'criterio 6', 'Responde «¿y en otros datos?». La ganancia de la propuesta en OTIF (0,012) depende de '
       'rasgos del caso: entidades con historia en el tiempo, desenlace continuo y plazo prometido. Airlines no trae el '
       'año: su partición es por mes. No decir que generaliza: es una hipótesis con apoyo.')
@@ -610,15 +611,17 @@ lista(s, 1.3, 3.4, 13.4, [
       tam=11.5, paso=1.9, alto=1.8)
 filas_v = [['objetivo', 'cumplido'], ['comparar las 112 con el mismo presupuesto', 'sí'],
            ['costo de las entidades nuevas', f'AUC {n(s26.loc["alguna nueva", "ROC-AUC"], 2)} contra '
-            f'{n(s26.loc["todo conocido", "ROC-AUC"], 2)}'], ['modelo servido en el tablero', 'sí, XGBoost']]
-tabla(s, 15.4, 3.4, 8.8, 4.0, filas_v, anchos=[5.0, 3.0], tam=10.5)
-banda(s, 15.4, 7.9, 8.8, 5.2, [('Para el negocio:  ', True, ORO_CL),
+            f'{n(s26.loc["todo conocido", "ROC-AUC"], 2)}'], ['modelo servido en el tablero', 'sí, XGBoost'],
+           ['modelo original contra el óptimo', f'+{n(k26["ΔROC-AUC"], 3)} de AUC [{n(k26.inf, 3)}; {n(k26.sup, 3)}]']]
+tabla(s, 15.4, 3.4, 8.8, 4.8, filas_v, anchos=[4.4, 3.6], tam=10.5)
+banda(s, 15.4, 8.6, 8.8, 4.5, [('Para el negocio:  ', True, ORO_CL),
                                (f'marcando el {pc(x26.marcadas, 0)} de las posiciones, XGBoost ve venir el '
                                 f'{pc(x26.sensibilidad, 0)} de las tardías de 2026. El comprador puede concentrar el '
                                 'seguimiento en un tercio de las órdenes.', False, BLANCO)], VERDE, tam=11.5)
 pie(s, 'libro, capítulos 2 a 10')
-notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo. La propuesta del '
-      'Entregable 3 le gana a XGBoost por 0,012 en 2026; se presenta aparte.')
+notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo. El modelo original '
+      'del Entregable 3 le gana al óptimo de las 112 por 0,012 en 2026 (pestaña Modelo original del tablero); el tablero '
+      'sirve el XGBoost porque la propuesta necesita la historia de entregas de cada entidad, que no se publica.')
 
 # ============================================================== 21 LIMITACIONES Y MEJORAS
 s = nueva()
