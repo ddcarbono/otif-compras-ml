@@ -1,5 +1,5 @@
 /* Paleta del proyecto (cinco colores): verde #405731, oro #B08A2D, azul #3F6F8F, gris #6B6B6B, marrón #7A5526 */
-:root { --verde: #405731; --oro: #B08A2D; --azul: #3F6F8F; --gris: #6B6B6B; --marron: #7A5526; }
+:root { --teja: #8C4A2D; --verde: #405731; --oro: #B08A2D; --azul: #3F6F8F; --gris: #6B6B6B; --marron: #7A5526; }
 body { color: #333333; background: #FAFAF8; }
 .navbar-otif { background-color: var(--verde) !important; }
 .navbar-otif .nav-link.active { border-bottom: 3px solid var(--oro); }
@@ -14,23 +14,26 @@ h2, h3, h4 { color: var(--verde); margin-top: 1.2rem; }
 .card { border-color: #E3E0D8; }
 
 /* FLATLY trae un aguamarina (#18BC9C) para success, enlaces y pestañas: se reemplaza en todo por el oro del proyecto.
-   El aviso (warning) pasa a marrón para que «alerta» y «sin alerta» no se confundan. */
+   El aviso (warning) pasa al rojo teja de la plantilla Uninorte (#8C4A2D): «alerta» y «sin alerta» no se confunden. */
 :root, [data-bs-theme=light] {
   --bs-success: #B08A2D; --bs-success-rgb: 176, 138, 45; --bs-success-text-emphasis: #4A3A13;
   --bs-success-bg-subtle: #F2E3BE; --bs-success-border-subtle: #D9C08A;
   --bs-link-color: #B08A2D; --bs-link-color-rgb: 176, 138, 45; --bs-link-hover-color: #7A5F1F;
   --bs-link-hover-color-rgb: 122, 95, 31;
-  --bs-warning: #7A5526; --bs-warning-rgb: 122, 85, 38;
+  --bs-warning: #8C4A2D; --bs-warning-rgb: 140, 74, 45;
 }
 a { color: var(--oro); } a:hover { color: #7A5F1F; }
 .alert-success { --bs-alert-bg: var(--oro); --bs-alert-color: #FFFFFF; --bs-alert-border-color: var(--oro);
   background-color: var(--oro); color: #FFFFFF; border-color: var(--oro); }
-.alert-warning { --bs-alert-bg: var(--marron); --bs-alert-color: #FFFFFF; --bs-alert-border-color: var(--marron);
-  background-color: var(--marron); color: #FFFFFF; border-color: var(--marron); }
+.alert-warning { --bs-alert-bg: var(--teja); --bs-alert-color: #FFFFFF; --bs-alert-border-color: var(--teja);
+  background-color: var(--teja); color: #FFFFFF; border-color: var(--teja); }
 .alert-success h4, .alert-warning h4 { color: #FFFFFF; }
 .btn-success { --bs-btn-bg: var(--oro); --bs-btn-border-color: var(--oro); --bs-btn-hover-bg: #7A5F1F;
   --bs-btn-hover-border-color: #7A5F1F; }
 .text-success { color: var(--oro) !important; } .bg-success { background-color: var(--oro) !important; }
 .nav-tabs .nav-link, .nav-link { color: var(--oro); } .nav-tabs .nav-link:hover { color: #7A5F1F; }
 .nav-tabs .nav-link.active { color: var(--verde); }
-.navbar-otif .nav-link { color: #FFFFFF; } .navbar-otif .nav-link.active, .navbar-otif .nav-link:hover { color: var(--oro) !important; }
+.navbar-otif .nav-link { color: #FFFFFF; } .navbar-otif .nav-link:hover { color: var(--oro) !important; }
+/* la página seleccionada: fondo blanco, letra verde y el filete oro debajo */
+.navbar-otif .nav-link.active { background: #FFFFFF; color: var(--verde) !important; border-radius: 4px 4px 0 0;
+  padding-left: .7rem !important; padding-right: .7rem !important; }
