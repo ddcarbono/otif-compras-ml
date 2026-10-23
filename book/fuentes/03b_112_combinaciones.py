@@ -162,8 +162,79 @@ tabla(legible(pd.read_csv(R / "wilcoxon.csv")).rename(columns={
 # %% [markdown]
 # XGBoost le gana a cada modelo en los ocho bloques, y la diferencia frente a los segundos es de 0,011 a 0,014 de AUC. Con
 # ocho pares, el p exacto más pequeño que puede dar Wilcoxon es 2/2⁸ = 0,0078; tras Holm queda en 0,047. La diferencia
-# es significativa al 5 %, pero en el límite de lo que ocho bloques pueden mostrar: decir más exigiría más bloques. Con
-# la prueba de DeLong sobre la prueba 2026 se medirá si esa ventaja se sostiene en un año nuevo.
+# es significativa al 5 %, pero en el límite de lo que ocho bloques pueden mostrar. Para decir más no hacen falta más
+# bloques: hace falta mirar dentro de cada uno, con las predicciones y no solo con el AUC.
+#
+# ### DeLong, delta de Cliff e intervalos BCa
+#
+# Friedman y Wilcoxon ven ocho números por modelo. Cada AUC sale de 33.000 a 42.000 posiciones, y con las
+# predicciones se puede preguntar en cada bloque si la diferencia supera lo que daría el azar. Para eso se reajustó la
+# mejor combinación de cada modelo de la tabla de líderes en cada bloque, con los hiperparámetros que ya había elegido
+# su optimizador (`src/puntajes.py`; 56 ajustes, cada uno con el mismo AUC que su trabajo hasta 1e-5). Las combinaciones
+# son las de mayor AUC externo medio, no las de mayor AUC interno que usó Friedman, y por eso XGBoost entra con Optuna
+# y no con el genético (0,852 frente a 0,851); en los demás modelos cambia el balanceo o el optimizador, y las medias se
+# mueven en la tercera cifra.
+#
+# - **DeLong** (DeLong, DeLong y Clarke-Pearson, 1988) compara dos AUC medidos sobre las mismas filas. El AUC es la
+#   proporción de pares (tardía, puntual) que el modelo ordena bien; DeLong estima su varianza y la covarianza entre los
+#   dos modelos a partir de la contribución de cada fila a esa proporción, y da un z para la diferencia. La
+#   implementación (`src/pruebas.py`, algoritmo de Sun y Xu, 2014) se validó contra `pROC::roc.test` de R: coincide
+#   hasta 1e-10 en seis casos sintéticos con empates y sin ellos (`tests/test_pruebas.py`) y en un bloque real (abajo).
+# - **El delta de Cliff** mide el tamaño de una diferencia sin suponer distribución: la proporción de pares (bloque de
+#   XGBoost, bloque del rival) en que gana XGBoost menos la proporción en que pierde. Va de −1 a 1; por la escala de
+#   Romano y otros (2006), es despreciable bajo 0,147, pequeño bajo 0,33, mediano bajo 0,474 y grande desde ahí. Compara
+#   las dos colecciones de ocho AUC sin parearlas, y por eso un 7 de 8 pareado puede quedar en un delta pequeño.
+# - **El intervalo BCa** (bootstrap corregido por sesgo y acelerado, Efron, 1987) toma los percentiles del bootstrap y
+#   los corrige por dos cosas: el sesgo de la mediana bootstrap frente a la estimación y la asimetría con que cambia el
+#   error estándar (la aceleración, estimada con jackknife). Aquí se remuestrean **órdenes** dentro de cada bloque
+#   (1.000 réplicas), porque las posiciones de una misma orden no son independientes.
+#
+# Esa última frase es también el límite de DeLong: supone filas independientes y, con posiciones agrupadas por orden,
+# su error estándar queda corto. Por eso el p de DeLong de cada bloque se lee junto con el intervalo BCa por órdenes,
+# que sí lo tiene en cuenta.
+
+# %%
+P = datos.RAIZ / "resultados" / "pruebas"
+v = pd.read_csv(P / "validacion_delong.csv")
+tabla(v.rename(columns={"fuente": "implementación", "AUC_1": "AUC XGBoost", "AUC_2": "AUC logística"}), dec=10)
+
+# %% [markdown]
+# En el bloque 2025-S2 (XGBoost contra la logística, unas 42.000 posiciones) la implementación propia y la de R dan los
+# mismos AUC, el mismo z y el mismo p hasta la décima cifra.
+#
+# Las 48 pruebas de DeLong (seis rivales por ocho bloques) llevan la corrección de Holm. El resumen por rival:
+
+# %%
+rs = pd.read_csv(P / "resumen.csv")
+rs = rs.assign(intervalo=[f"[{a:.4f}; {b:.4f}]".replace(".", ",") for a, b in zip(rs.dif_inf, rs.dif_sup)])
+tabla(legible(rs.rename(columns={"rival": "modelo"}))[
+    ["modelo", "bloques_gana", "bloques_delong_holm", "dif_AUC", "intervalo", "cliff", "magnitud"]].rename(columns={
+        "bloques_gana": "bloques que gana XGBoost", "bloques_delong_holm": "bloques con DeLong significativo (Holm, 5 %)",
+        "dif_AUC": "diferencia media de AUC", "intervalo": "BCa 95 %", "cliff": "δ de Cliff"}), dec=4)
+
+# %% [markdown]
+# - **Frente al árbol, KNN y Naive Bayes** no hay discusión: XGBoost gana en los ocho bloques, DeLong lo confirma en
+#   los ocho (z de 19 a 32 en el peor bloque de cada uno), el intervalo BCa de la diferencia queda lejos de cero y el
+#   delta de Cliff es grande.
+# - **Frente al bosque, la logística y el SVM** la ventaja es real pero chica. La diferencia media es de 0,009 a 0,013,
+#   y ningún intervalo BCa toca el cero: el más bajo, el del bosque, empieza en 0,006. DeLong la da por
+#   significativa en seis bloques frente al bosque y en siete frente a los otros dos. Donde no, XGBoost empata: con la logística y el SVM en 2022-S1 (−0,001 y +0,001), y con el
+#   bosque en 2024-S1 (+0,001) y 2025-S2 (−0,0004). En ningún bloque un rival le gana a XGBoost de forma significativa.
+# - **El delta de Cliff** con esos tres es pequeño (bosque, 0,25) o mediano (logística 0,34, SVM 0,38). La diferencia
+#   pareada es consistente, pero menor que la variación entre semestres: el peor bloque de XGBoost queda por debajo del
+#   mejor de cualquiera de los tres.
+
+# %%
+ab = pd.read_csv(P / "auc_bca.csv")
+ab = ab.assign(intervalo=[f"[{a:.4f}; {b:.4f}]".replace(".", ",") for a, b in zip(ab["inf"], ab["sup"])])
+tabla(legible(ab)[["modelo", "AUC", "intervalo"]].rename(columns={"AUC": "AUC medio (8 bloques)",
+                                                                   "intervalo": "BCa 95 %"}), dec=4)
+
+# %% [markdown]
+# El intervalo del AUC medio de XGBoost, [0,844; 0,857], apenas se cruza con el del bosque, [0,836; 0,848]. Los
+# intervalos de cada modelo por separado se solapan más que el de la diferencia, porque la diferencia es pareada: los
+# dos modelos suben y bajan juntos con el bloque, y esa variación se cancela al restar. Qué tan lejos llega esa ventaja
+# en un año que ningún modelo vio se mide en la prueba 2026.
 #
 # ## Los optimizadores
 #
@@ -205,7 +276,9 @@ mostrar(plots.costo(df, MODELO, BALANCEO))
 # ## Qué deja este capítulo
 #
 # El modelo es lo que decide, no el balanceo ni el optimizador. **XGBoost sin balanceo** queda primero, con ROC-AUC
-# 0,852 ± 0,020 y F1 0,676 ± 0,048 en los ocho bloques, y le gana a cada uno de los otros seis modelos en los ocho. El
+# 0,852 ± 0,020 y F1 0,676 ± 0,048 en los ocho bloques, y le gana a cada uno de los otros seis modelos. Frente a los
+# tres más cercanos (bosque, logística, SVM) la ventaja es de 0,009 a 0,013 de AUC, con un intervalo BCa por órdenes que
+# no toca el cero y un DeLong significativo en seis o siete de los ocho bloques; en el resto, empate. El
 # balanceo no aporta, y con 20 evaluaciones Optuna y el genético llegan más rápido a lo mismo que la rejilla y la búsqueda
 # aleatoria. Falta evaluar ese modelo una sola vez en la prueba 2026 (matriz de confusión, ROC, PR, calibración) y
 # explicarlo con SHAP.

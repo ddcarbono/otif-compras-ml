@@ -14,3 +14,5 @@ artifacts/logistica.joblib
 # Revision visual de las diapositivas (se rehace con exportar.py y mosaico.py)
 presentacion/render/
 presentacion/hoja.png
+# Puntajes por posicion de los 56 modelos (16 MB; los rehace src.puntajes en srvgdai). Lo que se publica es resultados/pruebas/
+resultados/puntajes/

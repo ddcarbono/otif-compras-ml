@@ -29,6 +29,9 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `src/optimizadores.py` | Grid, Random, Optuna (TPE) y DEAP (genético) con el mismo presupuesto de evaluaciones. |
 | `src/experimentos.py` | Las 112 combinaciones (7 modelos × 4 balanceos × 4 optimizadores) en los 8 bloques; reanudable. |
 | `src/comparar.py` | Resume los 896 trabajos: tabla de líderes, curvas de los optimizadores, Friedman, Nemenyi y Wilcoxon con Holm. `python -m src.comparar` |
+| `src/puntajes.py` | Reajusta la mejor combinación de cada modelo en cada bloque con los hiperparámetros ya elegidos y guarda el puntaje por posición (`resultados/puntajes/`); comprueba que el AUC coincide con el del trabajo. Corre en srvgdai (`srvgdai/puntajes.sh`). |
+| `src/pruebas.py` | DeLong para dos AUC pareados (validado contra `pROC::roc.test` con `src/validar_delong.R`), delta de Cliff e intervalo BCa con remuestreo de órdenes por bloque. |
+| `src/comparar_pruebas.py` | DeLong de XGBoost contra cada rival en los 8 bloques (Holm), AUC medio y diferencias con BCa 95 %, delta de Cliff, y la validación en un bloque real contra pROC. `python -m src.comparar_pruebas` |
 | `src/complejidad.py` | Tiempo de ajuste e inferencia de los 7 modelos contra el número de filas, con hiperparámetros fijos (exponente empírico). |
 | `src/similitud.py` | Validación adversaria: qué tan distinta es la evaluación del entrenamiento en la partición cronológica y en una aleatoria. |
 | `src/prediccion.py` | Prepara el modelo que sirve el tablero sin tablas de entidades (`artifacts/servido.joblib`), los ejemplos reales y los rangos de desarrollo. |
