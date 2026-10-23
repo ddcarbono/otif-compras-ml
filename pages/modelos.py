@@ -119,6 +119,7 @@ def pestana_2026():
                  cifra(f"+{_n(d.diferencia)}", f"de AUC sobre la logística [{_n(d['BCa inf'])}; {_n(d['BCa sup'])}]"),
                  cifra(_n(XG.ECE), "error de calibración esperado (ECE), con Platt")]),
         tarjeta_formula(1),
+        tarjeta_formula(3, None),
         tabla_simple(m),
         dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("p26_curvas"), "ROC", P26.reset_index()),
                                    config=CONFIG), lg=6),
@@ -191,6 +192,7 @@ def pestana_original():
                  cifra(f"+{_n(k0['ΔROC-AUC'])}", f"de AUC sobre el ganador de las 112 [{_n(k0.inf)}; {_n(k0.sup)}]"),
                  cifra(_n(pr.ECE), "error de calibración esperado (ECE)")]),
         tarjeta_formula(2),
+        tarjeta_formula(3, None),
         tabla_simple(m),
         html.H4("Modelo × información: la comparación 2 × 2", className="mt-4"),
         html.P("Separa lo que aporta el modelo de lo que aporta la información: cada modelo con las 136 variables del "
@@ -233,9 +235,16 @@ FORMULAS = [
     ("XGBoost: suma de árboles",
      r"$$F(x) = \sum_{m=1}^{M} \eta\, f_m(x)$$"
      r"$$\hat p(x) = \sigma\big(a\,F(x) + b\big)$$"
-     r"$$\min_{f_m} \sum_i \ell(y_i, \hat p_i) + \gamma T + \tfrac{1}{2}\lambda \textstyle\sum_j w_j^2$$",
-     "Cada árbol corrige lo que los anteriores predicen mal (g = p̂ − y). γ cobra cada hoja y λ encoge sus pesos. "
-     "a y b son la calibración de Platt, fijada en 2025."),
+     r"$$\min_{f_m} \sum_i \ell(y_i, \hat p_i) + \gamma T + \tfrac{1}{2}\lambda \textstyle\sum_j w_j^2$$"
+     r"$$g_i = \hat p_i - y_i, \qquad h_i = \hat p_i\,(1 - \hat p_i)$$"
+     r"$$w_j^* = -\frac{G_j}{H_j + \lambda}$$"
+     r"$$\text{ganancia} = \frac{1}{2}\left[\frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - "
+     r"\frac{(G_L + G_R)^2}{H_L + H_R + \lambda}\right] - \gamma$$",
+     "Cada árbol corrige lo que los anteriores predicen mal. g es el residuo con signo (positivo si el modelo "
+     "sobreestima el riesgo de una posición que llegó a tiempo) y h la varianza de Bernoulli: grande donde el modelo duda "
+     "(p̂ cerca de 0,5), pequeña donde ya está seguro. Con G y H, sus sumas en la hoja, el peso óptimo es un paso de "
+     "Newton, el gradiente sobre la curvatura, encogido por λ. Una hoja se parte en izquierda (L) y derecha (R) solo si "
+     "la ganancia es positiva: γ es el costo de cada hoja nueva. a y b son la calibración de Platt, fijada en 2025."),
     ("Modelo original: efectos por entidad y cortes ordenados",
      r"$$P(d_i > c \mid x_i) = \sigma\Big(f(x_i, c) + \sum_{e} b_{e(i)}\Big)$$"
      r"$$c \in \{0, 1, 5, 15\}, \qquad b_e \sim N(0, \sigma_e^2)$$"
@@ -246,13 +255,19 @@ FORMULAS = [
      "d son los días de retraso; se predice en c = 1. Cada b es un intercepto aleatorio por "
      "proveedor, material, solicitante y comprador, "
      "encogido hacia 0 si tiene pocas posiciones. Recibe además el plazo log-normal y las 32 variables de plazo real."),
+    ("Entidades: tasa encogida hacia su nivel superior",
+     r"$$\hat p(v) = \frac{\text{retrasos}(v) + M\,\hat p(\text{padre}(v))}{n(v) + M}, \qquad M = 20$$",
+     "Cada proveedor, material o persona entra como su tasa de retraso, encogida hacia la de su nivel superior (el "
+     "proveedor, la de su región): con pocas posiciones pesa la del padre, y un valor nuevo recibe la del padre. Se "
+     "calcula fuera de pliegue y agrupada por orden, para que una posición no vea su propio objetivo ni el de su orden. "
+     "La usan la logística y XGBoost para las 11 entidades; el original, para las 7 que no llevan efecto aleatorio."),
 ]
 
 
 def tarjeta_formula(i, titulo="Formulación"):
     """La formulación de un modelo (``FORMULAS[i]``): la fórmula a la izquierda y su lectura a la derecha."""
     t, f, d = FORMULAS[i]
-    return html.Div([html.H4(titulo, className="mt-4"), dbc.Card(dbc.CardBody(dbc.Row([
+    return html.Div([html.H4(titulo, className="mt-4") if titulo else None, dbc.Card(dbc.CardBody(dbc.Row([
         dbc.Col(dcc.Markdown(f.replace("$$$$", "$$\n\n$$"), mathjax=True, style={"overflowX": "auto"}), md=7),
         dbc.Col([html.H6(t), html.Small(d, className="text-muted")], md=5)])), className="mb-2")])
 
@@ -261,6 +276,7 @@ def formulacion():
     """La de la logística, con la log-pérdida que comparten los tres modelos y su gráfica interactiva."""
     return html.Div([
         tarjeta_formula(0),
+        tarjeta_formula(3, None),
         html.P("Los tres modelos (base, óptimo y original) estiman la misma probabilidad con la logística σ y minimizan "
                "la misma pérdida, la log-pérdida (menos la log-verosimilitud de Bernoulli); cambia la forma de la "
                "función.", className="mb-0"),
