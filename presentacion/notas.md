@@ -1,38 +1,20 @@
-# Notas del expositor: Entregable 2 (10 minutos)
+# Notas del expositor
 
-## 1. Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite (0:30)
+Las escribe `construir.py` (también van en las notas de cada diapositiva). A = Daniel Carbonó, B = Luis Pérez; cada uno ensaya también lo del otro.
 
-Presentarse y dar las tres direcciones: repositorio, libro y tablero (este último aún sin publicar). Una frase: predecir, el día en que sale la orden, si la posición llegará tarde.
-
-## 2. Estimamos la probabilidad de que cada posición llegue tarde y decidimos con un umbral elegido en validación (0:45)
-
-x_i son 136 predictoras conocidas el día de liberación; y_i es la etiqueta de retraso (tolerancia 1 día hábil). Se estima p(x) y se decide con un umbral τ. Se pone en validación para no mirar la prueba.
-
-## 3. Ninguna variable ordena sola por encima de 0,75 de AUC: la señal está repartida entre plazo, historial y entidad (1:30)
-
-ETL: de las tablas de SAP a una fila por posición, con la etiqueta y las 136 predictoras. Ver las diferencias por línea y clase, las mejores variables sueltas (ninguna pasa de 0,75) y que los vacíos son estructurales. Fuga: se descartaron variables registradas después del hecho; la codificación por objetivo va fuera de pliegue y agrupada por orden.
-
-## 4. La tasa de retraso se mueve en el tiempo, por eso se parte cronológicamente y nunca al azar (0:45)
-
-La serie mensual no es estacionaria (ADF y KPSS) y cambia de nivel entre 2021 y 2026. Por eso 2021-2024 entrena, 2025 valida y 2026 prueba. También hay entidades nuevas en validación y prueba que el modelo no vio. La etiqueta de lo más reciente madura tarde: es una limitación.
-
-## 5. El boosting minimiza la log-pérdida paso a paso con árboles; la logística hace lo mismo con una sola recta y un óptimo (2:00)
-
-Dos minutos. Boosting: cada árbol es un paso de descenso por gradiente sobre la log-pérdida en el espacio de funciones, usando gradiente y hessiano; el peso de hoja sale cerrado. Regularización: η, hojas, λ, α, submuestreo. Complejidad: histograma. Contraste: logística, convexa, un óptimo, L2/L1. El nombre exacto del mejor benchmark depende de los 112.
-
-## 6. Cada una de las 112 combinaciones se evalúa con el mismo presupuesto, hacia adelante en el tiempo (1:30)
-
-La prueba 2026 se usa una sola vez y no elige nada. La validación anidada evita que el optimizador vea la fila que se evalúa. Mismo presupuesto para comparar optimizadores de forma justa.
-
-## 7. LightGBM supera a la logística en 0,06 de AUC con las cifras de hoy (provisionales) (1:15)
-
-Hoy solo hay el ajuste de LightGBM, la logística y la regla del proveedor. Se muestran como provisionales. Los 112 darán las curvas de optimización, la tabla de líderes y el diagrama de diferencia crítica.
-
-## 8. Con entidades nuevas el AUC baja de 0,860 a 0,823: el costo del arranque en frío (provisional) (0:45)
-
-Calibración: lo predicho coincide con lo observado por decil. Con entidades nuevas el AUC baja. Pendiente: errores por línea, sobreajuste (brecha entrenamiento-validación) y SHAP para el mejor de los 112.
-
-## 9. El retraso se anticipa mejor que con la regla del proveedor, con límites claros de periodo, maestros y entidades nuevas (1:00)
-
-Cerrar con la respuesta y sus cifras (provisionales), y con las cuatro limitaciones: censura, maestros en foto actual, una sola empresa y entidades nuevas. Los dos autores responden preguntas.
-
+| # | min | criterio | expone | qué decir |
+|---|---|---|---|---|
+| 1 | 0:30 | criterio 1 | A | Presentarse los dos. Una frase: el día en que la orden se libera, predecir si cada posición llegará tarde. Las tres direcciones quedan en pantalla; el tablero se abre al final si hay tiempo. |
+| 2 | 0:50 | criterio 1 | A | Problema, unidad, x, y, p(x) y el umbral. Insistir: el umbral sale de 2025; la prueba 2026 se mira una vez. Por qué binaria: la decisión es binaria. |
+| 3 | 0:40 | criterio 2 | A | Fuente y estructura. La unidad independiente es la orden: por eso los pliegues se agrupan por orden. La partición es cronológica. |
+| 4 | 0:40 | criterio 2 | A | Lo más importante: ninguna variable sola es sospechosa (máximo 0,732) y los vacíos son estructurales, con su mecanismo. Los atípicos llegan más tarde: son información. |
+| 5 | 0:40 | criterio 2 | A | Tres pruebas de que el tiempo importa: la serie no es estacionaria, hay entidades nuevas y la validación adversaria reconoce el año. Fuga: la codificación por objetivo va fuera de pliegue y agrupada por orden, y se descartaron las variables registradas después de la liberación. |
+| 6 | 1:00 | criterio 3 | B | Boosting: descenso por gradiente en el espacio de funciones. Derivar en voz alta g y h de la log-pérdida: dℓ/dF = p − y; d²ℓ/dF² = p(1 − p). Es lo que más preguntan. |
+| 7 | 0:45 | criterio 3 | B | w* = −G/(H + λ) sale de derivar la parábola e igualar a cero. La ganancia compara la pérdida óptima de las dos hojas hijas con la de la madre; γ es el costo de una hoja más. |
+| 8 | 0:45 | criterio 3 | B | Cada hiperparámetro y dónde vive en la fórmula. Complejidad: teoría y medición coinciden; el exponente 0,91 en log-log es casi lineal. Supuesto clave: independencia dado x. |
+| 9 | 0:45 | criterio 4 | B | Validación anidada: el externo mide, el interno elige. La prueba 2026 no entra. Mismo presupuesto para comparar optimizadores de forma justa. Reproducibilidad: pruebas y CI. |
+| 10 | 0:45 | criterio 4 | B | Lectura: con poco presupuesto conviene Optuna; con 20 evaluaciones la superficie es plana cerca del óptimo y los cuatro terminan a milésimas. El balanceo tampoco cambia el AUC. |
+| 11 | 1:00 | criterio 5 | A | Media y desviación del bucle externo, 8 semestres. Ser precisos con las pruebas: Friedman rechaza la igualdad; Nemenyi es conservador y no separa a los tres primeros; el Wilcoxon pareado con Holm sí, porque XGBoost gana en cada bloque. La ganancia es de una centésima de AUC. |
+| 12 | 1:00 | criterio 5 | B | Sobreajuste en dos vistas: interno contra externo por bloque y la curva de aprendizaje. Lo que falta del análisis de errores depende de la evaluación final en 2026; no se adelanta. |
+| 13 | 1:00 | criterio 6 | A | Responder la pregunta con cifras y decir los límites sin rodeos. Mejoras: el modelo original del Entregable 3 ataca el arranque en frío y usa los días de retraso. |
+| 14 | 2:00 | criterio 7 | A y B | Preparar: derivar g, h y w*; por qué la codificación va fuera de pliegue; por qué la prueba no elige nada; por qué Nemenyi y Wilcoxon dicen cosas distintas; qué pasa con un proveedor nuevo. |

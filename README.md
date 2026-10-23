@@ -38,6 +38,7 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `artifacts/` | El modelo que sirve el tablero (`servido.joblib` y `servido.json`: transformaciones, modelo, umbral, versiones y métricas) y la ficha del modelo base. El *pipeline* completo no se publica: sus tablas de entidades llevan los códigos. |
 | `data/` | Lo liviano y anonimizado que usa el tablero: muestra de 30.000 posiciones, agregados, diccionario y resumen. |
 | `resultados/` | Tablas que calculan el libro (`resultados/eda/`) y los scripts de modelos (`resultados/modelo_base/`, `resultados/experimentos/` con un JSON por trabajo y `resultados/tabla_maestra.csv`) y que después leen el tablero y las láminas. |
+| `presentacion/` | Diapositivas de la sustentación (PPTX y PDF con la plantilla Uninorte), notas del expositor y guía de estudio; ver `presentacion/LEEME.md`. |
 | `assets/` | Estilos del tablero. |
 | `book/` | Libro en Jupyter Book. |
 | `book/fuentes/` | Capítulos como scripts en formato percent (`# %%`); `compilar.py` los convierte en cuadernos. |
