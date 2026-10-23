@@ -5,7 +5,7 @@
 # Cada una se evalúa en los ocho bloques semestrales de la validación anidada: 896 trabajos, que corrieron en un
 # servidor de 32 núcleos del 22 al 23 de octubre de 2026 (6,7 horas de reloj, 200,6 horas de CPU, 30 trabajos a la vez,
 # ningún error). El código está en `src/validacion.py`, `src/optimizadores.py` y `src/experimentos.py`; el resumen, en
-# `src/comparar.py`. La prueba 2026 no se usa en este capítulo.
+# `src/comparar.py`. La prueba 2026 solo aparece al final, para justificar la elección frente a la logística.
 
 # %% tags=["remove-cell"]
 import pandas as pd
@@ -407,3 +407,33 @@ tabla(pe.rename(columns={"puntaje_mediano": "puntaje", "proveedor_nuevo": "prove
 # no toca el cero y un DeLong significativo en seis o siete de los ocho bloques; en el resto, empate. El
 # balanceo no aporta, y con 20 evaluaciones Optuna y el genético llegan más rápido a lo mismo que la rejilla y la búsqueda
 # aleatoria. El capítulo siguiente lo mide en la prueba 2026 y lo explica con SHAP.
+#
+# **Por qué XGBoost y no la logística.** La logística es más simple y se lee coeficiente por coeficiente; la elección se
+# decide por lo que pasa en la operación. Un retraso y una falsa alarma no cuestan lo mismo: la alerta de más es una
+# llamada al proveedor, la tardía que no se vio puede dejar una planta esperando el material. Con el mismo esfuerzo de
+# revisión, el 20 % de las posiciones de mayor riesgo en la prueba 2026 (la medida del capítulo siguiente), XGBoost atrapa
+# más tardías, y una parte son de material que el mes anterior tenía el stock en cero:
+
+# %%
+cr = pd.read_csv(datos.RAIZ / "resultados" / "prueba_2026" / "criticas.csv").set_index("cifra")
+dos = lambda c: f"{cr.loc[c, 'total']:,.0f} [{cr.loc[c, 'BCa inf']:,.0f}; {cr.loc[c, 'BCa sup']:,.0f}]".replace(",", ".")
+tabla(pd.DataFrame({
+    "": ["Tardías atrapadas", "De ellas, con stock en cero"],
+    "XGBoost": [cr.loc["XGBoost: tardías atrapadas", "total"], cr.loc["XGBoost: críticas atrapadas", "total"]],
+    "Logística": [cr.loc["logística: tardías atrapadas", "total"], cr.loc["logística: críticas atrapadas", "total"]],
+    "Diferencia [BCa 95 %]": [dos("N: tardías de más"), dos("M: de ellas, con stock en cero")],
+    "Diferencia por mes": [cr.loc["N: tardías de más", "por mes"], cr.loc["M: de ellas, con stock en cero", "por mes"]]}),
+    dec=1, enteros=["XGBoost", "Logística"])
+
+# %% [markdown]
+# Son 347 tardías más en los diez meses, unas 35 por mes, y 166 de ellas (unas 17 por mes) de material sin stock. El
+# intervalo por órdenes de la primera no toca el cero; el de la segunda sí lo roza (−3), así que esa cifra es
+# indicativa. Esas tardías de más caen sobre todo en órdenes que ya tenían otra alerta (2.362 órdenes con una tardía
+# atrapada contra 2.407): la ventaja es por posición, que es lo que se recibe. La «crítica» se tomó del stock porque
+# las otras marcas posibles no sirven: la pieza crítica es constante en los datos y la razón cantidad/stock está vacía
+# en el 73 % de 2026. Ganar esas posiciones va en la dirección que busca el área, que compras responda a la planeación
+# y no a la urgencia. No hay datos del costo de una parada por falta de material, así que la ventaja no se lleva a
+# pesos. Y entrenar no es una restricción: 3,2 minutos, que permiten reentrenar cada mes.
+#
+# En los números de la validación: XGBoost gana a la logística en los ocho bloques (Wilcoxon con Holm, p = 0,047), con
+# delta de Cliff 0,34 (mediano), y en 2026 por 0,023 de AUC [0,017; 0,030], DeLong z = 22,5.

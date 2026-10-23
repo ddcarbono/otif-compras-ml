@@ -75,8 +75,7 @@ def main():
                             ("estabilidad/convergencia.csv", "convergencia_xgboost.csv")] + [
             (f"prueba_2026/{f}.csv", f"p26_{f}.csv") for f in ("metricas", "diferencias", "curvas", "calibracion",
                                                                 "confusion", "segmentos", "brecha", "shap_global",
-                                                                "dos_por_dos", "contrastes", "presupuesto",
-                                                                "forma_clase")]:
+                                                                "dos_por_dos", "contrastes", "criticas")]:
         f = datos.RAIZ / "resultados" / origen
         if f.exists():
             (sal / "modelos").mkdir(exist_ok=True)

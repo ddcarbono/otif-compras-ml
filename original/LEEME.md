@@ -13,6 +13,8 @@ viajan con el repositorio.
 | `mejorar_otif.py` | Validación por cuatro semestres (2024-S1 a 2025-S2) con la regla fijada antes de correr: intervalo sobre 0 y ganar en 3 de 4 semestres. Salida en `mejorar_otif.txt`. |
 | `evaluar_k3_otif.py` | K3: los efectos de cada semestre estimados solo con los anteriores, al entrenar. Su fase de validación congela `k3_congelado.json`. |
 | `evaluar_2x2_otif.py` | La comparación modelo × información en 2026. Su fase de validación congela `config_2x2/<celda>.json` (Platt y umbral, ajustados en 2025) antes de la prueba. Salida en `evaluar_2x2_otif_comparar.txt`. |
+| `publicos_otif.py` | K3 contra el XGBoost de las 112 en conjuntos públicos de OpenML, con el mismo protocolo (Optuna con 20 evaluaciones, una medida en la prueba, DeLong). Recibe la carpeta de los ARFF descargados. Salidas `publicos_otif.*` (primera ronda) y `publicos_otif_ronda2.*`. |
+| `resumir_publicos_otif.py` | Junta las dos rondas: Holm sobre los siete conjuntos y Wilcoxon. Salida en `publicos_otif_resumen.txt` y `.csv`. |
 
 Orden de ejecución:
 

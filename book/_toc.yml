@@ -21,6 +21,7 @@ parts:
   - caption: Modelo original
     chapters:
       - file: 05_modelo_original
+      - file: 06_validacion
   - caption: Referencia
     chapters:
       - file: glosario

@@ -64,9 +64,8 @@ x26 = m26.loc['XGBoost (las 112)']
 d26 = leer(R, 'prueba_2026', 'diferencias.csv').iloc[0]
 s26 = leer(R, 'prueba_2026', 'segmentos.csv')
 s26 = s26[s26.modelo == 'XGBoost (las 112)'].set_index('valor')
-p26 = leer(R, 'prueba_2026', 'presupuesto.csv')
-p26 = p26[p26.presupuesto == 0.2].set_index('modelo')
-c26 = leer(R, 'prueba_2026', 'costo.csv').set_index('modelo')
+cr26 = leer(R, 'prueba_2026', 'criticas.csv').set_index('cifra')
+pub = pd.read_csv(os.path.join(AQUI, '..', 'original', 'publicos_otif_resumen.csv'))
 b26 = leer(R, 'prueba_2026', 'brecha.csv').set_index('modelo').loc['XGBoost (las 112)']
 f26 = leer(R, 'prueba_2026', 'confusion.csv').set_index(['real', 'predicho']).posiciones
 cur = leer(MOD, 'curvas_optimizador.csv').pivot(index='eval', columns='optimizador', values='mean')
@@ -173,7 +172,7 @@ tarjeta(s, 17.4, 3.4, 6.8, 9.7, 'Objetivos',
          'Específico 1: comparar 7 modelos × 4 balanceos × 4 optimizadores con el mismo presupuesto.',
          'Específico 2: medir cuánto cuesta decidir con entidades nuevas (proveedor o material sin historia).',
          'Específico 3: dejar el modelo servido en un tablero con predicción en vivo.'], VERDECL, tam_c=10.5)
-pie(s, 'libro, introducción y literatura; capítulo 4 (modelo base): data/modelos/metricas.csv')
+pie(s, 'libro, introducción y literatura; capítulo 5 (modelo base): data/modelos/metricas.csv')
 notas(s, '0:45', 'A', 'criterio 1', 'El problema en una frase y su magnitud. La tercera cifra es del modelo base en '
       '2026 y ya está en el libro: marcando poco más de un tercio, se ven venir siete de cada diez tardías.')
 
@@ -201,7 +200,7 @@ tarjeta(s, 16.0, 3.3, 8.2, 4.6, 'Tarea', 'Clasificación binaria supervisada: la
 tarjeta(s, 16.0, 8.2, 8.2, 4.9, 'Por qué no regresión', 'La decisión del comprador es binaria: seguir la orden o no. '
         'Los días de retraso tienen colas muy largas y se usan como contexto; el modelo original del Entregable 3 los '
         'aprovecha con cortes ordenados.', CREMA, tam_c=10.5)
-pie(s, 'libro, capítulos 1 y 2a (definición de la etiqueta y de la población)')
+pie(s, 'libro, capítulos 1 y 2 (definición de la etiqueta y de la población)')
 notas(s, '1:00', 'A', 'criterio 1', 'x, y, el modelo Bernoulli, la log-pérdida como menos log-verosimilitud y el '
       'umbral. Insistir: τ sale de 2025 y 2026 no elige nada.')
 
@@ -245,7 +244,7 @@ texto(s, 1.3, 9.8, 13.0, 3.4, [('Las órdenes son la unidad independiente: '
                                 'Ninguna orden cruza particiones y toda validación cruzada agrupa por orden.', {}),
                                ('La partición es por la fecha de la orden, no al azar (diapositiva 8).', {'color': GRIS})],
       tam=11, espacio=6)
-pie(s, 'libro, capítulo 2a (datos); diccionario de variables en data/diccionario.csv')
+pie(s, 'libro, capítulo 2 (datos); diccionario de variables en data/diccionario.csv')
 notas(s, '0:45', 'A', 'criterio 2', 'Fuente y estructura. La unidad independiente es la orden: por eso los pliegues '
       'se agrupan por orden. La partición es cronológica.')
 
@@ -271,7 +270,7 @@ tarjeta(s, 14.8, 8.2, 9.4, 4.9, 'Faltantes estructurales', f'{int((falt["vacíos
         'de 50 % de vacíos, y no son azar: faltan porque la orden no tiene solicitud o no tiene imputación. Se marcan '
         'con indicadores tiene_* y se imputa la mediana; Δ tasa es la diferencia de retraso entre filas con y sin dato.',
         VERDECL, tam_t=12, tam_c=10)
-pie(s, 'libro, capítulo 2b (EDA): resultados/eda/univariado_numericas.csv, faltantes.csv, atipicos_if.csv')
+pie(s, 'libro, capítulo 3 (EDA): resultados/eda/univariado_numericas.csv, faltantes.csv, atipicos_if.csv')
 notas(s, '0:30', 'A', 'criterio 2', 'Distribuciones: colas largas, transformación justificada. Faltantes: el mecanismo '
       'es estructural, no aleatorio. Atípicos: tienen más retraso, se quedan.')
 
@@ -292,7 +291,7 @@ figura(s, 'f_te.png', 14.1, 8.9, w=9.8)
 texto(s, 14.0, 10.9, 10.2, 2.2, 'Se calcula fuera de pliegue y agrupada por orden: una posición no ve su propio '
       'objetivo ni el de su orden. Un valor nuevo recibe la tasa de su padre (el proveedor, la de su región).',
       tam=10, color=GRIS)
-pie(s, 'libro, capítulos 2b y 2c: resultados/eda/asociacion.csv; src/datos.py')
+pie(s, 'libro, capítulos 3 y 4: resultados/eda/asociacion.csv; src/datos.py')
 notas(s, '0:30', 'A', 'criterio 2', 'Relaciones: la señal está repartida. Fuga: lo que se retiró y por qué, y la '
       'codificación por objetivo fuera de pliegue, que es la fuga más fácil de cometer aquí.')
 
@@ -312,7 +311,7 @@ texto(s, 13.4, 8.2, 10.8, 4.9, [
      'reconocer el año.', {}),
     ('Por eso: partición cronológica, validación por ventanas crecientes y reentrenar con 2021-2025 antes de la prueba.',
      {'color': VERDE, 'negrita': True})], tam=10.5, espacio=5)
-pie(s, 'libro, capítulo 2c (tiempo y fuga): resultados/eda/ y resultados/similitud/auc.csv')
+pie(s, 'libro, capítulo 4 (tiempo y fuga): resultados/eda/ y resultados/similitud/auc.csv')
 notas(s, '0:30', 'A', 'criterio 2', 'Tres pruebas de que el tiempo importa: la serie no es estacionaria, hay entidades '
       'nuevas y la validación adversaria reconoce el año aun sin las variables de reloj.')
 
@@ -339,7 +338,7 @@ tarjeta(s, 16.6, 3.3, 7.6, 4.7, 'Boosting', 'Árboles en secuencia, cada uno sob
 tarjeta(s, 16.6, 8.3, 7.6, 4.8, 'Bosque aleatorio', 'Árboles independientes y promediados: baja la varianza. Fue el '
         'segundo de los 112; la diferencia está en corregir el error en vez de promediarlo.', CREMA, tam_t=12,
         tam_c=10.5)
-pie(s, 'libro, capítulo 7 (fundamentos); Friedman (2001), Chen y Guestrin (2016)')
+pie(s, 'libro, capítulo 8 (fundamentos); Friedman (2001), Chen y Guestrin (2016)')
 notas(s, '1:15', 'B', 'criterio 3', 'Qué es el modelo, qué pérdida minimiza y por qué esa pérdida (Bernoulli). '
       'Principio: gradiente en el espacio de funciones. Contraste con el bosque: sesgo contra varianza.')
 
@@ -360,7 +359,7 @@ tarjeta(s, 1.3, 10.8, 11.2, 2.3, 'g_i, el gradiente', 'El residuo con signo: pos
         'riesgo de una posición que llegó a tiempo.', VERDECL, tam_t=12, tam_c=10)
 tarjeta(s, 13.0, 10.8, 11.2, 2.3, 'h_i, el hessiano', 'La varianza de Bernoulli: grande donde el modelo duda (p̂ cerca '
         'de 0,5) y pequeño donde ya está seguro.', CREMA, tam_t=12, tam_c=10)
-pie(s, 'libro, capítulo 7; Chen y Guestrin (2016)')
+pie(s, 'libro, capítulo 8; Chen y Guestrin (2016)')
 notas(s, '1:15', 'B', 'criterio 3', 'Derivar en voz alta: σ′ = σ(1 − σ); dℓ/dF = σ − y; d²ℓ/dF² = σ(1 − σ). γ cobra por '
       'hoja y λ encoge los pesos. Es la derivación que más preguntan.')
 
@@ -384,7 +383,7 @@ banda(s, 13.2, 10.2, 11.0, 2.8, [('Contraste: la logística  ', True, VERDE),
                                  ('minimiza la misma log-pérdida con una sola recta, convexa y con un único óptimo. No ve '
                                   'interacciones ni umbrales sin construirlos; XGBoost los encuentra con los cortes.',
                                   False, TINTA)], NIEBLA, tam=10.5)
-pie(s, 'libro, capítulo 7; Chen y Guestrin (2016)')
+pie(s, 'libro, capítulo 8; Chen y Guestrin (2016)')
 notas(s, '1:15', 'B', 'criterio 3', 'w* = −G/(H + λ) sale de derivar la parábola e igualar a cero. La ganancia compara '
       'la pérdida óptima de las dos hojas hijas con la de la madre; γ es el costo de una hoja más.')
 
@@ -408,7 +407,7 @@ tarjeta(s, 9.0, 9.3, 7.4, 3.8, 'Complejidad', f'Ajuste O(M·D·n·d′) por hist
         'por cada 1.000 predicciones.', CREMA, tam_t=12, tam_c=10)
 tarjeta(s, 16.7, 9.3, 7.5, 3.8, 'Generalización', 'Regularización más validación por ventanas en el tiempo; una '
         'entidad nueva recibe la tasa de su nivel superior.', NIEBLA, tam_t=12, tam_c=10)
-pie(s, 'libro, capítulo 7: resultados/complejidad.csv (tiempos medidos en srvgdai)')
+pie(s, 'libro, capítulo 8: resultados/complejidad.csv (tiempos medidos en srvgdai)')
 notas(s, '1:15', 'B', 'criterio 3', 'Cada hiperparámetro y dónde vive en la fórmula. Complejidad: teoría y medición '
       f'coinciden; el exponente {n(expo, 2)} en log-log es casi lineal. Supuesto clave: independencia dado x, que la '
       'agrupación por orden protege.')
@@ -433,7 +432,7 @@ tarjeta(s, 15.0, 3.3, 9.2, 4.6, '4 balanceos', 'Ninguno, SMOTE, ADASYN y pesos d
 tarjeta(s, 15.0, 8.2, 9.2, 4.9, '4 optimizadores, mismo presupuesto', '20 evaluaciones por combinación y bloque para '
         'Grid, Random, Optuna (TPE) y DEAP (genético). Medias y desviaciones salen de los 8 bloques externos.', CREMA,
         tam_c=10.5)
-pie(s, 'libro, capítulo 5 (las 112): src/validacion.py, src/experimentos.py')
+pie(s, 'libro, capítulo 6 (las 112): src/validacion.py, src/experimentos.py')
 notas(s, '0:45', 'B', 'criterio 4', 'Validación anidada: el externo mide, el interno elige. Mismo presupuesto para '
       'comparar optimizadores de forma justa. La prueba 2026 se mira una vez, al final.')
 
@@ -503,14 +502,20 @@ tarjeta(s, 15.6, 3.3, 8.6, 6.8, 'Cómo leer la tabla', ['Media y desviación de 
                                                       'midió en un semestre que el modelo no vio.',
                                                       'La línea base son la regla del proveedor (su tasa previa de '
                                                       'retraso) y la logística, medidas en 2026.',
-                                                      'KNN predice 80 veces más lento que XGBoost: compara contra todo '
-                                                      'el entrenamiento.'], VERDECL, tam_c=10)
+                                                      f'Frente a la logística, con el mismo 20 % de alertas: '
+                                                      f'{n(cr26.loc["N: tardías de más", "por mes"])} tardías más por '
+                                                      f'mes, {n(cr26.loc["M: de ellas, con stock en cero", "por mes"])} '
+                                                      'de material sin stock.'], VERDECL, tam_c=10)
 tarjeta(s, 15.6, 10.4, 8.6, 2.7, 'De la validación a 2026', f'AUC interno {n(b26.iloc[0], 3)}, bloques externos '
         f'{n(b26.iloc[1], 3)}, prueba 2026 {n(b26.iloc[3], 3)}: no cae.', VERDECL, tam_c=10)
-pie(s, 'libro, capítulos 5 y 6: data/modelos/lideres.csv; resultados/prueba_2026/metricas.csv, brecha.csv')
+pie(s, 'libro, capítulos 6 y 7: data/modelos/lideres.csv; resultados/prueba_2026/metricas.csv, brecha.csv, criticas.csv')
 notas(s, '1:00', 'B', 'criterio 5', 'Por qué cada métrica. En los bloques la ganancia es de una centésima frente al '
       f'bosque y la logística. En 2026, medido una vez con lo congelado en 2025, XGBoost da {n(x26["ROC-AUC"], 3)} y le '
-      f'saca {n(d26.diferencia, 3)} a la logística. La brecha no muestra caída de la validación a la prueba.')
+      f'saca {n(d26.diferencia, 3)} a la logística. La brecha no muestra caída de la validación a la prueba. Por qué '
+      'XGBoost y no la logística: un retraso cuesta más que una falsa alarma, y con el mismo esfuerzo de revisión '
+      f'atrapa {n(cr26.loc["N: tardías de más", "total"])} tardías más en 2026 (BCa por órdenes '
+      f'[{n(cr26.loc["N: tardías de más", "BCa inf"])}; {n(cr26.loc["N: tardías de más", "BCa sup"])}]); las de material '
+      'sin stock tienen un intervalo que roza el cero. Entrenar tarda minutos: se puede reentrenar cada mes.')
 
 # ============================================================== 17 TABLERO: PREDICCION + CD
 s = nueva()
@@ -558,35 +563,38 @@ banda(s, 1.3, 11.1, 22.9, 1.7, [('Errores de XGBoost en 2026:  ', True, ORO_CL),
                                  f'{n(s26.loc["alguna nueva", "ROC-AUC"], 3)} con alguna entidad nueva; ganadería, '
                                  f'{n(s26.loc["ganaderia", "ROC-AUC"], 3)}. El falso negativo típico tenía plazo amplio y un '
                                  'proveedor puntual: el retraso se decide en la ejecución.', False, BLANCO)], VERDE, tam=10.5)
-pie(s, 'libro, capítulos 5 y 6: resultados/experimentos/por_bloque.csv, resultados/prueba_2026/segmentos.csv')
+pie(s, 'libro, capítulos 6 y 7: resultados/experimentos/por_bloque.csv, resultados/prueba_2026/segmentos.csv')
 notas(s, '0:45', 'B', 'criterio 5', 'Sobreajuste en dos vistas: interno contra externo por bloque y la curva de '
       'aprendizaje. En 2026, el error se concentra en las órdenes con entidades nuevas y en ganadería; el falso negativo '
       'típico no se podía ver al liberar.')
 
-# ============================================================== 19 POR QUE XGBOOST Y NO LA LOGISTICA
+# ============================================================== 19 LA PROPUESTA EN OTROS DATOS
 s = nueva()
-cabecera(s, 'Por qué XGBoost y no la logística, que es más simple', 'CRITERIO 5  ·  PARSIMONIA CON CIFRAS')
-px, pl = p26.loc['XGBoost'], p26.loc['Regresión logística']
-lista(s, 1.3, 3.3, 12.4, [
-    f'Significativa. 2026: {n(x26["ROC-AUC"], 3)} contra {n(lb["ROC-AUC"], 3)}, Δ {n(d26.diferencia, 3)} '
-    f'[{n(d26["BCa inf"], 3)}; {n(d26["BCa sup"], 3)}], DeLong z = {n(d26["z DeLong"], 1)}. Bloques: gana 8 de 8, '
-    'Wilcoxon-Holm p = 0,047, Cliff 0,34.',
-    f'Material. Con el 20 % de alertas atrapa {n(px["tardías atrapadas"])} tardías contra '
-    f'{n(pl["tardías atrapadas"])}: {n((px["tardías atrapadas"] - pl["tardías atrapadas"]) / px.meses)} más por mes. '
-    f'F1 {n(x26.F1, 3)} contra {n(lb.F1, 3)}.',
-    'Forma. Sin plazo, el riesgo sube 3,4 de logit en Generales y 2,4 en Producción Cluster; la logística da una sola '
-    'pendiente y una caída suave cerca de cero.',
-    f'Costo. Un ajuste: {n(c26.loc["xgboost", "segundos_un_ajuste"] / 60, 1)} min contra '
-    f'{n(c26.loc["logistica", "segundos_un_ajuste"])} s; mil predicciones: '
-    f'{n(c26.loc["xgboost", "ms_inferencia_por_1000"])} ms contra {n(c26.loc["logistica", "ms_inferencia_por_1000"], 1)}. '
-    'SHAP da la lectura.',
-    'Parsimonia. Se acepta lo complejo solo si gana significativa y materialmente: se cumple. La logística queda como '
-    'base legible.'], tam=10.5, paso=1.95, alto=1.9)
-figura(s, 'forma_plazo.png', 14.2, 3.2, w=10.0)
-pie(s, 'libro, capítulo 6: resultados/prueba_2026/diferencias.csv, presupuesto.csv, forma_clase.csv, costo.csv')
-notas(s, '1:00', 'A', 'criterio 5', 'Cinco razones con cifras. Si el negocio pusiera explicar cada coeficiente por encima '
-      'de atrapar tardías, la logística sería defendible: pierde 0,023 de AUC y unas 35 tardías por mes. Precisión: '
-      'las tardías de más caen en órdenes que ya tenían otra alerta.')
+cabecera(s, 'En otros datos, la propuesta gana donde hay historia por entidad', 'CRITERIO 6  ·  VALIDACIÓN EN CONJUNTOS PÚBLICOS')
+NPUB = {'airlines': 'Vuelos (Airlines)', 'amazon': 'Acceso (Amazon)', 'click': 'Publicidad (Click)',
+        'nyc_bus': 'Buses de Nueva York', 'zurich': 'Transporte de Zúrich', 'diabetes': 'Reingreso (Diabetes130US)',
+        'noshow': 'Citas no asistidas'}
+filas_p = [['conjunto', 'AUC XGBoost', 'AUC K3', 'Δ [IC 95 %]', 'p Holm', 'veredicto']]
+for _, r in pub.iterrows():
+    filas_p.append([NPUB[r.conjunto], n(r.auc_xgb, 3), n(r.auc_k3, 3), f'{n(r.dif, 3)} [{n(r.ic_lo, 3)}; {n(r.ic_hi, 3)}]',
+                    '< 0,001' if r.p_holm < 0.001 else n(r.p_holm, 3), r.veredicto])
+tabla(s, 1.3, 3.3, 14.4, 7.2, filas_p, anchos=[4.4, 1.8, 1.6, 3.6, 1.4, 1.8], tam=9.5)
+texto(s, 1.3, 10.7, 14.4, 2.4, 'Mismo protocolo para los dos: Optuna con 20 evaluaciones en validación, una medida en la '
+      'prueba, DeLong pareado con Holm sobre los siete. La segunda ronda (filas 4 a 7) se eligió con un criterio fijado '
+      'antes de correr. El plazo log-normal y las variables nuevas no aplican fuera de OTIF.', tam=10, color=GRIS)
+tarjeta(s, 16.3, 3.3, 7.9, 6.4, 'Lectura', [f'Gana {(pub.veredicto == "K3 gana").sum()}, empata '
+                                           f'{(pub.veredicto == "empate").sum()}, pierde '
+                                           f'{(pub.veredicto == "K3 pierde").sum()}; Wilcoxon p = 0,81: no hay '
+                                           'superioridad general.',
+                                           'Gana donde la entidad vuelve (el paciente), como el proveedor en OTIF.',
+                                           'Empata en transporte; pierde sin tiempo ni desenlace continuo.'],
+        VERDECL, tam_c=10)
+banda(s, 16.3, 10.0, 7.9, 3.1, [('Cuidado:  ', True, ORO_CL), ('esa separación se vio después de la segunda ronda; '
+                                'confirmarla pide una tercera fijada antes de correr.', False, BLANCO)], VERDE, tam=10.5)
+pie(s, 'libro, capítulo 10: original/publicos_otif_resumen.csv (OpenML)')
+notas(s, '1:00', 'A', 'criterio 6', 'Responde «¿y en otros datos?». La ganancia de la propuesta en OTIF (0,012) depende de '
+      'rasgos del caso: entidades con historia en el tiempo, desenlace continuo y plazo prometido. Airlines no trae el '
+      'año: su partición es por mes. No decir que generaliza: es una hipótesis con apoyo.')
 
 # ============================================================== 20 CONCLUSIONES
 s = nueva()
@@ -608,7 +616,7 @@ banda(s, 15.4, 7.9, 8.8, 5.2, [('Para el negocio:  ', True, ORO_CL),
                                (f'marcando el {pc(x26.marcadas, 0)} de las posiciones, XGBoost ve venir el '
                                 f'{pc(x26.sensibilidad, 0)} de las tardías de 2026. El comprador puede concentrar el '
                                 'seguimiento en un tercio de las órdenes.', False, BLANCO)], VERDE, tam=11.5)
-pie(s, 'libro, capítulos 2 a 9')
+pie(s, 'libro, capítulos 2 a 10')
 notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo. La propuesta del '
       'Entregable 3 le gana a XGBoost por 0,012 en 2026; se presenta aparte.')
 
@@ -634,7 +642,7 @@ tarjeta(s, 16.7, 3.3, 7.5, 9.8, 'Mejoras', ['Reentrenar por semestre y vigilar l
                                            'Usar los días de retraso con cortes ordenados (el modelo original del '
                                            'Entregable 3).',
                                            'Maestros con vigencia por fecha.'], NIEBLA, tam_t=12.5, tam_c=10.5)
-pie(s, 'libro, capítulos 2c, 5 y 7')
+pie(s, 'libro, capítulos 4, 6 y 9')
 notas(s, '1:00', 'B', 'criterio 6', 'Separar lo teórico (supuestos del modelo) de lo empírico (los datos). Las mejoras '
       'apuntan al modelo original.')
 

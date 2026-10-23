@@ -95,9 +95,7 @@ def pestana_2026():
     d = DIF.iloc[0]
     m = P26.reset_index()[["modelo", "ROC-AUC", "ROC-AUC inf", "ROC-AUC sup", "PR-AUC", "F1", "precisión",
                            "sensibilidad", "ECE", "umbral"]]
-    pr = modelo("p26_presupuesto")
-    pr = pr[pr.presupuesto == 0.2][["modelo", "alertas", "tardías atrapadas", "precisión",
-                                    "órdenes con una tardía atrapada", "tardías atrapadas por mes"]]
+    cr = modelo("p26_criticas")[["cifra", "total", "BCa inf", "BCa sup", "por mes"]]
     k = modelo("p26_contrastes")[["contraste", "ΔROC-AUC", "inf", "sup"]]
     return html.Div([
         html.H3("XGBoost en la prueba 2026"),
@@ -123,17 +121,12 @@ def pestana_2026():
                "proveedor. A la derecha, las posiciones de 2026 según lo que pasó y lo que dijo el modelo.",
                className="small text-muted"),
         html.H4("¿Por qué XGBoost y no la logística?"),
-        html.P("Gana de forma significativa (ΔAUC 0,023 en 2026; en los 8 bloques gana los 8, con DeLong significativo "
-               "en 7) y material: con el mismo presupuesto de alertas, el 20 % de mayor riesgo, atrapa más tardías.",
-               className="small text-muted"),
-        tabla_simple(pr, 3),
-        dcc.Graph(figure=plots.forma_plazo(modelo("p26_forma_clase"), "clase de compras",
-                                           ["Generales", "Servicios", "Produccion Cluster"]), config=CONFIG),
-        html.P("Cómo leer: el efecto del plazo al liberar sobre el logit. La logística (punteada) le da la misma "
-               "pendiente a todas las clases de compra; XGBoost (llena) encuentra que sin plazo el riesgo sube más en "
-               "Generales que en Producción Cluster, y que la caída es brusca al pasar de cero a uno o dos días. Cuesta "
-               "17 ms predecir mil posiciones, contra 0,7 de la logística: nada para el volumen de compras.",
-               className="small text-muted"),
+        html.P("Un retraso no visto cuesta más que una falsa alarma. Con el mismo esfuerzo de revisión, el 20 % de "
+               "posiciones de mayor riesgo en 2026, XGBoost atrapa más tardías; «con stock en cero» es material que el "
+               "mes anterior no tenía existencias. Intervalos BCa por órdenes; el de las críticas roza el cero. Entrenar "
+               "tarda minutos: se puede reentrenar cada mes. En los 8 bloques gana los 8 (Wilcoxon-Holm 0,047, Cliff "
+               "0,34).", className="small text-muted"),
+        tabla_simple(cr, 1),
         html.H4("La propuesta original: modelo × información", className="mt-4"),
         html.P("La propuesta del Entregable 3 (efectos aleatorios por entidad, plazo log-normal y 32 variables de plazo "
                "real) frente al ganador de las 112, con y sin la información nueva. Diferencias de ROC-AUC en pareja.",

@@ -2,8 +2,8 @@
 # # El mejor modelo en la prueba 2026
 #
 # XGBoost sin balanceo con Optuna ganó las 112 combinaciones en los ocho bloques de validación. Este capítulo lo mide en
-# la prueba 2026, que ningún modelo usó para elegir nada, lo explica con SHAP y responde por qué se prefiere a la
-# regresión logística, que es más simple y queda cerca.
+# la prueba 2026, que ningún modelo usó para elegir nada, y lo explica con SHAP. Por qué se prefiere a la regresión
+# logística está al final del capítulo anterior.
 #
 # **Lo que se fijó antes de mirar 2026.** Los hiperparámetros son los que eligió Optuna en el bloque más reciente
 # (2025-S2). Con ellos, el modelo se entrenó con 2021-2024 y se ajustaron en la validación 2025 la calibración de Platt y
@@ -123,78 +123,10 @@ tabla(sl.drop(columns="base"), dec=3)
 # - **Falso positivo** (0,46): el plazo amplio (29 días) baja el riesgo, pero el proveedor, con un retraso medio previo de
 #   11 días, lo sube; esa vez cumplió.
 #
-# ## ¿Por qué XGBoost y no la logística?
-#
-# La logística es más simple, se lee coeficiente por coeficiente y queda a 0,023 de AUC. La regla que se aplica es la
-# parsimonia: se prefiere el modelo más simple salvo que el complejo gane de forma **significativa** y **material**. Las
-# cinco razones, con cifras.
-#
-# **1. La diferencia es estadística.** En 2026, 0,848 contra 0,825: ΔAUC 0,023 con BCa por órdenes [0,017; 0,030] y
-# DeLong pareado z = 22,5. En los ocho bloques (con la logística de las 112), 0,852 contra 0,839: XGBoost gana los ocho
-# bloques (Wilcoxon con Holm, p = 0,047), DeLong es significativo en siete, la diferencia media es 0,012 con BCa
-# [0,007; 0,016] y el delta de Cliff es 0,34, mediano. Y la ventaja es unas catorce veces lo que mueve la semilla.
-#
-# **2. La diferencia importa en la operación.** Un comprador no revisa todo: revisa las alertas que le caben. Con el
-# mismo presupuesto de alertas para los dos, el de mayor riesgo:
-
-# %%
-pr = pd.read_csv(P / "presupuesto.csv")
-tabla(pr.drop(columns=["meses"]), dec=3, pct=["presupuesto", "fracción de las tardías"],
-      enteros=["alertas", "tardías atrapadas", "órdenes con una tardía atrapada"])
-
-# %% [markdown]
-# Revisando el 20 % de mayor riesgo (10.388 posiciones en los diez meses de 2026), XGBoost atrapa 8.242 tardías y la
-# logística 7.895: 347 más, unas 35 por mes, con mejor precisión (0,79 frente a 0,76). Con el 10 % atrapa 165 más, con
-# precisión 0,91. Al umbral de validación, el F1 es 0,675 contra 0,649. Una precisión: esas tardías de más caen en
-# órdenes que ya tenían otra alerta. En órdenes con alguna tardía atrapada, XGBoost cubre 2.362 y la logística 2.407. Si
-# la gestión es por orden y no por posición, la ventaja operativa se reduce; si es por posición (lo que se recibe), se
-# mantiene.
-#
-# **3. Por qué la logística se queda corta.** La logística asigna a cada variable una sola pendiente, la misma para
-# todas las órdenes. El efecto del plazo al liberar no es así. La figura compara, por tramo de plazo, el valor SHAP medio
-# de XGBoost (línea llena) con el término de la logística (punteada), en las cuatro clases de compra más frecuentes:
-
-# %%
-fc = pd.read_csv(P / "forma_clase.csv")
-mostrar(plots.forma_plazo(fc, "clase de compras", ["Generales", "Servicios", "Produccion Cluster", "Materia Prima"]))
-tabla(fc.pivot(index="tramo", columns="clase de compras", values="xgboost").reindex(
-    ["≤ 0", "1-2", "3-5", "6-10", "11-20", "> 20"]).reset_index(), dec=2)
-
-# %% [markdown]
-# - **Umbral cerca de cero.** Sin plazo (≤ 0 días), XGBoost suma unos 2,9 de logit. Con uno o dos días ya suma solo
-#   1,0. La caída del primer tramo al segundo es de 1,9, contra 1,4 de la logística, que la reparte de forma suave con
-#   el logaritmo.
-# - **Interacción con la clase de compra.** El mismo «sin plazo» vale 3,4 de logit en Generales y 2,4 en Producción
-#   Cluster, y el recorrido completo (de ≤ 0 a más de 20 días) es de 4,5 contra 3,1. En la logística las dos clases
-#   tienen la misma pendiente; lo que cambia entre ellas es solo cómo se reparten los plazos dentro de cada tramo
-#   (2,5 y 2,6). Con el tercio de la tasa previa del proveedor la interacción es más débil: con 1-2 días, 0,90 en los
-#   proveedores puntuales y 1,22 en los que se retrasan (`forma_plazo.csv`).
-#
-# La logística captaría esto solo si alguien escribiera a mano los tramos y los productos plazo × clase; el boosting los
-# encuentra solo.
-#
-# **4. La complejidad no es una restricción aquí.**
-
-# %%
-tabla(pd.read_csv(P / "costo.csv"), dec=3, enteros=["filas_un_ajuste"])
-
-# %% [markdown]
-# Un ajuste de XGBoost con 311.865 posiciones tarda 3,2 minutos en un hilo, contra 12 segundos de la logística, y se
-# reentrena una vez por semestre. Predecir mil posiciones toma 17 milisegundos, contra 0,7. 2026 trae unas 5.200
-# posiciones por mes: menos de una décima de segundo al mes. En el tablero, una predicción con sus contribuciones SHAP
-# tarda 0,2 segundos. La legibilidad, que es la ventaja real de la logística, se cubre con SHAP: global, para saber qué
-# mira el modelo, y local, para explicar cada alerta.
-#
-# **5. La parsimonia, aplicada con honestidad.** Las dos condiciones se cumplen: la ventaja es significativa (1) y
-# material (2), y lo que cuesta es despreciable (4). Por eso se elige XGBoost. La logística se queda como modelo base y
-# como referencia legible. Si el negocio pusiera la explicación de cada coeficiente por encima de atrapar tardías, por
-# ejemplo para una auditoría o una regla de compras, elegir la logística sería defendible: pierde 0,023 de AUC y unas 35
-# tardías atrapadas al mes.
-#
 # ## Qué deja este capítulo
 #
 # XGBoost, elegido en la validación, da en 2026 ROC-AUC 0,848 [0,835; 0,860], F1 0,675 y ECE 0,022 con Platt. No cae de
-# la validación a la prueba. Le gana a la logística de forma significativa y material, y lo que la logística ofrece en
+# la validación a la prueba. Le gana a la logística por 0,023 de AUC, y lo que la logística ofrece en
 # legibilidad lo dan los valores SHAP. Donde más falla es en las órdenes con entidades nuevas (AUC 0,821) y en
 # ganadería. El tablero sirve este modelo en la predicción en vivo. La propuesta del capítulo siguiente le gana por
 # 0,012.

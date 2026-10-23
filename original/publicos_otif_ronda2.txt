@@ -1,0 +1,29 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+nyc_bus: 125706 filas | tasa del positivo 0.183 | entrenamiento 75423, validación 25141, prueba 25142 (tasa 0.188) | efectos de ['Bus_Company_Name', 'Route_Number', 'Schools_Serviced', 'Bus_No'] | cortes [0, 15, 30, 45, 60] | periodo periodo
+   XGBoost  AUC validación 0.7952 (mejor de 20) | prueba 0.8456 | F1 0.5549 al umbral 0.139 | {'n_estimators': 344, 'learning_rate': 0.09564633811567283, 'max_depth': 4, 'subsample': 0.7856996937156578, 'colsample_bytree': 0.729406443948518, 'min_child_weight': 7.662897468487906} | 0.6 min
+   efectos de K3 estimados con 75423 filas; varianzas {'Bus_Company_Name': 1.33, 'Route_Number': 0.375, 'Schools_Serviced': 0.261, 'Bus_No': 0.363} | 1.5 min
+   efectos de K3 estimados con 100564 filas; varianzas {'Bus_Company_Name': 1.304, 'Route_Number': 0.367, 'Schools_Serviced': 0.24, 'Bus_No': 0.34} | 8.1 min
+   K3       AUC validación 0.7952 (mejor de 20) | prueba 0.8439 | F1 0.5668 al umbral 0.148 | {'learning_rate': 0.02449591107490694, 'num_leaves': 104, 'min_child_samples': 175, 'colsample_bytree': 0.3626373506559105, 'reg_alpha': 0.3170226879219806, 'arboles': 965} | 8.3 min
+   K3 − XGBoost en la prueba: ΔAUC -0.0017 [-0.0045; +0.0008] | DeLong EE 0.0014, p = 0.2108 | ΔF1 +0.0119
+
+zurich: 27327 filas | tasa del positivo 0.073 | entrenamiento 16396, validación 5465, prueba 5466 (tasa 0.073) | efectos de ['line_number', 'stop_id', 'linea_sentido'] | cortes [0, 60, 180, 300] | periodo None
+   XGBoost  AUC validación 0.8178 (mejor de 20) | prueba 0.8324 | F1 0.3951 al umbral 0.189 | {'n_estimators': 590, 'learning_rate': 0.037230332461285674, 'max_depth': 3, 'subsample': 0.7011900782032531, 'colsample_bytree': 0.7846613093480928, 'min_child_weight': 6.472286784395579} | 8.6 min
+   efectos de K3 estimados con 16396 filas; varianzas {'line_number': 0.309, 'stop_id': 0.354, 'linea_sentido': 0.076} | 8.7 min
+   efectos de K3 estimados con 21861 filas; varianzas {'line_number': 0.403, 'stop_id': 0.343, 'linea_sentido': 0.074} | 10.0 min
+   K3       AUC validación 0.8159 (mejor de 20) | prueba 0.8332 | F1 0.4056 al umbral 0.163 | {'learning_rate': 0.01535571925707993, 'num_leaves': 119, 'min_child_samples': 52, 'colsample_bytree': 0.9426995318968878, 'reg_alpha': 0.003785261799177522, 'arboles': 341} | 10.0 min
+   K3 − XGBoost en la prueba: ΔAUC +0.0008 [-0.0076; +0.0084] | DeLong EE 0.0044, p = 0.8542 | ΔF1 +0.0104
+
+diabetes: 101766 filas | tasa del positivo 0.112 | entrenamiento 61059, validación 20353, prueba 20354 (tasa 0.106) | efectos de ['paciente', 'medical_specialty', 'diag_1', 'diag_2'] | cortes [0, 1] | periodo periodo
+   XGBoost  AUC validación 0.6557 (mejor de 20) | prueba 0.6595 | F1 0.2587 al umbral 0.176 | {'n_estimators': 107, 'learning_rate': 0.01863579867947911, 'max_depth': 8, 'subsample': 0.8915645991277337, 'colsample_bytree': 0.6157864498572159, 'min_child_weight': 5.333188543286887} | 10.8 min
+   efectos de K3 estimados con 61059 filas; varianzas {'paciente': 0.462, 'medical_specialty': 0.084, 'diag_1': 0.15, 'diag_2': 0.146} | 11.7 min
+   efectos de K3 estimados con 81412 filas; varianzas {'paciente': 0.463, 'medical_specialty': 0.082, 'diag_1': 0.137, 'diag_2': 0.138} | 16.2 min
+   K3       AUC validación 0.6700 (mejor de 20) | prueba 0.6751 | F1 0.2699 al umbral 0.162 | {'learning_rate': 0.019768208575786452, 'num_leaves': 116, 'min_child_samples': 11, 'colsample_bytree': 0.6115473499345098, 'reg_alpha': 0.1768379846596558, 'arboles': 500} | 16.4 min
+   K3 − XGBoost en la prueba: ΔAUC +0.0156 [+0.0080; +0.0237] | DeLong EE 0.0041, p = 0.0002 | ΔF1 +0.0112
+
+noshow: 110522 filas | tasa del positivo 0.202 | entrenamiento 66313, validación 22104, prueba 22105 (tasa 0.185) | efectos de ['paciente', 'Neighbourhood'] | cortes [0] | periodo periodo
+   XGBoost  AUC validación 0.7410 (mejor de 20) | prueba 0.7317 | F1 0.4184 al umbral 0.243 | {'n_estimators': 508, 'learning_rate': 0.032786331971703275, 'max_depth': 3, 'subsample': 0.6270021040679016, 'colsample_bytree': 0.6893645023866815, 'min_child_weight': 4.1569043852100185} | 17.1 min
+   efectos de K3 estimados con 66313 filas; varianzas {'paciente': 0.487, 'Neighbourhood': 0.027} | 17.9 min
+   efectos de K3 estimados con 88417 filas; varianzas {'paciente': 0.488, 'Neighbourhood': 0.021} | 20.2 min
+   K3       AUC validación 0.7432 (mejor de 20) | prueba 0.7369 | F1 0.4287 al umbral 0.230 | {'learning_rate': 0.014182053920782166, 'num_leaves': 15, 'min_child_samples': 19, 'colsample_bytree': 0.5858529181925636, 'reg_alpha': 0.16857940447494651, 'arboles': 946} | 20.3 min
+   K3 − XGBoost en la prueba: ΔAUC +0.0052 [+0.0027; +0.0076] | DeLong EE 0.0011, p = 0.0000 | ΔF1 +0.0103

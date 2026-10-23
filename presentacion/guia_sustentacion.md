@@ -429,15 +429,26 @@ sobreajuste de probabilidades (la log-loss externa sube), no de orden; lo corrig
 proveedor codificado (1,87). Con SHAP en XGBoost (2026): plazo hábil al liberar 0,85 de |SHAP| medio, proveedor 0,46, y
 el resto bajo 0,13 (promesa, experiencia con el centro, cuenta, días de liberación, material, creador de la solped).
 
-**¿Por qué XGBoost y no la logística, si es más simple y queda cerca?** Por parsimonia aplicada con cifras: se acepta lo
-complejo solo si gana de forma significativa y material, y aquí pasan las dos. (1) Significativa: en 2026, 0,848 contra
-0,825, Δ 0,023 [0,017; 0,030], DeLong z = 22,5; en los ocho bloques gana los ocho (Wilcoxon-Holm 0,047), Cliff 0,34. (2)
-Material: con el mismo 20 % de alertas atrapa 8.242 tardías contra 7.895, unas 35 más por mes, con precisión 0,79 contra
-0,76; F1 0,675 contra 0,649. Ojo: esas tardías de más caen en órdenes que ya tenían alerta (2.362 órdenes contra 2.407).
-(3) Forma: sin plazo, el riesgo sube 3,4 de logit en Generales y 2,4 en Producción Cluster; la logística da la misma
-pendiente a todas y una caída suave cerca de cero. (4) Costo: un ajuste tarda 3,2 min contra 12 s y mil predicciones 17
-ms contra 0,7; nada para unas 5.200 posiciones al mes. SHAP da la lectura. (5) Si el negocio pusiera explicar cada
-coeficiente por encima de atrapar tardías, la logística sería defendible: pierde 0,023 de AUC y unas 35 tardías al mes.
+**¿Por qué XGBoost y no la logística, si es más simple y queda cerca?** Por el negocio, con cifras. (1) Un retraso no visto
+cuesta más que una falsa alarma: la alerta de más es una llamada; la tardía que no se vio puede dejar una planta esperando.
+(2) Con el mismo esfuerzo de revisión (el 20 % de mayor riesgo en 2026) atrapa 8.242 tardías contra 7.895: N = 347 más
+[150; 570] (BCa por órdenes), unas 35 por mes; de ellas, M = 166 [−3; 391], unas 17 por mes, son de material con stock en
+cero el mes anterior. El intervalo de M roza el cero: es indicativo. Esas tardías de más caen sobre todo en órdenes que ya
+tenían alerta (2.362 órdenes contra 2.407). (3) Va en la dirección que busca el área: que compras responda a la planeación
+y no a la urgencia. (4) No hay datos del costo de una parada por falta de material; no se lleva a pesos. (5) Entrenar
+tarda 3,2 minutos: se puede reentrenar cada mes. En números: gana los ocho bloques (Wilcoxon-Holm 0,047), Cliff 0,34, y
+en 2026 Δ 0,023 [0,017; 0,030], DeLong z = 22,5. Por qué «crítica» es el stock: la marca de pieza crítica es constante
+en los datos y la razón cantidad/stock está vacía en el 73 % de 2026.
+
+**¿Y en otros datos?** Se midió K3 (la pieza central de la propuesta) contra el XGBoost de las 112 en siete conjuntos
+públicos de OpenML, con el mismo protocolo (Optuna con 20 evaluaciones, una medida en la prueba, DeLong con Holm). Gana en
+dos (reingreso hospitalario +0,016 [0,008; 0,024]; citas no asistidas +0,005 [0,003; 0,008]), empata en tres (vuelos,
+buses de Nueva York, transporte de Zúrich) y pierde en dos (Amazon −0,013, Click −0,008). F1 mayor en 5 de 7. Wilcoxon
+sobre las siete diferencias: p = 0,81, no hay superioridad general. Gana donde una entidad tiene historia propia en el
+tiempo (el paciente que vuelve), como el proveedor en OTIF; empata en transporte, con entidades pocas y estables; pierde
+sin tiempo ni desenlace continuo. **Cuidado:** esa separación se vio después de la segunda ronda (cuyo criterio sí se fijó
+antes de correr); confirmarla pide una tercera ronda fijada antes. El plazo log-normal y las variables nuevas no se pueden
+llevar a esos datos. Capítulo 10 del libro, lámina 19.
 
 **¿La diferencia entre XGBoost y el bosque es real?** Sí, y pequeña. Con las combinaciones de mayor AUC interno gana en
 los ocho bloques (Wilcoxon, p Holm 0,047); con las de la tabla de líderes, en siete, y DeLong la da por significativa en
@@ -460,4 +471,4 @@ mejor que la regla del comprador.
 
 `src/prueba_2026.py`, `src/modelo_final.py` y `src/xgb_vs_logistica.py`, sobre las probabilidades de la comparación 2 × 2
 (Platt y umbral congelados en 2025). El modelo servido en el tablero las reproduce (diferencia máxima 3·10⁻⁸, misma
-decisión en las 51.941 posiciones). Capítulos 6 (mejor modelo) y 9 (modelo original) del libro.
+decisión en las 51.941 posiciones). Capítulos 7 (mejor modelo) y 9 (modelo original) del libro; la justificación frente a la logística, al final del 6.

@@ -1,0 +1,22 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+airlines: 100000 filas | tasa del positivo 0.156 | entrenamiento 67178, validación 16411, prueba 16411 (tasa 0.173) | efectos de ['UniqueCarrier', 'Origin', 'Dest', 'ruta'] | cortes [0, 15, 30, 60] | periodo periodo
+   XGBoost  AUC validación 0.6538 (mejor de 20) | prueba 0.6355 | F1 0.2310 al umbral 0.214 | {'n_estimators': 475, 'learning_rate': 0.012025181751485951, 'max_depth': 6, 'subsample': 0.9933222028877797, 'colsample_bytree': 0.35018730209846066, 'min_child_weight': 14.540903442447144} | 1.2 min
+   efectos de K3 estimados con 67178 filas; varianzas {'UniqueCarrier': 0.063, 'Origin': 0.073, 'Dest': 0.054, 'ruta': 0.221} | 2.9 min
+   efectos de K3 estimados con 83589 filas; varianzas {'UniqueCarrier': 0.066, 'Origin': 0.065, 'Dest': 0.052, 'ruta': 0.207} | 16.5 min
+   K3       AUC validación 0.6497 (mejor de 20) | prueba 0.6337 | F1 0.3051 al umbral 0.172 | {'learning_rate': 0.012008614350828803, 'num_leaves': 20, 'min_child_samples': 30, 'colsample_bytree': 0.4267626569977054, 'reg_alpha': 3.6931682751950374, 'arboles': 718} | 16.6 min
+   K3 − XGBoost en la prueba: ΔAUC -0.0018 [-0.0062; +0.0030] | DeLong EE 0.0026, p = 0.4824 | ΔF1 +0.0741
+
+amazon: 32769 filas | tasa del positivo 0.058 | entrenamiento 19661, validación 6554, prueba 6554 (tasa 0.058) | efectos de ['RESOURCE', 'MGR_ID', 'ROLE_TITLE', 'ROLE_DEPTNAME'] | cortes [0] | periodo None
+   XGBoost  AUC validación 0.8676 (mejor de 20) | prueba 0.8700 | F1 0.4694 al umbral 0.187 | {'n_estimators': 365, 'learning_rate': 0.02006585185280622, 'max_depth': 7, 'subsample': 0.6113795333040364, 'colsample_bytree': 0.982456715340345, 'min_child_weight': 6.494730573860239} | 16.9 min
+   efectos de K3 estimados con 19661 filas; varianzas {'RESOURCE': 0.478, 'MGR_ID': 0.508, 'ROLE_TITLE': 0.186, 'ROLE_DEPTNAME': 0.277} | 17.0 min
+   efectos de K3 estimados con 26215 filas; varianzas {'RESOURCE': 0.479, 'MGR_ID': 0.532, 'ROLE_TITLE': 0.171, 'ROLE_DEPTNAME': 0.291} | 17.8 min
+   K3       AUC validación 0.8668 (mejor de 20) | prueba 0.8564 | F1 0.4389 al umbral 0.155 | {'learning_rate': 0.03753788440597465, 'num_leaves': 70, 'min_child_samples': 19, 'colsample_bytree': 0.6156184923318992, 'reg_alpha': 5.750630227531086, 'arboles': 443} | 17.8 min
+   K3 − XGBoost en la prueba: ΔAUC -0.0135 [-0.0220; -0.0043] | DeLong EE 0.0051, p = 0.0077 | ΔF1 -0.0305
+
+click: 39948 filas | tasa del positivo 0.168 | entrenamiento 23968, validación 7990, prueba 7990 (tasa 0.168) | efectos de ['ad_id', 'advertiser_id', 'query_id', 'user_id'] | cortes [0] | periodo None
+   XGBoost  AUC validación 0.6864 (mejor de 20) | prueba 0.7069 | F1 0.3849 al umbral 0.176 | {'n_estimators': 322, 'learning_rate': 0.02575162529031892, 'max_depth': 3, 'subsample': 0.8071638220958226, 'colsample_bytree': 0.5936408471824549, 'min_child_weight': 3.7248518695134094} | 18.1 min
+   efectos de K3 estimados con 23968 filas; varianzas {'ad_id': 0.422, 'advertiser_id': 0.363, 'query_id': 0.445, 'user_id': 0.45} | 18.2 min
+   efectos de K3 estimados con 31958 filas; varianzas {'ad_id': 0.418, 'advertiser_id': 0.352, 'query_id': 0.446, 'user_id': 0.451} | 19.3 min
+   K3       AUC validación 0.6775 (mejor de 20) | prueba 0.6986 | F1 0.3788 al umbral 0.163 | {'learning_rate': 0.01107698568612089, 'num_leaves': 54, 'min_child_samples': 22, 'colsample_bytree': 0.5309191448497179, 'reg_alpha': 0.5886998635324197, 'arboles': 455} | 19.3 min
+   K3 − XGBoost en la prueba: ΔAUC -0.0083 [-0.0136; -0.0020] | DeLong EE 0.0032, p = 0.0106 | ΔF1 -0.0061

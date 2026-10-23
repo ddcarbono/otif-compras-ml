@@ -9,6 +9,8 @@ base (``artifacts/logistica.joblib``, entrenada con 2021-2025). Escribe en ``res
   de la tasa previa de retraso del proveedor. En XGBoost es la media de su valor SHAP; en la logística, el coeficiente
   por la variable transformada (centrado), que no puede depender del proveedor;
 - ``forma_clase.csv``: lo mismo con la clase de compras en lugar del proveedor;
+- ``criticas.csv``: con el 20 % de alertas, cuántas tardías de más atrapa XGBoost (N) y cuántas de ellas son de
+  material con stock en cero el mes anterior (M), con intervalo BCa por órdenes;
 - ``costo.csv``: horas de CPU de las 8 ventanas, segundos de un ajuste (el de 2025-S2, 311.865 filas, un hilo) y
   milisegundos de inferencia por 1.000 posiciones de los dos, de la tabla
   maestra de las 112.
@@ -22,7 +24,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
-from . import datos
+from . import datos, pruebas
 from .modelo_final import contribuciones
 
 P26 = datos.RAIZ / "resultados" / "prueba_2026"
@@ -46,6 +48,27 @@ def presupuesto(d, modelos):
     return pd.DataFrame(filas)
 
 
+def criticas(d, frac=0.20, B=1000):
+    """Tardías de más que atrapa XGBoost con el mismo presupuesto de alertas, en total (N) y en material con stock en
+    cero el mes anterior (M), con su intervalo BCa remuestreando órdenes."""
+    def est(m):
+        m = m[0]
+        k = int(round(frac * len(m)))
+        a = {n: (m[n].rank(method="first", ascending=False) <= k) & m.y.eq(1) for n in ("XGBoost", "Regresión logística")}
+        crit = m.stock_en_cero.eq(1)
+        return np.array([a["XGBoost"].sum() - a["Regresión logística"].sum(),
+                         (a["XGBoost"] & crit).sum() - (a["Regresión logística"] & crit).sum(),
+                         a["XGBoost"].sum(), a["Regresión logística"].sum(),
+                         (a["XGBoost"] & crit).sum(), (a["Regresión logística"] & crit).sum()], dtype=float)
+    e, lo, hi = pruebas.bca([(pd.factorize(d.oc_id)[0], d)], est, B=B)
+    meses = d.fecha_pedido.dt.to_period("M").nunique()
+    nombres = ["N: tardías de más", "M: de ellas, con stock en cero", "XGBoost: tardías atrapadas",
+               "logística: tardías atrapadas", "XGBoost: críticas atrapadas", "logística: críticas atrapadas"]
+    return pd.DataFrame({"cifra": nombres, "total": e, "BCa inf": lo, "BCa sup": hi, "por mes": e / meses,
+                         "presupuesto": frac, "posiciones críticas": int(d.stock_en_cero.eq(1).sum()),
+                         "tardías críticas": int((d.stock_en_cero.eq(1) & d.y.eq(1)).sum())})
+
+
 def forma(d, shap, logit_log, grupo, nombre_grupo):
     t = pd.DataFrame({"tramo": pd.cut(d.plazo_habil_al_liberar, TRAMOS, labels=ETIQUETAS), "grupo": grupo,
                       "xgboost": shap, "logistica": logit_log})
@@ -59,12 +82,17 @@ def main():
     df = datos.cargar()
     pru = datos.particion(df, "prueba")
     d = pru[["oc_id", "posicion", "fecha_pedido", "plazo_habil_al_liberar", "prov_tasa_tarde_previa", "clase_compras",
-             datos.OBJETIVO]].merge(q[["oc_id", "posicion", "XGBoost 136"]], on=["oc_id", "posicion"], how="left",
+             "stock_mes_anterior", datos.OBJETIVO]].merge(q[["oc_id", "posicion", "XGBoost 136"]], on=["oc_id", "posicion"], how="left",
                                     validate="1:1").rename(columns={datos.OBJETIVO: "y", "XGBoost 136": "XGBoost"})
     meta = json.loads((ART / "logistica.metadata.json").read_text(encoding="utf-8"))
     log = joblib.load(ART / "logistica.joblib")
     d["Regresión logística"] = log.predict_proba(pru[meta["entrada"]])[:, 1]
     presupuesto(d, ["XGBoost", "Regresión logística"]).to_csv(P26 / "presupuesto.csv", index=False)
+    # crítica: material con stock en cero el mes anterior (mc_pieza_critica es constante y se retiró del dataset;
+    # razon_cantidad_stock está vacía en el 73 % de 2026)
+    d["stock_en_cero"] = np.where(d.stock_mes_anterior.isna(), np.nan, (d.stock_mes_anterior <= 0).astype(float))
+    criticas(d).to_csv(P26 / "criticas.csv", index=False)
+    print(pd.read_csv(P26 / "criticas.csv").round(1).to_string(index=False))
 
     # forma del efecto del plazo: SHAP de XGBoost contra el término lineal de la logística
     xgb = joblib.load(ART / "xgboost.joblib")
