@@ -1,3 +1,4 @@
 particion,filas_a,filas_b,AUC
 cronológica: 2021-2024 contra 2025,271391,82794,1.0
+"cronológica, sin variables de reloj",271391,82794,0.9994580810509492
 "aleatoria por orden, mismo tamaño",270289,83896,0.5036270272806749

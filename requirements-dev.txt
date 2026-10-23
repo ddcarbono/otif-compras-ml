@@ -1,0 +1,3 @@
+# Pruebas (lo que instala el CI de GitHub, Python 3.11 como Render). Además del tablero:
+-r requirements.txt
+pytest==8.3.3

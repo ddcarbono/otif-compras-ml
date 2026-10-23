@@ -111,6 +111,67 @@ tabla(guardar(eda.deriva(df, top), "deriva"), dec=3)
 # concepto (que la misma variable se relacione distinto con el retraso) no se mide aquí, porque exigiría el objetivo
 # de 2025 y 2026.
 #
+# ### Validación adversaria
+#
+# El PSI mira las variables una por una. La **validación adversaria** las mira todas juntas: se juntan dos conjuntos,
+# se etiqueta de cuál viene cada posición y se entrena un clasificador (XGBoost, validación cruzada de 5 pliegues
+# agrupada por orden) para distinguirlos. Si su AUC es 0,5, los conjuntos son intercambiables; cuanto más sube, más
+# distinto es lo que el modelo tendrá que predecir de lo que vio. Se comparan tres particiones, con las numéricas y
+# las categóricas (las entidades quedan fuera porque su codificación usa el objetivo) y sin tocar la prueba 2026:
+#
+# - **cronológica**: 2021-2024 contra 2025, la que usa el proyecto;
+# - **cronológica sin variables de reloj**: la misma, sin las 16 predictoras que fechan la fila por sí solas (conteos
+#   acumulados de historia, antigüedades, tasa de cambio y mes);
+# - **aleatoria**: dentro de 2021-2025, órdenes al azar del mismo tamaño que 2025 contra el resto, que es lo que haría
+#   una partición 80/20 sin mirar la fecha.
+#
+# El cálculo lo hace `python -m src.similitud` (unos 30 minutos) y el capítulo lee sus tablas.
+
+# %%
+SIM = datos.RAIZ / "resultados" / "similitud"
+auc_adv = pd.read_csv(SIM / "auc.csv")
+tabla(auc_adv.rename(columns={"particion": "partición", "filas_a": "filas del conjunto A",
+                              "filas_b": "filas del conjunto B"}), dec=3, enteros=("filas del conjunto A",
+                                                                                     "filas del conjunto B"))
+
+# %%
+imp_adv = pd.read_csv(SIM / "importancia.csv")
+imp_adv["variable"] = imp_adv.columna.str.split("__").str[1]
+for p in imp_adv.particion.unique()[:2]:
+    t = imp_adv[imp_adv.particion == p].head(10)
+    t = t.assign(n=[N.get(v, N.get(v.rsplit("_", 1)[0], v)) + ("" if v in N else f" = {v.rsplit('_', 1)[1]}")
+                    for v in t.variable])
+    mostrar(plots.barras_horizontales(t, "importancia", "n", f"Lo que separa los conjuntos ({p})", "importancia",
+                                      ".3f"))
+
+# %% [markdown]
+# **La partición aleatoria no separa nada (AUC 0,504)**: órdenes al azar de 2021-2025 son intercambiables con el
+# resto, y un modelo evaluado así se mediría contra datos idénticos a los que vio. **La cronológica separa del todo
+# (AUC 1,000)**, y casi toda la separación la hacen las variables de reloj: la antigüedad del proveedor sola pesa
+# 0,28, y le siguen los conteos de historia, la tasa de cambio y el mes. Son variables que crecen con el calendario y
+# fechan la fila por sí solas; que separen no dice nada del problema.
+#
+# Lo que sí dice algo es la tercera fila: **sin las variables de reloj el AUC sigue en 0,999**. Ya no hay una variable
+# dominante (la que más pesa no llega a 0,04), sino muchas que se mueven poco a la vez: el indicador de IVA W1 baja de
+# 13,5 % de las posiciones en 2021-2024 a 6,4 % en 2025, las del centro en la región 20 suben de 4,4 % a 11,3 %, cambia la mezcla de
+# líneas de negocio y de tipos de material, la tasa previa del comprador (la misma que el PSI marcaba con cambio
+# fuerte), la tolerancia de sobreentrega y la carga reciente de los centros y los compradores. Con 350.000 posiciones y un
+# clasificador flexible, la suma de cambios pequeños basta para reconocer el año. Es la misma deriva de covariables del
+# PSI, ahora vista en conjunto.
+#
+# Consecuencias para el resto del proyecto:
+#
+# - **una partición aleatoria sobreestimaría el desempeño**: evaluaría con datos de la misma distribución del
+#   entrenamiento, que no es lo que el modelo encuentra al usarse. Por eso la partición es cronológica y la validación
+#   cruzada de los modelos usa ventanas crecientes por semestre;
+# - **la caída de 2024 a 2025 es esperable** y no es por sí sola señal de sobreajuste; la prueba 2026 viene de una
+#   distribución aún más lejana;
+# - **antes de medir la prueba se reentrena con 2021-2025**, para que el modelo vea el año más parecido al que va a
+#   predecir.
+#
+# La validación adversaria solo mira las predictoras: un AUC alto dice que el año se reconoce, no que la relación
+# entre las variables y el retraso haya cambiado (eso sería deriva del concepto, y necesita el objetivo).
+#
 # ## Componente espacial
 #
 # **No aplica.** El dataset no trae coordenadas: los centros y las sociedades van anonimizados y la región del

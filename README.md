@@ -46,7 +46,9 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `requirements.txt` | Dependencias del tablero (versiones exactas). |
 | `book/requirements.txt` | Dependencias del libro y de los cálculos (versiones exactas). |
 | `render.yaml` | Blueprint de Render para desplegar el tablero. |
-| `tests/` | Pruebas; se agregan en los entregables siguientes. |
+| `tests/` | Pruebas con pytest: preprocesamiento y codificación por objetivo, series de tiempo, modelo servido, arranque del tablero y que `data/` no publique identificadores. Usan datos sintéticos y lo que trae el repositorio, no el dataset completo. |
+| `requirements-dev.txt` | Dependencias de las pruebas (el tablero más pytest). |
+| `.github/workflows/ci.yml` | CI: corre las pruebas en cada push a `main`, con Python 3.11.9 como Render. |
 
 ## Datos
 
@@ -74,6 +76,13 @@ pip install -r book/requirements.txt
 set OTIF_CSV=C:\ruta\al\otif_depurado.csv
 python book/compilar.py
 jupyter-book build book/
+```
+
+### Pruebas
+
+```bash
+pip install -r requirements-dev.txt
+pytest -q
 ```
 
 ### Datos del tablero

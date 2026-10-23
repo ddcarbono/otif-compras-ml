@@ -95,7 +95,8 @@ def _predecir(_, vals, ids, i):
         fila[c] = v
         if r.tipo != "categórica" and not (r.p01 <= float(v) <= r.p99):
             fuera.append(NOMBRE.get(c, c))
-        if r.tipo == "categórica" and v not in json.loads(r.categorias):
+        # una categórica vacía es un faltante que el modelo imputa, no un valor fuera de rango
+        if r.tipo == "categórica" and v is not None and v not in json.loads(r.categorias):
             fuera.append(NOMBRE.get(c, c))
     p, u, contrib = predecir(fila)
     alerta = p >= u

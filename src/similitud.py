@@ -63,7 +63,9 @@ def adversaria(a, b, nombre, sin=()):
 
 def main():
     SALIDA.mkdir(parents=True, exist_ok=True)
-    df = datos.cargar()
+    # solo las columnas que se usan: con el dataset entero, las copias de cada variante no caben en 16 GB
+    df = datos.cargar()[datos.NUMERICAS + datos.CATEGORICAS + ["oc_id", "particion"]]
+    df = df[df.particion.ne("prueba")]
     ent, val = datos.particion(df, "entrenamiento"), datos.particion(df, "validacion")
     pool = pd.concat([ent, val])
     oc = pool.oc_id.unique()

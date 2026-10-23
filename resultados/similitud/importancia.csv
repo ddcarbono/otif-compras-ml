@@ -14,6 +14,21 @@ cronológica: 2021-2024 contra 2025,num__cmp_n_previas,0.026425246
 cronológica: 2021-2024 contra 2025,num__prov_n_previas,0.025348002
 cronológica: 2021-2024 contra 2025,cat__mes_4,0.022784468
 cronológica: 2021-2024 contra 2025,cat__mes_9,0.022034038
+"cronológica, sin variables de reloj",cat__indicador_iva_W1,0.03296388
+"cronológica, sin variables de reloj",cat__ce_region_20,0.02579086
+"cronológica, sin variables de reloj",cat__linea_banano,0.021997618
+"cronológica, sin variables de reloj",cat__tipo_material_ZDOT,0.021160418
+"cronológica, sin variables de reloj",num__cmp_tasa_tarde_previa,0.018808853
+"cronológica, sin variables de reloj",num__tolerancia_exceso,0.018744465
+"cronológica, sin variables de reloj",num__sp_dias_liberacion_a_oc,0.018319288
+"cronológica, sin variables de reloj",cat__linea_industrial,0.01728432
+"cronológica, sin variables de reloj",num__centro_oc_7d,0.016388629
+"cronológica, sin variables de reloj",num__cmp_oc_7d,0.015055348
+"cronológica, sin variables de reloj",cat__ce_region_47,0.014935201
+"cronológica, sin variables de reloj",cat__mc_clase_valoracion_3090,0.014829877
+"cronológica, sin variables de reloj",num__con_registro_info,0.0131154675
+"cronológica, sin variables de reloj",num__cmp_pos_abiertas,0.013023461
+"cronológica, sin variables de reloj",cat__indicador_iva_(en blanco),0.012782636
 "aleatoria por orden, mismo tamaño",cat__dia_semana_5,0.00836027
 "aleatoria por orden, mismo tamaño",cat__dia_semana_3,0.008188538
 "aleatoria por orden, mismo tamaño",cat__tipo_material_ZNLA,0.008154269
