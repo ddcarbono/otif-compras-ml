@@ -9,3 +9,5 @@ __pycache__/
 .ipynb_checkpoints/
 *.log
 cache/
+# El pipeline completo guarda las tablas de cada codigo de entidad con su tasa: no se publica (el tablero usa servido.joblib)
+artifacts/logistica.joblib

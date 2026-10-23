@@ -17,9 +17,14 @@ conocidas al liberar. La partición es cronológica: entrenamiento 2021-2024, va
 
 | capítulo | qué responde |
 |---|---|
+| {doc}`literatura` | qué se ha publicado sobre predecir retrasos de proveedores y por qué esas cifras no se comparan con estas |
 | {doc}`02a_datos` | el problema, la fuente, la población, el diccionario, la calidad de los datos y la ética |
 | {doc}`02b_eda` | cómo se distribuye el objetivo y qué variables se asocian con él |
-| {doc}`02c_tiempo_y_fuga` | cómo cambia el retraso en el tiempo, qué no puede entrar al modelo y cómo se preprocesa |
+| {doc}`02c_tiempo_y_fuga` | cómo cambia el retraso en el tiempo, qué tan distinta es la evaluación del entrenamiento, qué no puede entrar al modelo y cómo se preprocesa |
+| {doc}`03a_modelo_base` | cuánto logra una regresión logística frente a no tener modelo y frente a la regla del proveedor |
+| {doc}`03b_112_combinaciones` | qué modelo, balanceo y optimizador funcionan mejor en la validación anidada |
+| {doc}`03c_fundamentos` | cómo funciona XGBoost por dentro y cuánto cuesta cada modelo, en teoría y medido |
+| {doc}`glosario` | qué mide y cómo se lee cada estadístico del libro |
 
 ## Cómo reproducirlo
 

@@ -1,0 +1,31 @@
+particion,columna,importancia
+cronológica: 2021-2024 contra 2025,num__pv_antiguedad_dias,0.28319985
+cronológica: 2021-2024 contra 2025,num__prov_centro_oc_previas,0.05163346
+cronológica: 2021-2024 contra 2025,num__trm_usd_var90,0.04510391
+cronológica: 2021-2024 contra 2025,cat__mes_8,0.043093074
+cronológica: 2021-2024 contra 2025,cat__mes_11,0.042119805
+cronológica: 2021-2024 contra 2025,num__trm_usd,0.040130474
+cronológica: 2021-2024 contra 2025,num__trm_usd_vol30,0.03508848
+cronológica: 2021-2024 contra 2025,num__trm_eur,0.03482781
+cronológica: 2021-2024 contra 2025,cat__mes_1,0.02858591
+cronológica: 2021-2024 contra 2025,cat__ce_region_20,0.028465137
+cronológica: 2021-2024 contra 2025,cat__mes_12,0.028339285
+cronológica: 2021-2024 contra 2025,num__cmp_n_previas,0.026425246
+cronológica: 2021-2024 contra 2025,num__prov_n_previas,0.025348002
+cronológica: 2021-2024 contra 2025,cat__mes_4,0.022784468
+cronológica: 2021-2024 contra 2025,cat__mes_9,0.022034038
+"aleatoria por orden, mismo tamaño",cat__dia_semana_5,0.00836027
+"aleatoria por orden, mismo tamaño",cat__dia_semana_3,0.008188538
+"aleatoria por orden, mismo tamaño",cat__tipo_material_ZNLA,0.008154269
+"aleatoria por orden, mismo tamaño",cat__moneda_USD,0.00809823
+"aleatoria por orden, mismo tamaño",cat__ps_cond_pago_V015,0.007412344
+"aleatoria por orden, mismo tamaño",cat__tipo_material_ZDOT,0.0072477693
+"aleatoria por orden, mismo tamaño",cat__pv_sector_GRAN,0.006695888
+"aleatoria por orden, mismo tamaño",num__n_posiciones_oc,0.0061658965
+"aleatoria por orden, mismo tamaño",cat__mes_prometido_2,0.0061130417
+"aleatoria por orden, mismo tamaño",cat__mes_8,0.0060453517
+"aleatoria por orden, mismo tamaño",num__prov_oc_30d,0.005989359
+"aleatoria por orden, mismo tamaño",num__dia_mes,0.0059159254
+"aleatoria por orden, mismo tamaño",num__prov_tasa_devolucion_previa,0.005811815
+"aleatoria por orden, mismo tamaño",cat__ps_cond_pago_V060,0.0057822517
+"aleatoria por orden, mismo tamaño",cat__sp_clase_ZMAN,0.005778173

@@ -66,3 +66,50 @@ def es(v, d=0):
 
 def pct(v, d=1):
     return "—" if v is None or (isinstance(v, float) and np.isnan(v)) else f"{es(100 * v, d)} %"
+
+
+# --- predicción en vivo ------------------------------------------------------------------------------------------------
+@lru_cache(maxsize=None)
+def servido():
+    """El modelo publicado (``artifacts/servido.joblib``, lo escribe ``src.prediccion``) y su ficha. Se carga al primer
+    uso: importa scikit-learn, que el resto del tablero no necesita."""
+    import joblib
+    art = DATA.parent / "artifacts"
+    return joblib.load(art / "servido.joblib"), json.loads((art / "servido.json").read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=None)
+def ejemplos():
+    return pd.read_parquet(DATA / "prediccion" / "ejemplos.parquet")
+
+
+@lru_cache(maxsize=None)
+def rangos():
+    return pd.read_csv(DATA / "prediccion" / "rangos.csv").set_index("campo")
+
+
+def predecir(fila):
+    """Probabilidad de llegar tarde de una posición (``fila``: un DataFrame de una fila con las numéricas, las
+    categóricas y las tasas ``te_*``) y la contribución de cada variable al logit: coeficiente × valor en la logística,
+    valores SHAP exactos de árbol (``pred_contribs``) en XGBoost."""
+    s, ficha = servido()
+    cat = s["cat"].transform(fila[s["cat_cols"]])
+    cat = cat.toarray() if hasattr(cat, "toarray") else cat
+    X = np.hstack([np.asarray(s["num"].transform(fila[s["num_cols"]]), dtype=float), np.asarray(cat, dtype=float),
+                   fila[s["te_cols"]].to_numpy(dtype=float)])
+    m = s["modelo"]
+    p = float(m.predict_proba(X)[0, 1])
+    if hasattr(m, "coef_"):
+        contrib = X[0] * m.coef_[0]
+    else:
+        import xgboost
+        contrib = m.get_booster().predict(xgboost.DMatrix(X), pred_contribs=True)[0][:-1]
+    c = pd.DataFrame({"columna": s["nombres"], "contribucion": contrib})
+    c["variable"] = c.columna.str.split("__").str[1].str.replace(r"^te_", "", regex=True)
+    c["bloque"] = c.columna.str.split("__").str[0]
+    # una categórica one-hot suma la contribución de sus columnas bajo el nombre de la variable
+    cat = c.bloque == "cat"
+    for v in s["cat_cols"]:
+        c.loc[cat & c.variable.str.startswith(v + "_"), "variable"] = v
+    c = c.groupby("variable", as_index=False).contribucion.sum()
+    return p, ficha["umbral"], c.reindex(c.contribucion.abs().sort_values(ascending=False).index)

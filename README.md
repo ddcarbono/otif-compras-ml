@@ -17,7 +17,7 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | Ruta | Contenido |
 |---|---|
 | `app.py` | Tablero Dash multipágina (`use_pages=True`); lee solo `data/` y no entrena nada. Producción: `gunicorn app:server`. |
-| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (tabla de líderes de las 112 combinaciones con Friedman, Nemenyi y Wilcoxon, y el modelo base frente a dos líneas base). |
+| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (predicción en vivo, tabla de líderes de las 112 combinaciones con Friedman, Nemenyi y Wilcoxon, y el modelo base frente a dos líneas base). |
 | `src/` | Código del proyecto, compartido por el libro y el tablero. |
 | `src/datos.py` | Ruta del dataset, semilla, partición cronológica, tipos de variable y preprocesamiento. |
 | `src/data.py` | Carga y caché de lo que lee el tablero (`data/`); no importa scikit-learn. |
@@ -29,9 +29,13 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `src/optimizadores.py` | Grid, Random, Optuna (TPE) y DEAP (genético) con el mismo presupuesto de evaluaciones. |
 | `src/experimentos.py` | Las 112 combinaciones (7 modelos × 4 balanceos × 4 optimizadores) en los 8 bloques; reanudable. |
 | `src/comparar.py` | Resume los 896 trabajos: tabla de líderes, curvas de los optimizadores, Friedman, Nemenyi y Wilcoxon con Holm. `python -m src.comparar` |
+| `src/complejidad.py` | Tiempo de ajuste e inferencia de los 7 modelos contra el número de filas, con hiperparámetros fijos (exponente empírico). |
+| `src/similitud.py` | Validación adversaria: qué tan distinta es la evaluación del entrenamiento en la partición cronológica y en una aleatoria. |
+| `src/prediccion.py` | Prepara el modelo que sirve el tablero sin tablas de entidades (`artifacts/servido.joblib`), los ejemplos reales y los rangos de desarrollo. |
+| `src/vista_prediccion.py` | La pestaña de predicción en vivo de la página Modelos. |
 | `srvgdai/` | Guiones para correr los 112 en el servidor: subir el código, piloto, preparar las matrices y correr (30 trabajos a la vez). |
 | `src/preparar.py` | Escribe `data/` para el tablero a partir del dataset completo y de las tablas del libro. |
-| `artifacts/` | Modelos serializados con su `metadata.json` (versiones, semilla, hiperparámetros, umbral y métricas). Hoy: `logistica.joblib`. |
+| `artifacts/` | El modelo que sirve el tablero (`servido.joblib` y `servido.json`: transformaciones, modelo, umbral, versiones y métricas) y la ficha del modelo base. El *pipeline* completo no se publica: sus tablas de entidades llevan los códigos. |
 | `data/` | Lo liviano y anonimizado que usa el tablero: muestra de 30.000 posiciones, agregados, diccionario y resumen. |
 | `resultados/` | Tablas que calculan el libro (`resultados/eda/`) y los scripts de modelos (`resultados/modelo_base/`, `resultados/experimentos/` con un JSON por trabajo y `resultados/tabla_maestra.csv`) y que después leen el tablero y las láminas. |
 | `assets/` | Estilos del tablero. |

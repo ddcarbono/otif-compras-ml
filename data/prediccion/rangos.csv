@@ -1,0 +1,13 @@
+campo,tipo,p01,mediana,p99,categorias
+plazo_habil_al_liberar,numérica,-29.0,12.0,125.0,
+plazo_prometido_dias,numérica,-4.0,27.0,211.0,
+dias_habiles_liberacion,numérica,0.0,4.0,53.0,
+valor_oc_cop,numérica,0.0,3059327.0,1020000000.0,
+con_liberacion,numérica,0.0,1.0,1.0,
+prov_tasa_tarde_previa,numérica,0.0,0.3099808061420345,1.0,
+te_proveedor,tasa,0.06664497304947162,0.2991265069837853,0.8679876945790831,
+te_material,tasa,0.10980583086657596,0.3008529292289243,0.7531717887648836,
+linea,categórica,,,,"{""palma"": 0.4268, ""transporte"": 0.266, ""industrial"": 0.1645, ""banano"": 0.0873, ""puerto"": 0.0361, ""ganaderia"": 0.0193}"
+moneda,categórica,,,,"{""COP"": 0.9531, ""USD"": 0.0402, ""EUR"": 0.0066}"
+grupo_articulos,categórica,,,,"{""REPUESTOS"": 0.1855, ""MANTENIMI"": 0.113, ""OPERATIVO"": 0.0637, ""DOTACIONE"": 0.055, ""FERRETERI"": 0.0536, ""TRANSPORT"": 0.0424, ""PAPELERIA"": 0.0381, ""ASEO"": 0.0348, ""ADMINISTR"": 0.0335, ""TUERCAS Y"": 0.0289, ""E.PROTECC"": 0.0288, ""EMPAQUE"": 0.0231, ""CONSTRUCC"": 0.0201, ""ELECTRICO"": 0.019, ""LABORATO"": 0.0168, ""SEGUROS"": 0.0157, ""SERV_CARG"": 0.0154, ""HERRAMIEN"": 0.0149, ""CAFETERIA"": 0.0142, ""SISTEMAS"": 0.0136, ""INSUMOS"": 0.0134, ""FILTROS"": 0.0131, ""MAT.CAMPO"": 0.0117, ""RODAMIENT"": 0.0106, ""COMBUSTIB"": 0.01, ""ACCESORIO"": 0.0099, ""LUBRICANT"": 0.0095, ""ACE_CRUDO"": 0.0094, ""FRUTAS"": 0.0089, ""EQUIPOS"": 0.0087, ""DROGAS"": 0.0083, ""PVC"": 0.0068, ""PINTURAS"": 0.006, ""PALLETIZA"": 0.0059, ""SEGURIDAD"": 0.0042, ""TUBERIA"": 0.0033, ""FERTILIZA"": 0.0029, ""ACEITES"": 0.0029, ""GANADERIA"": 0.0028, ""PLAS_SELL"": 0.0024, ""VENT_SERV"": 0.0022}"
+clase_compras,categórica,,,,"{""Generales"": 0.6027, ""Servicios"": 0.3372, ""Produccion Cluster"": 0.0344, ""Activos Fijos"": 0.0195, ""Materia Prima"": 0.0064}"

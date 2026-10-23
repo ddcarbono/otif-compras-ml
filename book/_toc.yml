@@ -4,6 +4,9 @@ root: intro
 defaults:
   numbered: true
 parts:
+  - caption: Contexto
+    chapters:
+      - file: literatura
   - caption: Datos y análisis exploratorio
     chapters:
       - file: 02a_datos
@@ -13,3 +16,7 @@ parts:
     chapters:
       - file: 03a_modelo_base
       - file: 03b_112_combinaciones
+      - file: 03c_fundamentos
+  - caption: Referencia
+    chapters:
+      - file: glosario

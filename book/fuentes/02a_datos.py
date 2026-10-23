@@ -141,7 +141,8 @@ tabla(eda.vacios_por_bloque(ent), pct=["tasa de tarde"], dec=1)
 # siempre sin decir por qué.
 #
 # **Tratamiento:** no se imputa con modelos. En el *pipeline* la mediana rellena el número y la marca `tiene_*` conserva
-# la información del vacío; los árboles manejan el vacío directamente.
+# la información del vacío. Todos los modelos reciben la misma matriz, también los árboles, para que la comparación
+# entre ellos sea justa.
 
 # %%
 tabla(fal.head(15), dec=1, pct=["tasa con dato", "tasa sin dato"])
