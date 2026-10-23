@@ -185,4 +185,31 @@ ax.set_title('Costo de ajuste medido (log-log)')
 ax.legend(frameon=False, fontsize=11)
 guardar(fig, 'complejidad.png')
 
+# ---------------------------------------------------------------- el mejor modelo en 2026
+P26 = os.path.join(R, 'prueba_2026')
+NOM = dict(zip(*[pd.read_csv(os.path.join(RAIZ, 'data', 'diccionario.csv'))[c] for c in ('variable', 'nombre')]))
+NOM.update({'proveedor': 'Proveedor (tasa)', 'material': 'Material (tasa)', 'imp_cuenta': 'Cuenta contable (tasa)',
+            'sp_creador': 'Creador de la solped (tasa)'})
+sg = pd.read_csv(os.path.join(P26, 'shap_global.csv')).head(10).iloc[::-1]
+fig, ax = plt.subplots(figsize=(6.4, 4.4))
+ax.barh([NOM.get(v, v) for v in sg.variable], sg.shap_abs_medio, color=ORO)
+ax.set_xlabel('media de |SHAP| (logit)')
+ax.set_title('Qué mira XGBoost en 2026')
+ax.tick_params(axis='y', labelsize=12)
+guardar(fig, 'shap_global.png')
+
+fc = pd.read_csv(os.path.join(P26, 'forma_clase.csv'))
+orden = ['≤ 0', '1-2', '3-5', '6-10', '11-20', '> 20']
+fig, ax = plt.subplots(figsize=(6.4, 4.2))
+for g, c in [('Generales', ORO), ('Produccion Cluster', VERDE)]:
+    d = fc[fc['clase de compras'] == g].set_index('tramo').loc[orden]
+    ax.plot(orden, d.xgboost, color=c, lw=2.6, marker='o', label=f'{g.replace("Produccion", "Producción")} · XGBoost')
+    ax.plot(orden, d.logistica, color=c, lw=2.0, ls=':', label=f'{g.replace("Produccion", "Producción")} · logística')
+ax.axhline(0, color='#DDDDDD', lw=1)
+ax.set_xlabel('días hábiles de plazo al liberar')
+ax.set_ylabel('efecto sobre el logit')
+ax.set_title('El plazo pesa distinto según la clase de compra')
+ax.legend(frameon=False, fontsize=10.5)
+guardar(fig, 'forma_plazo.png')
+
 print('figuras en', IMG, ':', len([f for f in os.listdir(IMG) if f.endswith('.png')]))

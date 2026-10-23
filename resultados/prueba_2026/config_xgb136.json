@@ -1,0 +1,13 @@
+{
+  "celda": "xgb136",
+  "nombre": "XGBoost 136",
+  "platt": [
+    0.8357509408931487,
+    0.041698631387132354
+  ],
+  "umbral": 0.34453171491622925,
+  "auc_validacion": 0.8338,
+  "f1_validacion": 0.653,
+  "variables_nuevas": [],
+  "xgb_trabajo": "xgboost__ninguno__optuna__2025-S2.json"
+}

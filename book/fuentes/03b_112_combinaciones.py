@@ -273,6 +273,132 @@ mostrar(plots.costo(df, MODELO, BALANCEO))
 # uso es la de KNN: tarda 1,3 segundos por cada mil posiciones, porque tiene que buscar vecinos entre todo el
 # entrenamiento. XGBoost tarda 16 milisegundos y los lineales menos de uno.
 #
+# ## La semilla y la convergencia
+#
+# Todo lo anterior usa una semilla, la del proyecto (2026). La mejor combinación de XGBoost, el bosque, la logística y el
+# SVM se reajustó con diez semillas más en cada bloque, con los mismos hiperparámetros (`src/estabilidad.py`, 320
+# ajustes en el servidor). Solo cambia la semilla del modelo; el remuestreo SMOTE del bosque es el de la caché.
+
+# %%
+E = datos.RAIZ / "resultados" / "estabilidad"
+sem = pd.read_csv(E / "semillas.csv")
+mostrar(plots.semillas(sem, plots.MODELO))
+med = sem.groupby(["modelo", "semilla"]).AUC.mean().unstack(0)
+tabla(legible(med.agg(["mean", "std", "min", "max"]).T.reset_index().rename(columns={
+    "mean": "AUC medio", "std": "desviación entre semillas", "min": "mínimo", "max": "máximo"})), dec=4)
+
+# %% [markdown]
+# El AUC medio de cada modelo se mueve 0,0007 entre semillas (desviación estándar), y dentro de un bloque, 0,002. La
+# ventaja de XGBoost sobre el bosque va de 0,008 a 0,011 según la semilla, y XGBoost le gana en siete u ocho bloques con
+# cada una: la ventaja media, 0,010, es unas catorce veces lo que mueve la semilla. Con las diez, XGBoost queda primero
+# y el bosque segundo; la logística y el SVM, separados por 0,001, se alternan el tercer puesto.
+#
+# La **curva de convergencia** reajusta XGBoost en cada bloque y anota el AUC y la log-loss (la pérdida que minimiza el
+# boosting: el promedio de −log de la probabilidad que le dio a lo que pasó) en el entrenamiento y en el semestre externo
+# después de cada árbol. El número de árboles es el que eligió Optuna en cada bloque, de 266 a 587.
+
+# %%
+conv = pd.read_csv(E / "convergencia.csv")
+mostrar(plots.convergencia(conv))
+fin = conv[conv.arbol == conv.groupby("bloque").arbol.transform("max")].set_index("bloque")
+mejor_auc = conv.loc[conv.groupby("bloque").AUC_externo.idxmax()].set_index("bloque")
+mejor_ll = conv.loc[conv.groupby("bloque").logloss_externo.idxmin()].set_index("bloque")
+tabla(pd.DataFrame({"árboles": fin.arbol, "AUC entrenamiento": fin.AUC_entrenamiento, "AUC externo": fin.AUC_externo,
+                    "brecha": fin.AUC_entrenamiento - fin.AUC_externo, "árbol del mejor AUC externo": mejor_auc.arbol,
+                    "AUC que se deja": mejor_auc.AUC_externo - fin.AUC_externo,
+                    "árbol de la menor log-loss externa": mejor_ll.arbol}).reset_index(), dec=4,
+      enteros=["árboles", "árbol del mejor AUC externo", "árbol de la menor log-loss externa"])
+
+# %% [markdown]
+# Al final, el AUC de entrenamiento queda entre 0,92 y 0,99 y el externo entre 0,83 y 0,89: una brecha media de 0,12.
+# Hay sobreajuste, pero casi no le cuesta orden al modelo. El mejor AUC externo llega antes del último árbol en siete
+# bloques, y lo que se deja es de 0,0014 en promedio (0,004-0,005 en 2023-S1 y 2025-S1). La log-loss externa, en cambio,
+# toca su mínimo mucho antes (entre 55 y 501 árboles) y luego sube. Los árboles de más siguen ordenando igual de bien,
+# pero empujan las probabilidades hacia 0 y 1. Es la sobreconfianza que se ve en la curva de fiabilidad de la sección
+# siguiente, y es lo que corrige Platt. Una parada temprana por log-loss daría mejores probabilidades crudas; por AUC
+# no cambiaría casi nada.
+#
+# ## XGBoost en validación: calibración y errores
+#
+# Antes de la prueba 2026 se puede mirar cómo se equivoca el ganador en los ocho bloques, con sus predicciones y el
+# umbral de máximo F1 que cada trabajo fijó en su validación interna: aquí no se elige ningún umbral
+# (`src/diagnostico_validacion.py`).
+
+# %%
+D = datos.RAIZ / "resultados" / "diagnostico"
+tabla(pd.read_csv(D / "por_bloque.csv").rename(columns={"precision": "precisión"})[
+    ["bloque", "filas", "prevalencia", "umbral", "AUC", "F1", "precisión", "sensibilidad", "Brier", "ECE"]],
+    dec=3, enteros=["filas"])
+fia = pd.read_csv(D / "fiabilidad.csv").rename(columns={"filas": "posiciones"})
+mostrar(plots.calibracion(fia, "Calibración de XGBoost en los 8 bloques de validación (deciles)", "XGBoost"))
+
+# %% [markdown]
+# El ECE (error de calibración esperado: la distancia media, ponderada por filas, entre la probabilidad predicha y la
+# tasa observada en cada decil) va de 0,018 a 0,068 según el bloque, con media 0,040. La logística en la prueba 2026 dio
+# 0,021. La curva muestra la forma del error: en los deciles bajos XGBoost predice menos de lo que pasa (1 % contra 4 %
+# en el primero) y en los altos un poco más (74 % contra 69 % en el noveno). Exagera en los extremos, que es lo que
+# corrige el escalado de Platt: una regresión logística sobre el logit del puntaje, con pendiente menor que 1.
+#
+# Para decidir si calibrar sin mirar 2026, Platt se ajusta en un bloque y se aplica al siguiente, como se haría con 2025
+# y 2026:
+
+# %%
+pl = pd.read_csv(D / "platt.csv")
+tabla(pl.rename(columns={"ajuste": "Platt ajustado en", "bloque": "aplicado a", "ECE_crudo": "ECE sin calibrar",
+                         "ECE_platt": "ECE con Platt", "Brier_crudo": "Brier sin calibrar",
+                         "Brier_platt": "Brier con Platt"}), dec=4)
+
+# %% [markdown]
+# La evidencia es mixta. La pendiente sale siempre bajo 1 (de 0,61 a 0,95), como se esperaba, pero Platt baja el ECE en
+# tres de los siete pares y lo sube en cuatro; el Brier cambia en la tercera cifra. Los dos pares más recientes son los
+# que más ganan (2025-S1: de 0,055 a 0,030; 2025-S2: de 0,046 a 0,029), y son los que más se parecen al paso de 2025 a
+# 2026. Por eso el modelo que se lleva a la prueba (capítulo siguiente) lleva Platt ajustado con toda la validación
+# 2025, congelado antes de mirar 2026.
+#
+# **Dónde se equivoca.** Por línea de negocio, con los ocho bloques juntos y cada fila al umbral de su bloque:
+
+# %%
+tabla(pd.read_csv(D / "por_linea.csv").rename(columns={"linea": "línea", "precision": "precisión"}), dec=3,
+      enteros=["filas"])
+
+# %% [markdown]
+# Ordena mejor en puerto (AUC 0,897) y peor en ganadería (0,823), que además es la peor calibrada (ECE 0,083) y la de
+# menos filas. Palma, con el 43 % de las posiciones de estos semestres, queda en 0,836.
+#
+# **Proveedores nuevos.** Un proveedor es nuevo para un bloque si no aparece en el entrenamiento de ese bloque: el modelo
+# solo sabe de él lo que dicen su región, su grupo de cuentas y su sector.
+
+# %%
+nv = pd.read_csv(D / "nuevos.csv")
+tabla(nv[nv.bloque == "todos"].drop(columns="bloque").rename(columns={"proveedor_tipo": "proveedor",
+                                                                      "precision": "precisión"}), dec=3,
+      enteros=["filas"])
+
+# %% [markdown]
+# Son el 3,9 % de las posiciones (11.665 de 296.969) y llegan tarde más seguido (40 % contra 31 %). El modelo los
+# ordena peor (AUC 0,806 contra 0,852) y acierta menos cuando los marca (precisión 0,594 contra 0,672). En la prueba
+# pesará más: una de cada nueve posiciones de 2026 trae un proveedor que no estaba en 2021-2024 (capítulo 2), contra
+# una de cada 26 aquí.
+#
+# **El perfil de los errores.** Mediana de algunas variables por tipo de caso:
+
+# %%
+pe = pd.read_csv(D / "perfil_errores.csv").set_index("caso").loc[
+    ["verdadero positivo", "falso negativo", "falso positivo", "verdadero negativo"]].reset_index()
+tabla(pe.rename(columns={"puntaje_mediano": "puntaje", "proveedor_nuevo": "proveedor nuevo",
+                         "prov_tasa_tarde_previa_mediana": "tasa previa del proveedor",
+                         "prov_n_previas_mediana": "posiciones previas del proveedor",
+                         "plazo_habil_al_liberar_mediana": "días hábiles de plazo al liberar",
+                         "dias_habiles_liberacion_mediana": "días hábiles hasta liberar"}),
+      dec=3, pct=["proveedor nuevo"], enteros=["filas"])
+
+# %% [markdown]
+# Un **falso negativo típico** es una posición que parecía segura: le quedaban 13 días hábiles de plazo al liberarse
+# (contra 2 en los verdaderos positivos), su proveedor tenía una tasa previa de retraso de 0,31 (contra 0,45) y un
+# historial largo, y la orden se liberó rápido. El modelo le dio 0,16. Son retrasos que no anuncian las variables
+# disponibles al liberar la orden: se deciden después, en la ejecución del proveedor. Un **falso positivo típico** es lo
+# contrario: plazo corto (9 días) y un proveedor con historial de retraso (0,44), que esa vez cumplió.
+#
 # ## Qué deja este capítulo
 #
 # El modelo es lo que decide, no el balanceo ni el optimizador. **XGBoost sin balanceo** queda primero, con ROC-AUC
@@ -280,5 +406,4 @@ mostrar(plots.costo(df, MODELO, BALANCEO))
 # tres más cercanos (bosque, logística, SVM) la ventaja es de 0,009 a 0,013 de AUC, con un intervalo BCa por órdenes que
 # no toca el cero y un DeLong significativo en seis o siete de los ocho bloques; en el resto, empate. El
 # balanceo no aporta, y con 20 evaluaciones Optuna y el genético llegan más rápido a lo mismo que la rejilla y la búsqueda
-# aleatoria. Falta evaluar ese modelo una sola vez en la prueba 2026 (matriz de confusión, ROC, PR, calibración) y
-# explicarlo con SHAP.
+# aleatoria. El capítulo siguiente lo mide en la prueba 2026 y lo explica con SHAP.

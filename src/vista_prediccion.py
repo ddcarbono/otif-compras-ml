@@ -60,7 +60,8 @@ def vista():
         dcc.Loading(html.Div(id="p-resultado"), type="default",
                     custom_spinner=html.Div([dbc.Spinner(size="sm"), html.Span(" Calculando…", className="ms-2")])),
         html.P("Cómo leer las contribuciones: cada barra es cuánto sube (oro) o baja (verde) esa variable el logaritmo de "
-               "los odds de llegar tarde, frente a una posición promedio. Suman, con el intercepto, el riesgo estimado. "
+               "los odds de llegar tarde, frente a una posición promedio. Con XGBoost son valores SHAP exactos de árbol: "
+               "suman, con el valor base, el logit del modelo, que la calibración de Platt convierte en el riesgo. "
                "Si un valor queda fuera del rango de desarrollo, el modelo está extrapolando y la cifra es menos confiable.",
                className="small text-muted mt-2"),
     ])

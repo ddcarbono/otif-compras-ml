@@ -105,6 +105,15 @@ Bootstrap por grupos
   *En el proyecto* ({doc}`03a_modelo_base`). 200 réplicas por órdenes completas; da los intervalos de AUC, PR-AUC y F1
   de la prueba 2026. Remuestrear por posición daría intervalos demasiado estrechos.
 
+Bootstrap BCa
+  Intervalo bootstrap corregido por sesgo y acelerado (Efron, 1987). En lugar de los percentiles 2,5 y 97,5 toma
+  $\Phi\big(z_0 + (z_0 + z_\alpha)/(1 - a(z_0 + z_\alpha))\big)$, con $z_0$ el sesgo (qué fracción de réplicas cae bajo la
+  estimación) y $a$ la aceleración (cuánto cambia el error estándar con el parámetro, estimada con jackknife). Sirve
+  cuando la distribución bootstrap está corrida o es asimétrica, como la de un AUC cerca de 1.
+
+  *En el proyecto* ({doc}`03b_112_combinaciones`). 1.000 réplicas que remuestrean órdenes dentro de cada bloque: la
+  diferencia de AUC entre XGBoost y el bosque es 0,009 [0,006; 0,012].
+
 Brier
   Error cuadrático medio de la probabilidad: $\frac{1}{n}\sum_i (p_i - y_i)^2$.
 
@@ -164,9 +173,10 @@ DeLong
   $z = (\mathrm{AUC}_1 - \mathrm{AUC}_2) / \sqrt{\mathrm{Var}_1 + \mathrm{Var}_2 - 2\,\mathrm{Cov}}$. La covarianza importa
   porque los dos modelos puntúan los mismos casos y sus errores están correlacionados; ignorarla subestima la potencia.
 
-  *En el proyecto.* Se usará sobre la prueba 2026 para ver si la ventaja de XGBoost se sostiene en un año nuevo
-  (pendiente: evaluación 2026). Las filas de una orden no son independientes, así que la inferencia debe tenerlo en
-  cuenta (como el *bootstrap por grupos*).
+  *En el proyecto* ({doc}`03b_112_combinaciones`). En los 8 bloques, XGBoost contra cada rival (48 pruebas, Holm):
+  supera al bosque en 6, a la logística y al SVM en 7 y a los demás en 8; nunca pierde. La implementación coincide con
+  `pROC::roc.test` de R hasta 1e-10. Como supone filas independientes y las de una orden no lo son, se lee con un
+  intervalo BCa por órdenes. Falta en la prueba 2026 (pendiente: evaluación 2026).
 ```
 
 ## D a F
@@ -176,8 +186,9 @@ Delta de Cliff
   Tamaño del efecto no paramétrico entre dos grupos: $\delta = P(X > Y) - P(X < Y)$, entre −1 y 1. Referencia usual
   (Romano et al., 2006): $|\delta| < 0{,}147$ despreciable, hasta 0,33 pequeño, hasta 0,474 mediano, más grande.
 
-  *En el proyecto.* Acompañará a las pruebas pareadas para dar el tamaño de la diferencia entre XGBoost y los demás,
-  además del p (pendiente: evaluación 2026). Con ocho bloques, XGBoost gana en los ocho frente a cada modelo.
+  *En el proyecto* ({doc}`03b_112_combinaciones`). Sobre los 8 AUC por bloque: frente al bosque 0,25 (pequeño), a la
+  logística 0,34 y al SVM 0,38 (medianos), a los otros tres de 0,88 a 1 (grandes). Cliff no parea: con el bosque sale
+  pequeño aunque XGBoost gane 7 de 8 bloques, porque la variación entre semestres es mayor que la ventaja.
 
 Deriva de covariables
   Cambio de la distribución de las predictoras entre el periodo de entrenamiento y el de uso. Se mide con el *PSI*. La

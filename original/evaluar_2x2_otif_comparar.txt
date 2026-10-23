@@ -1,0 +1,52 @@
+evaluar_2x2_otif.py --fase comparar | TERCERA mirada a la prueba 2026, exploratoria | 51941 filas (tasa 0.315)
+
+toda la prueba (51941 filas, 12584 OC, tasa 0.315):
+   celda | ROC-AUC [IC 95 %] | PR-AUC [IC 95 %] | F1 al umbral de validación [IC 95 %] | Brier | ECE
+   XGBoost 136                  0.848 [0.836, 0.865] | 0.758 [0.738, 0.777] | 0.675 [0.657, 0.693] | 0.1392 | 0.0222
+   XGBoost 136 + nuevas         0.858 [0.848, 0.869] | 0.767 [0.744, 0.787] | 0.685 [0.668, 0.701] | 0.1354 | 0.0164
+   Propuesta 136                0.856 [0.846, 0.869] | 0.763 [0.743, 0.782] | 0.680 [0.662, 0.696] | 0.1365 | 0.0093
+   Propuesta 136 + nuevas       0.860 [0.850, 0.872] | 0.767 [0.749, 0.790] | 0.685 [0.669, 0.702] | 0.1350 | 0.0131
+   K3 136 + nuevas (ablación)   0.858 [0.846, 0.869] | 0.767 [0.749, 0.786] | 0.686 [0.670, 0.703] | 0.1351 | 0.0076
+   K3 136 (ablación)            0.854 [0.844, 0.865] | 0.761 [0.744, 0.780] | 0.682 [0.665, 0.699] | 0.1373 | 0.0108
+   (referencia fuera de la comparación: LightGBM + Platt, ROC-AUC 0.852)
+   modelo, con las 136                            Propuesta 136 − XGBoost 136: ROC-AUC 0.008 [0.003, 0.013] | PR-AUC 0.005 [-0.003, 0.012] | F1 0.005 [-0.007, 0.019]
+   modelo, con 136 + nuevas                       Propuesta 136 + nuevas − XGBoost 136 + nuevas: ROC-AUC 0.002 [-0.003, 0.007] | PR-AUC 0.000 [-0.006, 0.007] | F1 0.000 [-0.009, 0.008]
+   información, en XGBoost                        XGBoost 136 + nuevas − XGBoost 136: ROC-AUC 0.010 [0.006, 0.014] | PR-AUC 0.009 [0.003, 0.014] | F1 0.010 [0.001, 0.020]
+   información, en la propuesta                   Propuesta 136 + nuevas − Propuesta 136: ROC-AUC 0.004 [-0.002, 0.009] | PR-AUC 0.004 [-0.004, 0.009] | F1 0.005 [-0.005, 0.015]
+   propuesta completa contra el ganador del E2    Propuesta 136 + nuevas − XGBoost 136: ROC-AUC 0.012 [0.004, 0.019] | PR-AUC 0.009 [-0.000, 0.017] | F1 0.010 [-0.001, 0.022]
+   ablación: aporte del log-normal (con nuevas)   Propuesta 136 + nuevas − K3 136 + nuevas (ablación): ROC-AUC 0.002 [-0.001, 0.005] | PR-AUC 0.000 [-0.003, 0.003] | F1 -0.001 [-0.007, 0.005]
+   ablación: aporte del log-normal (con 136)      Propuesta 136 − K3 136 (ablación): ROC-AUC 0.003 [0.000, 0.006] | PR-AUC 0.002 [-0.002, 0.006] | F1 -0.002 [-0.011, 0.006]
+
+con algún valor nuevo (10571 filas, 3660 OC, tasa 0.320):
+   celda | ROC-AUC [IC 95 %] | PR-AUC [IC 95 %] | F1 al umbral de validación [IC 95 %] | Brier | ECE
+   XGBoost 136                  0.821 [0.795, 0.843] | 0.726 [0.691, 0.763] | 0.645 [0.616, 0.678] | 0.1514 | 0.0213
+   XGBoost 136 + nuevas         0.826 [0.807, 0.848] | 0.732 [0.699, 0.765] | 0.653 [0.621, 0.678] | 0.1497 | 0.0231
+   Propuesta 136                0.816 [0.795, 0.839] | 0.718 [0.678, 0.751] | 0.646 [0.615, 0.680] | 0.1552 | 0.0352
+   Propuesta 136 + nuevas       0.825 [0.800, 0.849] | 0.728 [0.693, 0.760] | 0.652 [0.625, 0.682] | 0.1521 | 0.0338
+   K3 136 + nuevas (ablación)   0.824 [0.803, 0.846] | 0.728 [0.693, 0.763] | 0.653 [0.618, 0.681] | 0.1513 | 0.0290
+   K3 136 (ablación)            0.814 [0.791, 0.831] | 0.720 [0.682, 0.755] | 0.649 [0.617, 0.679] | 0.1544 | 0.0351
+   (referencia fuera de la comparación: LightGBM + Platt, ROC-AUC 0.823)
+   modelo, con las 136                            Propuesta 136 − XGBoost 136: ROC-AUC -0.004 [-0.016, 0.008] | PR-AUC -0.009 [-0.019, 0.004] | F1 0.001 [-0.017, 0.019]
+   modelo, con 136 + nuevas                       Propuesta 136 + nuevas − XGBoost 136 + nuevas: ROC-AUC -0.002 [-0.010, 0.005] | PR-AUC -0.004 [-0.015, 0.006] | F1 -0.000 [-0.015, 0.015]
+   información, en XGBoost                        XGBoost 136 + nuevas − XGBoost 136: ROC-AUC 0.006 [-0.002, 0.013] | PR-AUC 0.006 [-0.004, 0.016] | F1 0.008 [-0.007, 0.021]
+   información, en la propuesta                   Propuesta 136 + nuevas − Propuesta 136: ROC-AUC 0.008 [0.002, 0.014] | PR-AUC 0.011 [0.003, 0.019] | F1 0.006 [-0.008, 0.020]
+   propuesta completa contra el ganador del E2    Propuesta 136 + nuevas − XGBoost 136: ROC-AUC 0.004 [-0.007, 0.013] | PR-AUC 0.002 [-0.010, 0.014] | F1 0.007 [-0.009, 0.023]
+   ablación: aporte del log-normal (con nuevas)   Propuesta 136 + nuevas − K3 136 + nuevas (ablación): ROC-AUC 0.001 [-0.004, 0.006] | PR-AUC -0.000 [-0.007, 0.006] | F1 -0.000 [-0.010, 0.011]
+   ablación: aporte del log-normal (con 136)      Propuesta 136 − K3 136 (ablación): ROC-AUC 0.002 [-0.004, 0.008] | PR-AUC -0.002 [-0.010, 0.004] | F1 -0.003 [-0.015, 0.007]
+
+todo conocido (41370 filas, 9886 OC, tasa 0.314):
+   celda | ROC-AUC [IC 95 %] | PR-AUC [IC 95 %] | F1 al umbral de validación [IC 95 %] | Brier | ECE
+   XGBoost 136                  0.856 [0.842, 0.867] | 0.767 [0.747, 0.788] | 0.683 [0.663, 0.705] | 0.1361 | 0.0233
+   XGBoost 136 + nuevas         0.866 [0.856, 0.878] | 0.777 [0.755, 0.799] | 0.694 [0.675, 0.715] | 0.1317 | 0.0192
+   Propuesta 136                0.866 [0.854, 0.879] | 0.776 [0.753, 0.797] | 0.690 [0.669, 0.709] | 0.1317 | 0.0143
+   Propuesta 136 + nuevas       0.869 [0.856, 0.881] | 0.779 [0.757, 0.801] | 0.694 [0.676, 0.714] | 0.1307 | 0.0143
+   K3 136 + nuevas (ablación)   0.867 [0.854, 0.878] | 0.778 [0.757, 0.801] | 0.695 [0.673, 0.716] | 0.1310 | 0.0118
+   K3 136 (ablación)            0.864 [0.851, 0.876] | 0.773 [0.753, 0.794] | 0.692 [0.670, 0.712] | 0.1329 | 0.0165
+   (referencia fuera de la comparación: LightGBM + Platt, ROC-AUC 0.860)
+   modelo, con las 136                            Propuesta 136 − XGBoost 136: ROC-AUC 0.011 [0.005, 0.017] | PR-AUC 0.010 [0.001, 0.018] | F1 0.007 [-0.008, 0.020]
+   modelo, con 136 + nuevas                       Propuesta 136 + nuevas − XGBoost 136 + nuevas: ROC-AUC 0.003 [-0.003, 0.009] | PR-AUC 0.002 [-0.006, 0.009] | F1 0.000 [-0.009, 0.010]
+   información, en XGBoost                        XGBoost 136 + nuevas − XGBoost 136: ROC-AUC 0.011 [0.006, 0.016] | PR-AUC 0.010 [0.003, 0.016] | F1 0.011 [-0.001, 0.023]
+   información, en la propuesta                   Propuesta 136 + nuevas − Propuesta 136: ROC-AUC 0.003 [-0.003, 0.009] | PR-AUC 0.003 [-0.005, 0.009] | F1 0.004 [-0.009, 0.015]
+   propuesta completa contra el ganador del E2    Propuesta 136 + nuevas − XGBoost 136: ROC-AUC 0.014 [0.005, 0.021] | PR-AUC 0.012 [0.002, 0.021] | F1 0.011 [-0.003, 0.025]
+   ablación: aporte del log-normal (con nuevas)   Propuesta 136 + nuevas − K3 136 + nuevas (ablación): ROC-AUC 0.002 [-0.001, 0.006] | PR-AUC 0.001 [-0.003, 0.004] | F1 -0.001 [-0.006, 0.006]
+   ablación: aporte del log-normal (con 136)      Propuesta 136 − K3 136 (ablación): ROC-AUC 0.003 [-0.000, 0.005] | PR-AUC 0.003 [-0.002, 0.009] | F1 -0.002 [-0.012, 0.007]

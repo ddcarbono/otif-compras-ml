@@ -23,7 +23,9 @@ conocidas al liberar. La partición es cronológica: entrenamiento 2021-2024, va
 | {doc}`02c_tiempo_y_fuga` | cómo cambia el retraso en el tiempo, qué tan distinta es la evaluación del entrenamiento, qué no puede entrar al modelo y cómo se preprocesa |
 | {doc}`03a_modelo_base` | cuánto logra una regresión logística frente a no tener modelo y frente a la regla del proveedor |
 | {doc}`03b_112_combinaciones` | qué modelo, balanceo y optimizador funcionan mejor en la validación anidada |
+| {doc}`03d_mejor_modelo` | cuánto logra el ganador en la prueba 2026, qué mira (SHAP) y por qué se prefiere a la logística |
 | {doc}`03c_fundamentos` | cómo funciona XGBoost por dentro y cuánto cuesta cada modelo, en teoría y medido |
+| {doc}`05_modelo_original` | la propuesta del Entregable 3 (efectos por entidad, plazo log-normal, plazo real), cómo se eligió y la comparación 2 × 2 en 2026 |
 | {doc}`glosario` | qué mide y cómo se lee cada estadístico del libro |
 
 ## Cómo reproducirlo

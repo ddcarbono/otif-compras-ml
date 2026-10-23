@@ -1,0 +1,23 @@
+{
+  "variante": "completo",
+  "monotono": true,
+  "centrar": true,
+  "prm": {
+    "learning_rate": 0.01528,
+    "num_leaves": 154,
+    "min_child_samples": 154,
+    "subsample": 0.834,
+    "colsample_bytree": 0.3826,
+    "reg_lambda": 0.2642,
+    "reg_alpha": 1.413,
+    "cat_smooth": 2.019,
+    "min_data_per_group": 24
+  },
+  "arboles_validacion": 770,
+  "platt": [
+    0.8866293039242062,
+    0.10224269927950144
+  ],
+  "umbral_f1": 0.32685548900798167,
+  "auc_validacion": 0.8453
+}

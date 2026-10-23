@@ -16,3 +16,5 @@ presentacion/render/
 presentacion/hoja.png
 # Puntajes por posicion de los 56 modelos (16 MB; los rehace src.puntajes en srvgdai). Lo que se publica es resultados/pruebas/
 resultados/puntajes/
+# El pipeline de XGBoost guarda la tasa de cada codigo de entidad: no se publica (el tablero usa servido.joblib)
+artifacts/xgboost.joblib

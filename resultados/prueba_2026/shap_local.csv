@@ -1,0 +1,25 @@
+caso,probabilidad,base,variable,contribucion,valor
+verdadero positivo,0.6780336,-0.8450448,proveedor,1.905160665512085,(código de entidad)
+verdadero positivo,0.6780336,-0.8450448,plazo_habil_al_liberar,-0.6638610363006592,27.0
+verdadero positivo,0.6780336,-0.8450448,material,0.35466232895851135,(código de entidad)
+verdadero positivo,0.6780336,-0.8450448,imp_ceco,-0.20802052319049835,(código de entidad)
+verdadero positivo,0.6780336,-0.8450448,prov_centro_oc_previas,0.19076430797576904,0.0
+verdadero positivo,0.6780336,-0.8450448,n_posiciones_oc,-0.18946124613285065,2
+verdadero positivo,0.6780336,-0.8450448,imp_cuenta,0.16364945471286774,(código de entidad)
+verdadero positivo,0.6780336,-0.8450448,valor_oc_cop,-0.150409996509552,557940.0
+falso negativo,0.2158764,-0.8450448,proveedor,-0.2979050278663635,(código de entidad)
+falso negativo,0.2158764,-0.8450448,sp_creador,-0.2703566253185272,(código de entidad)
+falso negativo,0.2158764,-0.8450448,dias_habiles_liberacion,0.2235649973154068,16.0
+falso negativo,0.2158764,-0.8450448,prov_tasa_tarde_previa,-0.12849602103233337,0.1515151515151515
+falso negativo,0.2158764,-0.8450448,cambiada_antes_de_liberar,-0.12790797650814056,1
+falso negativo,0.2158764,-0.8450448,ce_region,0.12244080007076263,13
+falso negativo,0.2158764,-0.8450448,material,-0.11998925358057022,(código de entidad)
+falso negativo,0.2158764,-0.8450448,imp_cuenta,0.11581894010305405,(código de entidad)
+falso positivo,0.45864055,-0.8450448,plazo_habil_al_liberar,-0.9521490335464478,29.0
+falso positivo,0.45864055,-0.8450448,proveedor,0.7649022936820984,(código de entidad)
+falso positivo,0.45864055,-0.8450448,prov_n_previas,0.18944483995437622,31.0
+falso positivo,0.45864055,-0.8450448,prov_retraso_medio_previo,0.14698901772499084,11.129032258064516
+falso positivo,0.45864055,-0.8450448,cmp_pos_abiertas,0.14131419360637665,2650.0
+falso positivo,0.45864055,-0.8450448,prov_centro_oc_previas,0.09657836705446243,12.0
+falso positivo,0.45864055,-0.8450448,material,0.08501327782869339,(código de entidad)
+falso positivo,0.45864055,-0.8450448,plazo_prometido_dias,-0.08362631499767303,47

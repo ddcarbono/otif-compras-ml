@@ -68,6 +68,19 @@ def main():
         (sal / "modelos").mkdir(exist_ok=True)
         for f in ["lideres", "rangos", "friedman", "wilcoxon", "auc_por_bloque_modelos", "curvas_optimizador"]:
             shutil.copy(ex / f"{f}.csv", sal / "modelos" / f"{f}.csv")
+    # pruebas sobre las predicciones (DeLong, BCa, Cliff), calibración y convergencia de XGBoost en validación
+    for origen, destino in [("pruebas/resumen.csv", "pruebas_resumen.csv"),
+                            ("diagnostico/fiabilidad.csv", "fiabilidad_xgboost.csv"),
+                            ("diagnostico/nuevos.csv", "nuevos_xgboost.csv"),
+                            ("estabilidad/convergencia.csv", "convergencia_xgboost.csv")] + [
+            (f"prueba_2026/{f}.csv", f"p26_{f}.csv") for f in ("metricas", "diferencias", "curvas", "calibracion",
+                                                                "confusion", "segmentos", "brecha", "shap_global",
+                                                                "dos_por_dos", "contrastes", "presupuesto",
+                                                                "forma_clase")]:
+        f = datos.RAIZ / "resultados" / origen
+        if f.exists():
+            (sal / "modelos").mkdir(exist_ok=True)
+            shutil.copy(f, sal / "modelos" / destino)
 
     # privacidad: la muestra no lleva identificadores ni entidades de personas o terceros
     prohibidas = set(datos.ENTIDADES) - {"sociedad"} | {"oc_id", "posicion"}

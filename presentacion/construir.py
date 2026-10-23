@@ -59,6 +59,16 @@ top = mejor.iloc[0]
 fri = leer(MOD, 'friedman.csv').iloc[0]
 wil = leer(MOD, 'wilcoxon.csv')
 pru = leer(R, 'pruebas', 'resumen.csv')
+m26 = leer(R, 'prueba_2026', 'metricas.csv').set_index('modelo')
+x26 = m26.loc['XGBoost (las 112)']
+d26 = leer(R, 'prueba_2026', 'diferencias.csv').iloc[0]
+s26 = leer(R, 'prueba_2026', 'segmentos.csv')
+s26 = s26[s26.modelo == 'XGBoost (las 112)'].set_index('valor')
+p26 = leer(R, 'prueba_2026', 'presupuesto.csv')
+p26 = p26[p26.presupuesto == 0.2].set_index('modelo')
+c26 = leer(R, 'prueba_2026', 'costo.csv').set_index('modelo')
+b26 = leer(R, 'prueba_2026', 'brecha.csv').set_index('modelo').loc['XGBoost (las 112)']
+f26 = leer(R, 'prueba_2026', 'confusion.csv').set_index(['real', 'predicho']).posiciones
 cur = leer(MOD, 'curvas_optimizador.csv').pivot(index='eval', columns='optimizador', values='mean')
 met = leer(MOD, 'metricas.csv').set_index(['modelo', 'partición'])
 lb = met.loc[('Regresión logística', 'prueba 2026')]
@@ -78,7 +88,7 @@ NOMBRE = {'xgboost': 'XGBoost', 'random_forest': 'Random Forest', 'logistica': '
 BAL = {'ninguno': 'sin balanceo', 'smote': 'SMOTE', 'adasyn': 'ADASYN', 'pesos': 'pesos'}
 OPT = {'grid': 'Grid', 'random': 'Random', 'optuna': 'Optuna', 'deap': 'DEAP'}
 
-N_TOTAL = 20
+N_TOTAL = 21
 NOTAS = []
 _k = [0]
 
@@ -424,7 +434,7 @@ tarjeta(s, 15.0, 8.2, 9.2, 4.9, '4 optimizadores, mismo presupuesto', '20 evalua
         'Grid, Random, Optuna (TPE) y DEAP (genético). Medias y desviaciones salen de los 8 bloques externos.', CREMA,
         tam_c=10.5)
 pie(s, 'libro, capítulo 5 (las 112): src/validacion.py, src/experimentos.py')
-notas(s, '1:00', 'B', 'criterio 4', 'Validación anidada: el externo mide, el interno elige. Mismo presupuesto para '
+notas(s, '0:45', 'B', 'criterio 4', 'Validación anidada: el externo mide, el interno elige. Mismo presupuesto para '
       'comparar optimizadores de forma justa. La prueba 2026 se mira una vez, al final.')
 
 # ============================================================== 14 IMPLEMENTACION
@@ -453,7 +463,7 @@ tarjeta(s, 14.6, 8.4, 9.6, 4.7, 'Pruebas e integración continua', '57 pruebas c
         'pliegue, series, modelo servido, tablero, que no se publiquen identificadores) que corren en GitHub en cada '
         'cambio.', CREMA, tam_c=10.5)
 pie(s, 'src/experimentos.py (ESPACIOS), resultados/experimentos/trabajos/*.json, tests/')
-notas(s, '1:00', 'B', 'criterio 4', 'Por qué ese espacio: rangos usuales de la literatura, escala logarítmica donde el '
+notas(s, '0:45', 'B', 'criterio 4', 'Por qué ese espacio: rangos usuales de la literatura, escala logarítmica donde el '
       'efecto es multiplicativo (tasa, peso mínimo). Decisiones computacionales: matrices preprocesadas en disco, SMOTE '
       'calculado una vez por ventana.')
 
@@ -469,7 +479,7 @@ en_vivo(s, 14.3, 7.1, 9.9, 6.0, ['Modelos → Las 112 combinaciones.', 'Tabla de
                                  'media ± desviación del bucle externo.',
                                  'Mapa balanceo × optimizador de XGBoost: el balanceo casi no mueve el AUC.'])
 pie(s, f'tablero, página Modelos ({URL["tablero"]}); data/modelos/curvas_optimizador.csv')
-notas(s, '1:00', 'A', 'criterio 4', 'Optuna (TPE) aprende de los ensayos y propone donde la mejora esperada es mayor; '
+notas(s, '0:45', 'A', 'criterio 4', 'Optuna (TPE) aprende de los ensayos y propone donde la mejora esperada es mayor; '
       'DEAP llega tarde pero llega. Con poco presupuesto conviene Optuna; con 20 la superficie es plana.')
 
 # ============================================================== 16 METRICAS Y COMPARACION
@@ -481,22 +491,26 @@ for _, r in mejor.iterrows():
     filas_r.append([f'{NOMBRE[r.modelo]} · {BAL[r.balanceo]} · {OPT[r.optimizador]}',
                     f'{n(r.AUC, 3)} ± {n(r.AUC_desv, 3)}', n(r.PR_AUC, 3), n(r.F1, 3), n(r.ms_inferencia_por_1000, 1)])
 tabla(s, 1.3, 3.3, 13.6, 5.8, filas_r, anchos=[5.6, 2.6, 1.6, 1.4, 1.6], tam=10)
-texto(s, 1.3, 9.4, 13.6, 1.1, 'AUC ordena por riesgo sin depender del umbral; PR-AUC atiende a la clase de interés; F1 '
-      'mide la decisión al umbral; Brier y ECE dicen si la probabilidad es creíble.', tam=10, color=GRIS)
-tabla(s, 1.3, 10.6, 13.6, 2.5, [['prueba 2026 (línea base)', 'AUC', 'F1', 'Brier'],
-                                ['regla del proveedor', n(rp['ROC-AUC'], 3), n(rp.F1, 3), n(rp.Brier, 3)],
-                                ['regresión logística', n(lb['ROC-AUC'], 3), n(lb.F1, 3), n(lb.Brier, 3)]],
-      anchos=[5.6, 2.0, 2.0, 2.0], tam=10)
+texto(s, 1.3, 9.2, 13.6, 1.0, 'AUC ordena por riesgo sin depender del umbral; PR-AUC atiende a la clase de interés; F1 '
+      'mide la decisión al umbral; Brier y ECE dicen si la probabilidad es creíble.', tam=9.5, color=GRIS)
+tabla(s, 1.3, 10.2, 13.6, 3.0, [['prueba 2026', 'AUC [BCa 95 %]', 'F1', 'ECE'],
+                                ['regla del proveedor', n(rp['ROC-AUC'], 3), n(rp.F1, 3), n(rp.ECE, 3)],
+                                ['regresión logística', n(lb['ROC-AUC'], 3), n(lb.F1, 3), n(lb.ECE, 3)],
+                                ['XGBoost, con Platt', f"{n(x26['ROC-AUC'], 3)} [{n(x26['ROC-AUC inf'], 3)}; "
+                                 f"{n(x26['ROC-AUC sup'], 3)}]", n(x26.F1, 3), n(x26.ECE, 3)]],
+      anchos=[5.0, 3.6, 1.8, 1.8], tam=9.5)
 tarjeta(s, 15.6, 3.3, 8.6, 6.8, 'Cómo leer la tabla', ['Media y desviación de los 8 bloques externos: cada cifra se '
                                                       'midió en un semestre que el modelo no vio.',
                                                       'La línea base son la regla del proveedor (su tasa previa de '
                                                       'retraso) y la logística, medidas en 2026.',
                                                       'KNN predice 80 veces más lento que XGBoost: compara contra todo '
                                                       'el entrenamiento.'], VERDECL, tam_c=10)
-pendiente(s, 15.6, 10.4, 8.6, 2.7, 'XGBoost en la prueba 2026 y la tabla de brecha validación-prueba de cada modelo.')
-pie(s, 'libro, capítulos 4 y 5: data/modelos/lideres.csv, metricas.csv')
-notas(s, '1:00', 'B', 'criterio 5', 'Por qué cada métrica. La ganancia de XGBoost es de una centésima de AUC frente al '
-      'bosque y la logística: real pero pequeña. La comparación en 2026 llega con la evaluación final.')
+tarjeta(s, 15.6, 10.4, 8.6, 2.7, 'De la validación a 2026', f'AUC interno {n(b26.iloc[0], 3)}, bloques externos '
+        f'{n(b26.iloc[1], 3)}, prueba 2026 {n(b26.iloc[3], 3)}: no cae.', VERDECL, tam_c=10)
+pie(s, 'libro, capítulos 5 y 6: data/modelos/lideres.csv; resultados/prueba_2026/metricas.csv, brecha.csv')
+notas(s, '1:00', 'B', 'criterio 5', 'Por qué cada métrica. En los bloques la ganancia es de una centésima frente al '
+      f'bosque y la logística. En 2026, medido una vez con lo congelado en 2025, XGBoost da {n(x26["ROC-AUC"], 3)} y le '
+      f'saca {n(d26.diferencia, 3)} a la logística. La brecha no muestra caída de la validación a la prueba.')
 
 # ============================================================== 17 TABLERO: PREDICCION + CD
 s = nueva()
@@ -517,8 +531,8 @@ texto(s, 13.4, 9.9, 10.8, 3.4, [(f'Friedman: χ² = {n(fri.chi2, 1)}, p < 0,001:
                                   f'{n(rb.dif_AUC, 3)}-{n(rl.dif_AUC, 3)} de AUC, con BCa por órdenes lejos de cero.',
                                   {})], tam=10, espacio=3)
 pie(s, f'tablero, página Modelos; data/modelos/friedman.csv, wilcoxon.csv; resultados/pruebas/resumen.csv')
-notas(s, '1:00', 'A', 'criterio 5', 'En vivo: la predicción la sirve hoy el modelo base (logística), con sus '
-      'contribuciones. Pruebas: Friedman rechaza la igualdad; Nemenyi es conservador con 8 bloques; el Wilcoxon pareado '
+notas(s, '1:00', 'A', 'criterio 5', 'En vivo: la predicción la sirve XGBoost con Platt, con sus contribuciones SHAP '
+      'exactas. Pruebas: Friedman rechaza la igualdad; Nemenyi es conservador con 8 bloques; el Wilcoxon pareado '
       'con Holm separa porque XGBoost gana en cada bloque. DeLong mira dentro de cada bloque (validado contra pROC); como '
       'supone filas independientes, se lee con el BCa que remuestrea órdenes. Cliff con el bosque: pequeño (0,25).')
 
@@ -536,35 +550,69 @@ texto(s, 1.3, 9.3, 11.0, 1.6, f'El bloque 2025-S1 baja de {n(b25.AUC_interno, 3)
 texto(s, 12.6, 9.3, 11.6, 1.6, f'Logística (modelo base): {n(ca["AUC entrenamiento"], 3)} en entrenamiento y '
       f'{n(ca["AUC validación"], 3)} en validación con todas las filas; bien calibrada en 2026 (ECE {n(lb.ECE, 3)}).',
       tam=10.5, color=GRIS)
-pendiente(s, 1.3, 11.1, 22.9, 2.0, 'para el mejor modelo en 2026: matriz de confusión por línea de negocio, errores con '
-          'entidades nuevas frente a conocidas, un falso negativo típico y SHAP (qué variables mueven cada predicción).')
-pie(s, 'libro, capítulos 4 y 5: resultados/experimentos/por_bloque.csv, data/modelos/curva_aprendizaje.csv')
-notas(s, '1:00', 'B', 'criterio 5', 'Sobreajuste en dos vistas: interno contra externo por bloque y la curva de '
-      'aprendizaje. Lo que falta del análisis de errores depende de la evaluación final en 2026; no se adelanta.')
+tardias = f26[('tarde', 'tarde')] + f26[('tarde', 'a tiempo')]
+banda(s, 1.3, 11.1, 22.9, 1.7, [('Errores de XGBoost en 2026:  ', True, ORO_CL),
+                                (f'de {n(tardias)} tardías marcó {n(f26[("tarde", "tarde")])} '
+                                 f'({pc(f26[("tarde", "tarde")] / tardias, 0)}), con {n(f26[("a tiempo", "tarde")])} falsas '
+                                 f'alarmas. AUC {n(s26.loc["todo conocido", "ROC-AUC"], 3)} con todo conocido y '
+                                 f'{n(s26.loc["alguna nueva", "ROC-AUC"], 3)} con alguna entidad nueva; ganadería, '
+                                 f'{n(s26.loc["ganaderia", "ROC-AUC"], 3)}. El falso negativo típico tenía plazo amplio y un '
+                                 'proveedor puntual: el retraso se decide en la ejecución.', False, BLANCO)], VERDE, tam=10.5)
+pie(s, 'libro, capítulos 5 y 6: resultados/experimentos/por_bloque.csv, resultados/prueba_2026/segmentos.csv')
+notas(s, '0:45', 'B', 'criterio 5', 'Sobreajuste en dos vistas: interno contra externo por bloque y la curva de '
+      'aprendizaje. En 2026, el error se concentra en las órdenes con entidades nuevas y en ganadería; el falso negativo '
+      'típico no se podía ver al liberar.')
 
-# ============================================================== 19 CONCLUSIONES
+# ============================================================== 19 POR QUE XGBOOST Y NO LA LOGISTICA
+s = nueva()
+cabecera(s, 'Por qué XGBoost y no la logística, que es más simple', 'CRITERIO 5  ·  PARSIMONIA CON CIFRAS')
+px, pl = p26.loc['XGBoost'], p26.loc['Regresión logística']
+lista(s, 1.3, 3.3, 12.4, [
+    f'Significativa. 2026: {n(x26["ROC-AUC"], 3)} contra {n(lb["ROC-AUC"], 3)}, Δ {n(d26.diferencia, 3)} '
+    f'[{n(d26["BCa inf"], 3)}; {n(d26["BCa sup"], 3)}], DeLong z = {n(d26["z DeLong"], 1)}. Bloques: gana 8 de 8, '
+    'Wilcoxon-Holm p = 0,047, Cliff 0,34.',
+    f'Material. Con el 20 % de alertas atrapa {n(px["tardías atrapadas"])} tardías contra '
+    f'{n(pl["tardías atrapadas"])}: {n((px["tardías atrapadas"] - pl["tardías atrapadas"]) / px.meses)} más por mes. '
+    f'F1 {n(x26.F1, 3)} contra {n(lb.F1, 3)}.',
+    'Forma. Sin plazo, el riesgo sube 3,4 de logit en Generales y 2,4 en Producción Cluster; la logística da una sola '
+    'pendiente y una caída suave cerca de cero.',
+    f'Costo. Un ajuste: {n(c26.loc["xgboost", "segundos_un_ajuste"] / 60, 1)} min contra '
+    f'{n(c26.loc["logistica", "segundos_un_ajuste"])} s; mil predicciones: '
+    f'{n(c26.loc["xgboost", "ms_inferencia_por_1000"])} ms contra {n(c26.loc["logistica", "ms_inferencia_por_1000"], 1)}. '
+    'SHAP da la lectura.',
+    'Parsimonia. Se acepta lo complejo solo si gana significativa y materialmente: se cumple. La logística queda como '
+    'base legible.'], tam=10.5, paso=1.95, alto=1.9)
+figura(s, 'forma_plazo.png', 14.2, 3.2, w=10.0)
+pie(s, 'libro, capítulo 6: resultados/prueba_2026/diferencias.csv, presupuesto.csv, forma_clase.csv, costo.csv')
+notas(s, '1:00', 'A', 'criterio 5', 'Cinco razones con cifras. Si el negocio pusiera explicar cada coeficiente por encima '
+      'de atrapar tardías, la logística sería defendible: pierde 0,023 de AUC y unas 35 tardías por mes. Precisión: '
+      'las tardías de más caen en órdenes que ya tenían otra alerta.')
+
+# ============================================================== 20 CONCLUSIONES
 s = nueva()
 cabecera(s, 'El retraso se puede anticipar el día de la liberación', 'CRITERIO 6  ·  CONCLUSIONES')
 lista(s, 1.3, 3.4, 13.4, [
     f'Se puede ordenar por riesgo al liberar: AUC {n(top.AUC, 3)} medido hacia adelante en el tiempo, contra '
     f'{n(rp["ROC-AUC"], 3)} de la regla del proveedor en 2026.',
     'La señal está en el plazo, el historial del proveedor y las entidades; ninguna variable sola basta.',
-    'XGBoost gana, pero por una centésima: la logística, más simple y calibrada, es una alternativa defendible.',
+    f'XGBoost gana de forma significativa y material: en 2026, AUC {n(x26["ROC-AUC"], 3)} contra '
+    f'{n(lb["ROC-AUC"], 3)} de la logística, y más tardías atrapadas con las mismas alertas.',
     'El optimizador importa con poco presupuesto; el balanceo casi no mueve el AUC.',
     'La partición cronológica no es un detalle: al azar, el problema parecería más fácil de lo que es.'],
       tam=11.5, paso=1.9, alto=1.8)
 filas_v = [['objetivo', 'cumplido'], ['comparar las 112 con el mismo presupuesto', 'sí'],
-           ['costo de las entidades nuevas', 'pendiente: 2026'], ['modelo servido en el tablero', 'sí, el modelo base']]
+           ['costo de las entidades nuevas', f'AUC {n(s26.loc["alguna nueva", "ROC-AUC"], 2)} contra '
+            f'{n(s26.loc["todo conocido", "ROC-AUC"], 2)}'], ['modelo servido en el tablero', 'sí, XGBoost']]
 tabla(s, 15.4, 3.4, 8.8, 4.0, filas_v, anchos=[5.0, 3.0], tam=10.5)
 banda(s, 15.4, 7.9, 8.8, 5.2, [('Para el negocio:  ', True, ORO_CL),
-                               (f'marcando el {pc(lb.marcadas, 0)} de las posiciones, el modelo base ve venir el '
-                                f'{pc(lb.sensibilidad, 0)} de las tardías de 2026. El comprador puede concentrar el '
+                               (f'marcando el {pc(x26.marcadas, 0)} de las posiciones, XGBoost ve venir el '
+                                f'{pc(x26.sensibilidad, 0)} de las tardías de 2026. El comprador puede concentrar el '
                                 'seguimiento en un tercio de las órdenes.', False, BLANCO)], VERDE, tam=11.5)
-pie(s, 'libro, capítulos 2 a 7')
-notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo, sin adelantar '
-      'lo que depende de 2026.')
+pie(s, 'libro, capítulos 2 a 9')
+notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo. La propuesta del '
+      'Entregable 3 le gana a XGBoost por 0,012 en 2026; se presenta aparte.')
 
-# ============================================================== 20 LIMITACIONES Y MEJORAS
+# ============================================================== 21 LIMITACIONES Y MEJORAS
 s = nueva()
 cabecera(s, 'Límites: deriva, etiqueta que madura y una sola empresa', 'CRITERIO 6  ·  LIMITACIONES Y MEJORAS')
 tarjeta(s, 1.3, 3.3, 7.4, 9.8, 'Teóricas', ['Independencia dado x: las posiciones de una orden se parecen; se protege '
@@ -590,7 +638,7 @@ pie(s, 'libro, capítulos 2c, 5 y 7')
 notas(s, '1:00', 'B', 'criterio 6', 'Separar lo teórico (supuestos del modelo) de lo empírico (los datos). Las mejoras '
       'apuntan al modelo original.')
 
-# ============================================================== 21 PREGUNTAS
+# ============================================================== 22 PREGUNTAS
 s = nueva(VERDE)
 logo(s, 1.3, 1.4, 3.9, 3.0)
 texto(s, 1.3, 5.6, 22.0, 1.6, 'Preguntas', tam=40, color=BLANCO, negrita=True)

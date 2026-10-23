@@ -1,0 +1,63 @@
+mejorar_otif.py | 354185 filas 2021-2025 (sin la prueba) | 32 variables nuevas | variantes ['base', 'nuevas', 'plazo', 'reciente', 'pareja', 'nuevas_semillas', 'nuevas_dist'] | 550 arboles fijos | 0.4 min
+
+origen 2024-01-01: entrena 198117 (tasa 0.349) | mide 36665 (tasa 0.299, 9314 OC) | 0.5 min
+   techo: 88.6% de las filas en OC de varias posiciones; 11.8% de esas OC con desenlace mixto; AUC del oraculo de la OC 0.971
+   base             AUC 0.8730 | log loss 0.3797 | 1.2 min
+   nuevas           AUC 0.8777 | log loss 0.3736 | 1.8 min
+   plazo            AUC 0.8767 | log loss 0.3744 | 2.8 min
+   reciente         AUC 0.8732 | log loss 0.3795 | 3.4 min
+   pareja           AUC 0.8720 | log loss 0.3805 | 4.2 min
+   nuevas_semillas  AUC 0.8781 | log loss 0.3723 | 8.8 min
+   plazo log-normal: s = 0.894; AUC de 1 - Phi(z) solo 0.8610
+   nuevas_dist      AUC 0.8797 | log loss 0.3731 | 12.1 min
+
+origen 2024-07-01: entrena 234782 (tasa 0.341) | mide 36609 (tasa 0.330, 9849 OC) | 12.3 min
+   techo: 87.2% de las filas en OC de varias posiciones; 9.9% de esas OC con desenlace mixto; AUC del oraculo de la OC 0.977
+   base             AUC 0.8934 | log loss 0.3747 | 12.9 min
+   nuevas           AUC 0.8988 | log loss 0.3664 | 13.5 min
+   plazo            AUC 0.8978 | log loss 0.3682 | 14.8 min
+   reciente         AUC 0.8942 | log loss 0.3729 | 16.4 min
+   pareja           AUC 0.8947 | log loss 0.3734 | 17.6 min
+   nuevas_semillas  AUC 0.8984 | log loss 0.3672 | 22.1 min
+   plazo log-normal: s = 0.892; AUC de 1 - Phi(z) solo 0.8797
+   nuevas_dist      AUC 0.9000 | log loss 0.3620 | 28.4 min
+
+origen 2025-01-01: entrena 271391 (tasa 0.340) | mide 40474 (tasa 0.325, 10842 OC) | 28.7 min
+   techo: 87.1% de las filas en OC de varias posiciones; 12.3% de esas OC con desenlace mixto; AUC del oraculo de la OC 0.972
+   base             AUC 0.8524 | log loss 0.4244 | 29.9 min
+   nuevas           AUC 0.8594 | log loss 0.4165 | 33.2 min
+   plazo            AUC 0.8572 | log loss 0.4195 | 35.9 min
+   reciente         AUC 0.8538 | log loss 0.4223 | 37.8 min
+   pareja           AUC 0.8515 | log loss 0.4256 | 38.9 min
+   nuevas_semillas  AUC 0.8600 | log loss 0.4149 | 47.1 min
+   plazo log-normal: s = 0.887; AUC de 1 - Phi(z) solo 0.8535
+   nuevas_dist      AUC 0.8627 | log loss 0.4135 | 53.4 min
+
+origen 2025-07-01: entrena 311865 (tasa 0.338) | mide 42320 (tasa 0.292, 10955 OC) | 53.7 min
+   techo: 87.7% de las filas en OC de varias posiciones; 10.4% de esas OC con desenlace mixto; AUC del oraculo de la OC 0.977
+   base             AUC 0.8476 | log loss 0.4198 | 54.6 min
+   nuevas           AUC 0.8625 | log loss 0.4036 | 55.6 min
+   plazo            AUC 0.8598 | log loss 0.4055 | 56.6 min
+   reciente         AUC 0.8487 | log loss 0.4174 | 57.4 min
+   pareja           AUC 0.8482 | log loss 0.4197 | 58.2 min
+   nuevas_semillas  AUC 0.8623 | log loss 0.4038 | 62.2 min
+   plazo log-normal: s = 0.881; AUC de 1 - Phi(z) solo 0.8499
+   nuevas_dist      AUC 0.8673 | log loss 0.3984 | 66.1 min
+
+AUC por semestre (origen = inicio del semestre medido):
+   variante         | 2024-01-01 | 2024-07-01 | 2025-01-01 | 2025-07-01
+   base             | 0.8730     | 0.8934     | 0.8524     | 0.8476    
+   nuevas           | 0.8777     | 0.8988     | 0.8594     | 0.8625    
+   plazo            | 0.8767     | 0.8978     | 0.8572     | 0.8598    
+   reciente         | 0.8732     | 0.8942     | 0.8538     | 0.8487    
+   pareja           | 0.8720     | 0.8947     | 0.8515     | 0.8482    
+   nuevas_semillas  | 0.8781     | 0.8984     | 0.8600     | 0.8623    
+   nuevas_dist      | 0.8797     | 0.9000     | 0.8627     | 0.8673    
+
+Diferencias contra la referencia (intervalo por bootstrap de OC, juntando los cuatro semestres; el AUC se calcula dentro de cada semestre y se promedia):
+   nuevas           - base    : +0.0080 [+0.0056; +0.0105] | por semestre +0.0046, +0.0054, +0.0070, +0.0149 | gana en 4/4 | PASA
+   plazo            - base    : +0.0063 [+0.0042; +0.0086] | por semestre +0.0037, +0.0044, +0.0049, +0.0121 | gana en 4/4 | PASA
+   reciente         - base    : +0.0009 [-0.0005; +0.0025] | por semestre +0.0001, +0.0008, +0.0014, +0.0011 | gana en 4/4 | no pasa
+   pareja           - base    : -0.0000 [-0.0013; +0.0012] | por semestre -0.0010, +0.0013, -0.0009, +0.0006 | gana en 2/4 | no pasa
+   nuevas_semillas  - nuevas  : +0.0001 [-0.0007; +0.0010] | por semestre +0.0004, -0.0004, +0.0007, -0.0003 | gana en 2/4 | no pasa
+   nuevas_dist      - nuevas  : +0.0028 [+0.0012; +0.0043] | por semestre +0.0020, +0.0012, +0.0033, +0.0048 | gana en 4/4 | PASA

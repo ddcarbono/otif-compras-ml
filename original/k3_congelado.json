@@ -1,0 +1,11 @@
+{
+  "variante": "K3 efectos ordenados",
+  "base": "original_congelado.json",
+  "arboles_validacion": 766,
+  "platt": [
+    0.8827389751991455,
+    0.09782472737489332
+  ],
+  "umbral_f1": 0.3271196275549118,
+  "auc_validacion": 0.8466
+}

@@ -16,7 +16,11 @@ parts:
     chapters:
       - file: 03a_modelo_base
       - file: 03b_112_combinaciones
+      - file: 03d_mejor_modelo
       - file: 03c_fundamentos
+  - caption: Modelo original
+    chapters:
+      - file: 05_modelo_original
   - caption: Referencia
     chapters:
       - file: glosario

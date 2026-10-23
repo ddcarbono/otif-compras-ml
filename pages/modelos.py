@@ -1,6 +1,6 @@
-"""Sección 3: modelos. Con el Entregable 2 lleva la tabla de líderes de las 112 combinaciones (validación anidada en 8
-bloques semestrales, con Friedman, Nemenyi y Wilcoxon) y el modelo base (regresión logística frente a dos líneas base)
-medido en la prueba 2026; con el 3 se suman la predicción en vivo, SHAP y el modelo original.
+"""Sección 3: modelos. La predicción en vivo (sirve XGBoost con Platt), la tabla de líderes de las 112 combinaciones
+(validación anidada en 8 bloques semestrales, con Friedman, Nemenyi, Wilcoxon, DeLong y BCa), el mejor modelo en la
+prueba 2026 con SHAP y la comparación 2 × 2 con la propuesta original, y el modelo base (regresión logística).
 Todo se lee de ``data/modelos`` (lo escribe ``src.preparar`` a partir de ``src.modelo_base``): aquí no se entrena."""
 import dash
 import dash_bootstrap_components as dbc
@@ -63,6 +63,85 @@ def tabla_lideres():
                                 style_data_conditional=[{"if": {"filter_query": "{puesto} = 1"}, "fontWeight": "bold"}])
 
 
+def tabla_pruebas():
+    t = modelo("pruebas_resumen")
+    filas = [{"modelo": plots.MODELO[f.rival], "bloques que gana XGBoost": f"{f.bloques_gana} de 8",
+              "DeLong significativo (Holm)": f"{f.bloques_delong_holm} de 8",
+              "diferencia de AUC [BCa 95 %]": f"{_n(f.dif_AUC)} [{_n(f.dif_inf)}; {_n(f.dif_sup)}]",
+              "δ de Cliff": f"{_n(f.cliff, 2)} ({f.magnitud})"} for f in t.itertuples()]
+    return dash_table.DataTable(data=filas, columns=[{"name": c, "id": c} for c in filas[0]],
+                                style_table={"overflowX": "auto"}, style_header={"fontWeight": "bold"},
+                                style_cell={"textAlign": "left", "fontSize": 13})
+
+
+def calibracion_xgb():
+    f = modelo("fiabilidad_xgboost").rename(columns={"filas": "posiciones"})
+    return plots.calibracion(f, "XGBoost en los 8 bloques de validación (deciles de probabilidad)", "XGBoost")
+
+
+P26 = modelo("p26_metricas").set_index("modelo")
+XG = P26.loc["XGBoost (las 112)"]
+DIF = modelo("p26_diferencias").set_index("comparación")
+
+
+def tabla_simple(df, dec=3):
+    filas = [{c: (_n(v, dec) if isinstance(v, float) else v) for c, v in r.items()} for r in df.to_dict("records")]
+    return dash_table.DataTable(data=filas, columns=[{"name": c, "id": c} for c in df.columns],
+                                style_table={"overflowX": "auto"}, style_header={"fontWeight": "bold"},
+                                style_cell={"textAlign": "left", "fontSize": 13})
+
+
+def pestana_2026():
+    d = DIF.iloc[0]
+    m = P26.reset_index()[["modelo", "ROC-AUC", "ROC-AUC inf", "ROC-AUC sup", "PR-AUC", "F1", "precisión",
+                           "sensibilidad", "ECE", "umbral"]]
+    pr = modelo("p26_presupuesto")
+    pr = pr[pr.presupuesto == 0.2][["modelo", "alertas", "tardías atrapadas", "precisión",
+                                    "órdenes con una tardía atrapada", "tardías atrapadas por mes"]]
+    k = modelo("p26_contrastes")[["contraste", "ΔROC-AUC", "inf", "sup"]]
+    return html.Div([
+        html.H3("XGBoost en la prueba 2026"),
+        html.P("El ganador de las 112 (sin balanceo, Optuna), con Platt y el umbral de máximo F1 fijados en la validación "
+               "2025 y congelados antes de mirar 2026. Es la tercera mirada del proyecto a la prueba: se lee como "
+               "exploratoria. Intervalos BCa al 95 % que remuestrean órdenes completas."),
+        dbc.Row([cifra(f"{_n(XG['ROC-AUC'])}", f"ROC-AUC [{_n(XG['ROC-AUC inf'])}; {_n(XG['ROC-AUC sup'])}]"),
+                 cifra(_n(XG.F1), f"F1 al umbral {_n(XG.umbral)}"),
+                 cifra(f"+{_n(d.diferencia)}", f"de AUC sobre la logística [{_n(d['BCa inf'])}; {_n(d['BCa sup'])}]"),
+                 cifra(_n(XG.ECE), "error de calibración esperado (ECE), con Platt")]),
+        tabla_simple(m),
+        dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("p26_curvas"), "ROC", P26.reset_index()),
+                                   config=CONFIG), lg=6),
+                 dbc.Col(dcc.Graph(figure=plots.calibracion(modelo("p26_calibracion"),
+                                                            "Calibración en la prueba 2026 (deciles)"), config=CONFIG),
+                         lg=6)], className="mt-3"),
+        html.H4("Qué mira el modelo (SHAP)"),
+        dbc.Row([dbc.Col(dcc.Graph(figure=plots.shap_global(modelo("p26_shap_global"), NOMBRES), config=CONFIG), lg=6),
+                 dbc.Col(dcc.Graph(figure=plots.matriz_confusion(modelo("p26_confusion"), XG.umbral), config=CONFIG),
+                         lg=6)]),
+        html.P("Cómo leer: a la izquierda, cuánto mueve en promedio cada variable el logit de XGBoost en 2026 (las "
+               "entidades entran como su tasa codificada). El plazo hábil que queda al liberar pesa casi el doble que el "
+               "proveedor. A la derecha, las posiciones de 2026 según lo que pasó y lo que dijo el modelo.",
+               className="small text-muted"),
+        html.H4("¿Por qué XGBoost y no la logística?"),
+        html.P("Gana de forma significativa (ΔAUC 0,023 en 2026; en los 8 bloques gana los 8, con DeLong significativo "
+               "en 7) y material: con el mismo presupuesto de alertas, el 20 % de mayor riesgo, atrapa más tardías.",
+               className="small text-muted"),
+        tabla_simple(pr, 3),
+        dcc.Graph(figure=plots.forma_plazo(modelo("p26_forma_clase"), "clase de compras",
+                                           ["Generales", "Servicios", "Produccion Cluster"]), config=CONFIG),
+        html.P("Cómo leer: el efecto del plazo al liberar sobre el logit. La logística (punteada) le da la misma "
+               "pendiente a todas las clases de compra; XGBoost (llena) encuentra que sin plazo el riesgo sube más en "
+               "Generales que en Producción Cluster, y que la caída es brusca al pasar de cero a uno o dos días. Cuesta "
+               "17 ms predecir mil posiciones, contra 0,7 de la logística: nada para el volumen de compras.",
+               className="small text-muted"),
+        html.H4("La propuesta original: modelo × información", className="mt-4"),
+        html.P("La propuesta del Entregable 3 (efectos aleatorios por entidad, plazo log-normal y 32 variables de plazo "
+               "real) frente al ganador de las 112, con y sin la información nueva. Diferencias de ROC-AUC en pareja.",
+               className="small text-muted"),
+        tabla_simple(k, 4),
+    ])
+
+
 def cifra(valor, texto):
     return dbc.Col(dbc.Card(dbc.CardBody([html.Div(valor, className="cifra"), html.Div(texto, className="cifra-texto")]),
                             className="h-100"), md=3, xs=6, className="mb-3")
@@ -93,6 +172,20 @@ layout = html.Div([
                    f"χ² = {_n(FR.chi2, 1)}, p < 0,001. Nemenyi (diferencia crítica {_n(FR.CD, 2)}) solo separa a XGBoost del "
                    f"árbol, KNN y Naive Bayes; la prueba de Wilcoxon pareada del mejor contra cada uno, con Holm, da p = "
                    f"{_n(W.p_holm.max(), 3)} en las seis comparaciones: el mínimo posible con 8 bloques.", className="small text-muted"),
+            html.H4("Dentro de cada bloque: DeLong, intervalos BCa y delta de Cliff", className="mt-3"),
+            html.P("Con las predicciones de cada posición, la prueba de DeLong compara el AUC de XGBoost con el de cada rival en "
+                   "cada bloque (48 pruebas, con Holm). El intervalo BCa de la diferencia media remuestrea órdenes completas, "
+                   "porque las posiciones de una orden no son independientes (DeLong supone que sí). El delta de Cliff mide el "
+                   "tamaño: qué tan seguido el AUC de un bloque de XGBoost supera al de un bloque del rival. Combinaciones de "
+                   "la tabla de líderes.", className="small text-muted"),
+            tabla_pruebas(),
+            html.H4("XGBoost en validación: calibración y convergencia", className="mt-4"),
+            dbc.Row([dbc.Col(dcc.Graph(figure=calibracion_xgb(), config=CONFIG), lg=6),
+                     dbc.Col(dcc.Graph(figure=plots.convergencia(modelo("convergencia_xgboost")), config=CONFIG), lg=6)]),
+            html.P("Cómo leer: a la izquierda, los puntos bajo la diagonal en los deciles altos y sobre ella en los bajos dicen "
+                   "que XGBoost exagera un poco en los extremos. A la derecha, el AUC de entrenamiento sigue subiendo con cada "
+                   "árbol mientras el del semestre externo se aplana: esa distancia es la brecha de sobreajuste.",
+                   className="small text-muted"),
             dbc.Row([dbc.Col(dcc.Graph(figure=plots.arrepentimiento(modelo("curvas_optimizador"), "eval", plots.OPTIMIZADOR,
                                                                     "Optimizadores: AUC perdido contra evaluaciones", "evaluación"),
                                        config=CONFIG), lg=6),
@@ -105,6 +198,7 @@ layout = html.Div([
                    "0,012 de AUC, y entre modelos la diferencia llega a 0,12. Optuna y el genético se acercan antes al mejor "
                    "valor conocido; con 20 evaluaciones los cuatro quedan a menos de 0,004.", className="small text-muted"),
         ]), label="Las 112 combinaciones", tab_id="t-112", className="pt-3"),
+        dbc.Tab(pestana_2026(), label="Mejor modelo (2026)", tab_id="t-2026", className="pt-3"),
         dbc.Tab(html.Div([
             html.H3("Modelo base: regresión logística"),
             html.P("El modelo base es una regresión logística con penalización L2, con el mismo preprocesamiento que usarán los "
@@ -148,8 +242,9 @@ layout = html.Div([
                    "25 %, 50 % y 100 % de las órdenes de entrenamiento.", className="small text-muted"),
         ]), label="Modelo base", tab_id="t-base", className="pt-3"),
     ], active_tab="t-prediccion"),
-    dbc.Alert("Con el Entregable 3 se suman aquí la evaluación de XGBoost en la prueba 2026, la explicación con SHAP y "
-              "el modelo original; la predicción en vivo pasará a servir el modelo elegido.", color="light", className="mt-3"),
+    dbc.Alert("La predicción en vivo sirve XGBoost (el ganador de las 112) con Platt. La propuesta original, que le gana "
+              "por 0,012 de AUC en 2026, se describe en el libro (capítulo del modelo original).", color="light",
+              className="mt-3"),
 ])
 
 

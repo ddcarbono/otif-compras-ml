@@ -180,7 +180,8 @@ def dispersion(df, x, y, color, nombres, log_x=False, log_y=False):
 
 
 # --- modelos ---------------------------------------------------------------------------------------------------------
-COLOR_MODELO = {"Dummy (tasa del entrenamiento)": GRIS, "Regla del proveedor": MARRON, "Regresión logística": AZUL}
+COLOR_MODELO = {"Dummy (tasa del entrenamiento)": GRIS, "Regla del proveedor": MARRON, "Regresión logística": AZUL,
+                "XGBoost (las 112)": ORO, "Propuesta (K3 + log-normal + nuevas)": VERDE}
 
 
 def curva_roc_pr(c, curva, metricas=None):
@@ -203,17 +204,20 @@ def curva_roc_pr(c, curva, metricas=None):
     return fig
 
 
-def calibracion(t):
+def calibracion(t, titulo="Calibración en la prueba 2026 (deciles de probabilidad)", nombre="logística"):
     """Diagrama de confiabilidad por deciles de probabilidad predicha (``calibracion.csv``)."""
     fig = go.Figure()
     fig.add_shape(type="line", x0=0, y0=0, x1=1, y1=1, line=dict(color=GRIS, dash="dot"))
-    fig.add_trace(go.Scatter(x=t.predicha, y=t.observada, mode="lines+markers", line=dict(color=AZUL),
-                             customdata=np.c_[t.decil, t.posiciones], name="logística",
-                             hovertemplate="decil %{customdata[0]}<br>predicha %{x:.1%}<br>observada %{y:.1%}"
-                                           "<br>%{customdata[1]:,} posiciones<extra></extra>"))
-    fig.update_layout(title="Calibración en la prueba 2026 (deciles de probabilidad)", xaxis_title="probabilidad predicha",
+    grupos = t.groupby("modelo", sort=False) if "modelo" in t else [(nombre, t)]
+    for n, g in grupos:
+        fig.add_trace(go.Scatter(x=g.predicha, y=g.observada, mode="lines+markers",
+                                 line=dict(color=COLOR_MODELO.get(n, AZUL)), customdata=np.c_[g.decil, g.posiciones],
+                                 name=n, hovertemplate="decil %{customdata[0]}<br>predicha %{x:.1%}<br>observada "
+                                                       "%{y:.1%}<br>%{customdata[1]:,} posiciones<extra></extra>"))
+    fig.update_layout(title=titulo, xaxis_title="probabilidad predicha",
                       yaxis_title="tasa de tarde observada", xaxis_tickformat=".0%", yaxis_tickformat=".0%",
-                      xaxis_range=[0, 1], yaxis_range=[0, 1], showlegend=False)
+                      xaxis_range=[0, 1], yaxis_range=[0, 1], showlegend="modelo" in t,
+                      legend=dict(y=0.02, x=0.98, xanchor="right", yanchor="bottom"))
     return fig
 
 
@@ -351,4 +355,60 @@ def costo(df, nombres, nombres_bal):
                              marker_color=color, hovertemplate="%{y}: %{x:.1f} h<extra>" + nombres_bal[b] + "</extra>"))
     fig.update_layout(barmode="stack", title="Horas de CPU de los 112 por modelo y balanceo",
                       xaxis_title="horas de CPU (un núcleo)", height=380, margin=dict(l=150))
+    return fig
+
+
+def convergencia(c):
+    """AUC de XGBoost en entrenamiento y en el semestre externo después de cada árbol (media de los 8 bloques, con el
+    rango entre bloques del externo)."""
+    m = c.groupby("arbol").agg(ent=("AUC_entrenamiento", "mean"), ext=("AUC_externo", "mean"),
+                               lo=("AUC_externo", "min"), hi=("AUC_externo", "max")).reset_index()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=np.r_[m.arbol, m.arbol[::-1]], y=np.r_[m.hi, m.lo[::-1]], fill="toself",
+                             fillcolor="rgba(63,111,143,0.15)", line=dict(width=0), hoverinfo="skip",
+                             name="rango entre bloques"))
+    for col, nombre, color in [("ent", "entrenamiento", ORO), ("ext", "semestre externo", AZUL)]:
+        fig.add_trace(go.Scatter(x=m.arbol, y=m[col], mode="lines", name=nombre, line=dict(color=color),
+                                 hovertemplate="árbol %{x}: AUC %{y:.4f}<extra></extra>"))
+    fig.update_layout(title="Convergencia de XGBoost: AUC por número de árboles (media de los 8 bloques)",
+                      xaxis_title="árboles", yaxis_title="ROC-AUC")
+    return fig
+
+
+def semillas(s, nombres):
+    """AUC de cada modelo en cada bloque con 10 semillas: un punto por semilla."""
+    fig = go.Figure()
+    for i, (m, g) in enumerate(s.groupby("modelo", sort=False)):
+        fig.add_trace(go.Box(x=g.bloque, y=g.AUC, name=nombres.get(m, m), boxpoints="all", jitter=0.3,
+                             marker=dict(size=4), hovertemplate="%{x}: AUC %{y:.4f}<extra></extra>"))
+    fig.update_layout(title="AUC por bloque con 10 semillas por modelo", boxmode="group", xaxis_title="bloque",
+                      yaxis_title="ROC-AUC")
+    return fig
+
+
+def shap_global(g, nombres, n=15):
+    """Media del valor SHAP absoluto por variable (``shap_global.csv``), las n mayores."""
+    g = g.head(n).iloc[::-1]
+    fig = go.Figure(go.Bar(x=g.shap_abs_medio, y=[nombres.get(v, v) for v in g.variable], orientation="h",
+                           marker_color=ORO, hovertemplate="%{y}: %{x:.3f}<extra></extra>"))
+    fig.update_layout(title="Qué pesa en XGBoost en 2026: media del valor SHAP absoluto",
+                      xaxis_title="media de |SHAP| (logit)", height=480)
+    return fig
+
+
+def forma_plazo(t, col, grupos):
+    """Efecto de los días hábiles de plazo al liberar sobre el logit, por tramo y por grupo (``forma_*.csv``): SHAP medio
+    de XGBoost (línea llena) contra el término lineal de la logística (punteada)."""
+    fig = go.Figure()
+    colores = [ORO, VERDE, AZUL, MARRON, GRIS]
+    for i, g in enumerate(grupos):
+        d = t[t[col] == g]
+        c = colores[i % len(colores)]
+        fig.add_trace(go.Scatter(x=d.tramo, y=d.xgboost, mode="lines+markers", name=f"{g} · XGBoost",
+                                 line=dict(color=c), hovertemplate="%{x} días: %{y:.2f}<extra></extra>"))
+        fig.add_trace(go.Scatter(x=d.tramo, y=d.logistica, mode="lines", name=f"{g} · logística",
+                                 line=dict(color=c, dash="dot"), hovertemplate="%{x} días: %{y:.2f}<extra></extra>"))
+    fig.update_layout(title="Efecto del plazo al liberar sobre el logit: XGBoost (SHAP) contra la logística",
+                      xaxis_title="días hábiles de plazo al liberar", yaxis_title="efecto sobre el logit", height=560,
+                      legend=dict(orientation="h", y=-0.22, x=0, xanchor="left", yanchor="top"))
     return fig
