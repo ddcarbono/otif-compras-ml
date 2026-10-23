@@ -165,7 +165,9 @@ tabla(guardar(eda.entidades_nuevas(df), "entidades_nuevas"), dec=1)
 # Todo lo que aprende de los datos (medianas, medias, categorías, tasas por entidad) se ajusta **solo con el
 # entrenamiento**, dentro de un `Pipeline` de scikit-learn, para que la validación cruzada lo reajuste en cada pliegue:
 #
-# - **numéricas** (83): mediana en los vacíos y estandarización;
+# - **numéricas** (83): $\mathrm{signo}(x)\log(1+|x|)$ para comprimir las colas largas, mediana en los vacíos y
+#   estandarización. La transformación es monótona: a los árboles no les cambia nada y a los modelos lineales les quita
+#   el peso de los montos extremos;
 # - **categóricas de pocos valores** (42): *one-hot*, con las categorías de menos de 30 filas juntas y las no vistas en
 #   ceros;
 # - **entidades** (11: proveedor, material, comprador, creador de la solicitud, liberador, centro de costo, cuenta,
@@ -183,8 +185,8 @@ tabla(guardar(eda.entidades_nuevas(df), "entidades_nuevas"), dec=1)
 # %%
 from sklearn import set_config
 set_config(display="text")
-pre = datos.preprocesador(grupos=ent.oc_id)
-Xt = pre.fit_transform(ent[datos.PREDICTORAS], ent.y_tarde)
+pre = datos.preprocesador()
+Xt = pre.fit_transform(ent[datos.ENTRADA], ent.y_tarde)
 for nombre, trans, cols in pre.transformers_:
     if nombre != "remainder":
         pasos = [n for n, _ in trans.steps] if hasattr(trans, "steps") else [type(trans).__name__]
@@ -192,7 +194,9 @@ for nombre, trans, cols in pre.transformers_:
 print("matriz del entrenamiento después del preprocesamiento:", Xt.shape)
 
 # %% [markdown]
-# Las 136 predictoras pasan a unas 450 columnas, casi todas del *one-hot* de las categóricas. El mismo objeto se ajusta
+# Las 136 predictoras pasan a 591 columnas, casi todas del *one-hot* de las categóricas. El bloque de entidades recibe
+# 16 columnas porque lleva también los niveles superiores (de donde sale la tasa de un valor nuevo) y el número de orden
+# (que solo agrupa los pliegues y no entra al modelo); devuelve una columna por entidad. El mismo objeto se ajusta
 # con el entrenamiento y solo transforma la validación y la prueba; dentro de la validación cruzada se reajusta en cada
 # pliegue. Los modelos de árboles del Entregable 2 usan este mismo preprocesamiento para que la comparación sea justa;
 # el balanceo (SMOTE, ADASYN) va después de él y antes del modelo, también dentro del *pipeline*.

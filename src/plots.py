@@ -177,3 +177,100 @@ def dispersion(df, x, y, color, nombres, log_x=False, log_y=False):
                       yaxis_title=nombres.get(y, y), xaxis_type="log" if log_x else None,
                       yaxis_type="log" if log_y else None)
     return fig
+
+
+# --- modelos ---------------------------------------------------------------------------------------------------------
+COLOR_MODELO = {"Dummy (tasa del entrenamiento)": GRIS, "Regla del proveedor": MARRON, "Regresión logística": AZUL}
+
+
+def curva_roc_pr(c, curva, metricas=None):
+    """ROC o PR de cada modelo en la prueba (``curvas.csv``). La referencia es la diagonal (ROC) o la prevalencia (PR)."""
+    fig = go.Figure()
+    for nombre, d in c[c.curva == curva].groupby("modelo", sort=False):
+        et = nombre
+        if metricas is not None:
+            k = "ROC-AUC" if curva == "ROC" else "PR-AUC"
+            et += f" ({k} {metricas.set_index('modelo').loc[nombre, k]:.3f})".replace(".", ",")
+        fig.add_trace(go.Scatter(x=d.x, y=d.y, mode="lines", name=et, line=dict(color=COLOR_MODELO.get(nombre, AZUL))))
+    if curva == "ROC":
+        fig.add_shape(type="line", x0=0, y0=0, x1=1, y1=1, line=dict(color=GRIS, dash="dot"))
+        fig.update_layout(title="Curva ROC en la prueba 2026", xaxis_title="tasa de falsos positivos",
+                          yaxis_title="sensibilidad")
+    else:
+        fig.update_layout(title="Curva de precisión y sensibilidad en la prueba 2026", xaxis_title="sensibilidad",
+                          yaxis_title="precisión", yaxis_range=[0, 1])
+    fig.update_layout(legend=dict(orientation="v", y=0.02, x=0.98, xanchor="right", yanchor="bottom"))
+    return fig
+
+
+def calibracion(t):
+    """Diagrama de confiabilidad por deciles de probabilidad predicha (``calibracion.csv``)."""
+    fig = go.Figure()
+    fig.add_shape(type="line", x0=0, y0=0, x1=1, y1=1, line=dict(color=GRIS, dash="dot"))
+    fig.add_trace(go.Scatter(x=t.predicha, y=t.observada, mode="lines+markers", line=dict(color=AZUL),
+                             customdata=np.c_[t.decil, t.posiciones], name="logística",
+                             hovertemplate="decil %{customdata[0]}<br>predicha %{x:.1%}<br>observada %{y:.1%}"
+                                           "<br>%{customdata[1]:,} posiciones<extra></extra>"))
+    fig.update_layout(title="Calibración en la prueba 2026 (deciles de probabilidad)", xaxis_title="probabilidad predicha",
+                      yaxis_title="tasa de tarde observada", xaxis_tickformat=".0%", yaxis_tickformat=".0%",
+                      xaxis_range=[0, 1], yaxis_range=[0, 1], showlegend=False)
+    return fig
+
+
+def matriz_confusion(t, umbral=None):
+    """Matriz de confusión en conteos y en proporción de cada fila real (``confusion.csv``)."""
+    orden = ["tarde", "a tiempo"]
+    m = t.pivot(index="real", columns="predicho", values="posiciones").loc[orden, orden]
+    prop = m.div(m.sum(axis=1), axis=0)
+    texto = [[f"{m.iloc[i, j]:,}".replace(",", ".") + f"<br>{_pct(prop.iloc[i, j])}" for j in range(2)] for i in range(2)]
+    fig = go.Figure(go.Heatmap(z=prop.values, x=[f"predicho {o}" for o in orden], y=[f"real {o}" for o in orden],
+                               text=texto, texttemplate="%{text}", colorscale=[[0, "#FFFFFF"], [1, AZUL]], zmin=0, zmax=1,
+                               showscale=False, hoverinfo="skip"))
+    tit = "Matriz de confusión en la prueba 2026"
+    if umbral is not None:
+        tit += f" (umbral {umbral:.3f})".replace(".", ",")
+    fig.update_layout(title=tit, yaxis_autorange="reversed", height=360)
+    return fig
+
+
+def coeficientes(t, nombres, n=20):
+    """Los ``n`` coeficientes de mayor valor absoluto, con el nombre legible de la variable de origen."""
+    t = t.head(n).copy()
+    def etiqueta(v):  # numérica o entidad: su nombre; one-hot "linea_palma": "Línea de negocio: palma"
+        v = v[3:] if v.startswith("te_") else v  # entidad codificada por objetivo
+        if v in nombres:
+            return nombres[v]
+        k = next((k for k in sorted(nombres, key=len, reverse=True) if v.startswith(k + "_")), None)
+        return f"{nombres[k]}: {v[len(k) + 1:]}" if k else v
+    t["etiqueta"] = t.variable.map(etiqueta)
+    t = t.iloc[::-1]
+    fig = go.Figure(go.Bar(x=t.coeficiente, y=t.etiqueta, orientation="h",
+                           marker_color=[ORO if v > 0 else VERDE for v in t.coeficiente],
+                           customdata=t["razón de odds por 1 desv."],
+                           hovertemplate="%{y}<br>coeficiente %{x:.3f}<br>razón de odds %{customdata:.2f}<extra></extra>"))
+    fig.add_vline(x=0, line=dict(color=GRIS))
+    fig.update_layout(title=f"Los {n} coeficientes de mayor magnitud (oro: sube el riesgo; verde: lo baja)",
+                      xaxis_title="coeficiente (log-odds por desviación estándar o por categoría)",
+                      height=max(360, 24 * len(t) + 140), margin=dict(l=320))
+    return fig
+
+
+def curva_aprendizaje(t):
+    fig = go.Figure()
+    for c, color in [("AUC entrenamiento", ORO), ("AUC validación", AZUL)]:
+        fig.add_trace(go.Scatter(x=t.filas, y=t[c], mode="lines+markers", name=c.replace("AUC ", ""),
+                                 line=dict(color=color), hovertemplate="%{x:,} filas: AUC %{y:.4f}<extra></extra>"))
+    fig.update_layout(title="Curva de aprendizaje de la regresión logística", xaxis_title="filas de entrenamiento",
+                      yaxis_title="ROC-AUC", xaxis_type="log")
+    return fig
+
+
+def validacion_c(t):
+    """AUC medio ± desviación de cada C en los tres pliegues temporales (``cv_C.csv``)."""
+    g = t.groupby("C").AUC.agg(["mean", "std"]).reset_index()
+    fig = go.Figure(go.Scatter(x=g.C, y=g["mean"], error_y=dict(type="data", array=g["std"], color=GRIS),
+                               mode="lines+markers", line=dict(color=AZUL),
+                               hovertemplate="C = %{x}<br>AUC medio %{y:.4f}<extra></extra>"))
+    fig.update_layout(title="Elección de C: AUC medio en los tres pliegues temporales (± desviación)",
+                      xaxis_title="C (inverso de la penalización L2)", yaxis_title="ROC-AUC", xaxis_type="log")
+    return fig

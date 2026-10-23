@@ -7,6 +7,7 @@ toma de ``resultados/eda/`` las tablas que el libro ya calculó (la cifra del ta
   del tablero se filtran y se suman desde aquí, no desde la muestra).
 - ``data/agregados/*.csv``: copias de las tablas del libro que el tablero muestra sin recalcular.
 - ``data/resumen.json``: las cifras de la portada.
+- ``data/modelos/*.csv``: las tablas del modelo base (``resultados/modelo_base``), si ya se corrió ``src.modelo_base``.
 
 Uso: ``python -m src.preparar`` desde la raíz del repositorio, con ``OTIF_CSV`` apuntando al dataset completo.
 """
@@ -53,6 +54,14 @@ def main():
                "periodo": [str(df.fecha_pedido.min().date()), str(df.fecha_pedido.max().date())],
                "particion": datos.PARTICIONES, "muestra": len(muestra), "semilla": datos.SEMILLA}
     (sal / "resumen.json").write_text(json.dumps(resumen, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    mb = datos.RAIZ / "resultados" / "modelo_base"
+    if (mb / "metricas.csv").exists():
+        (sal / "modelos").mkdir(exist_ok=True)
+        for f in ["metricas", "curvas", "calibracion", "confusion", "curva_aprendizaje", "cv_C"]:
+            shutil.copy(mb / f"{f}.csv", sal / "modelos" / f"{f}.csv")
+        pd.read_csv(mb / "coeficientes.csv").head(40).to_csv(sal / "modelos" / "coeficientes.csv", index=False)
+        shutil.copy(mb / "resumen.json", sal / "modelos" / "resumen.json")
 
     # privacidad: la muestra no lleva identificadores ni entidades de personas o terceros
     prohibidas = set(datos.ENTIDADES) - {"sociedad"} | {"oc_id", "posicion"}

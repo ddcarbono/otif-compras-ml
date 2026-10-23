@@ -1,0 +1,28 @@
+{
+ "C": 0.003,
+ "rejilla_C": [
+  0.0001,
+  0.0003,
+  0.001,
+  0.003,
+  0.01,
+  0.03,
+  0.1,
+  0.3,
+  1.0,
+  3.0
+ ],
+ "umbral_f1_validacion": {
+  "Dummy (tasa del entrenamiento)": 0.0,
+  "Regla del proveedor": 0.2128294380905022,
+  "Regresión logística": 0.2867140347243614
+ },
+ "semilla": 2026,
+ "bootstrap": 200,
+ "minutos": 40.7,
+ "filas": {
+  "entrenamiento": 271391,
+  "validacion": 82794,
+  "prueba": 51941
+ }
+}

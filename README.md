@@ -17,17 +17,21 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | Ruta | Contenido |
 |---|---|
 | `app.py` | Tablero Dash multipágina (`use_pages=True`); lee solo `data/` y no entrena nada. Producción: `gunicorn app:server`. |
-| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (se llena en los entregables siguientes). |
+| `pages/` | Una página del tablero por archivo: `contexto.py` (problema, datos y diccionario), `eda.py` (análisis exploratorio con filtros) y `modelos.py` (el modelo base frente a dos líneas base; las 112 combinaciones se suman después). |
 | `src/` | Código del proyecto, compartido por el libro y el tablero. |
 | `src/datos.py` | Ruta del dataset, semilla, partición cronológica, tipos de variable y preprocesamiento. |
 | `src/data.py` | Carga y caché de lo que lee el tablero (`data/`); no importa scikit-learn. |
 | `src/eda.py` | Cálculos del análisis exploratorio; cada función devuelve una tabla. |
 | `src/tiempo.py` | Series de tiempo del EDA: volumen y tasa por periodo, huecos, STL, estacionariedad y autocorrelación. |
 | `src/plots.py` | Una función por figura (Plotly) con la plantilla y la paleta del proyecto. |
+| `src/modelo_base.py` | Regresión logística L2 frente al Dummy y a la regla del proveedor: C por validación temporal, umbral en 2025, prueba 2026 con bootstrap de órdenes. `python -m src.modelo_base` |
+| `src/validacion.py` | Validación anidada por semestre (8 bloques externos) y caché de matrices preprocesadas, SMOTE y ADASYN por ventana. |
+| `src/optimizadores.py` | Grid, Random, Optuna (TPE) y DEAP (genético) con el mismo presupuesto de evaluaciones. |
+| `src/experimentos.py` | Las 112 combinaciones (7 modelos × 4 balanceos × 4 optimizadores) en los 8 bloques; reanudable. |
 | `src/preparar.py` | Escribe `data/` para el tablero a partir del dataset completo y de las tablas del libro. |
-| `artifacts/` | Modelos y objetos serializados; se llena en los entregables siguientes. |
+| `artifacts/` | Modelos serializados con su `metadata.json` (versiones, semilla, hiperparámetros, umbral y métricas). Hoy: `logistica.joblib`. |
 | `data/` | Lo liviano y anonimizado que usa el tablero: muestra de 30.000 posiciones, agregados, diccionario y resumen. |
-| `resultados/` | Tablas que calcula el libro (`resultados/eda/`) y que después leen el tablero y las láminas. |
+| `resultados/` | Tablas que calculan el libro (`resultados/eda/`) y los scripts de modelos (`resultados/modelo_base/`) y que después leen el tablero y las láminas. |
 | `assets/` | Estilos del tablero. |
 | `book/` | Libro en Jupyter Book. |
 | `book/fuentes/` | Capítulos como scripts en formato percent (`# %%`); `compilar.py` los convierte en cuadernos. |

@@ -33,6 +33,14 @@ def agregado(nombre):
 
 
 @lru_cache(maxsize=None)
+def modelo(nombre):
+    """Tablas del modelo base en ``data/modelos``; ``resumen`` devuelve el JSON."""
+    if nombre == "resumen":
+        return json.loads((DATA / "modelos" / "resumen.json").read_text(encoding="utf-8"))
+    return pd.read_csv(DATA / "modelos" / f"{nombre}.csv")
+
+
+@lru_cache(maxsize=None)
 def serie_mensual():
     s = agregado("serie_mensual").copy()
     s["fecha_pedido"] = pd.to_datetime(s.fecha_pedido)

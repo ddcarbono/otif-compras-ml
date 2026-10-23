@@ -1,4 +1,4 @@
-# Solo los capítulos ya escritos. Orden del cuadro 4 del Entregable 3; los del 3 se agregan cuando existan.
+# Solo los capítulos ya escritos. Orden del cuadro 4 del Entregable 3; los demás se agregan cuando existan.
 format: jb-book
 root: intro
 defaults:
@@ -9,3 +9,6 @@ parts:
       - file: 02a_datos
       - file: 02b_eda
       - file: 02c_tiempo_y_fuga
+  - caption: Modelos
+    chapters:
+      - file: 03a_modelo_base
