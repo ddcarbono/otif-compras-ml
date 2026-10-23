@@ -1,6 +1,7 @@
 """Sección 2: análisis exploratorio con filtros globales (línea, clase de compra y rango de meses) que actualizan todos
 los gráficos. Las distribuciones salen de la muestra de 30.000 posiciones del entrenamiento; las series, de los
-agregados mensuales de todo el entrenamiento. Cada gráfico lleva una frase de lectura."""
+agregados mensuales de todo el entrenamiento. Cada gráfico lleva una frase de lectura. Cierra con la exploración
+multivariada: PCA y DBSCAN sobre las 12 numéricas principales (``src/multivariado.py``)."""
 import dash
 import dash_bootstrap_components as dbc
 import numpy as np
@@ -9,7 +10,7 @@ from dash import Input, Output, callback, dcc, html
 
 from src import plots
 from src.data import agregado, es, muestra, nombre, pct, serie_mensual, unidad
-from src.tiempo import autocorrelacion, descomponer, estacionariedad
+from src import multivariado
 
 dash.register_page(__name__, path="/eda", name="EDA", order=1, title="EDA · órdenes de compra")
 
@@ -66,9 +67,17 @@ layout = html.Div([
         dbc.Col([dbc.Label("Color"), dcc.Dropdown(id="v-color", options=OPC_COLOR, value="y_tarde", clearable=False)],
                 md=4)])),
     dbc.Row([dbc.Col(tarjeta("g-corr", "t-corr"), lg=7), dbc.Col(tarjeta("g-vacios", "t-vacios"), lg=5)]),
-    html.H4("Tiempo"),
-    tarjeta("g-stl", "t-stl"),
-    tarjeta("g-acf", "t-acf"),
+    html.H4("Componentes principales (PCA)"),
+    dbc.Row([dbc.Col(tarjeta("g-pca-var", "t-pca-var"), lg=5), dbc.Col(tarjeta("g-pca", "t-pca"), lg=7)]),
+    html.H4("Grupos por densidad (DBSCAN)"),
+    tarjeta("g-dbscan", "t-dbscan", dbc.Row([
+        dbc.Col([dbc.Label("Componentes que usa"), dcc.Slider(id="d-k", min=2, max=6, step=1, value=3,
+                                                              marks={i: str(i) for i in range(2, 7)})], md=4),
+        dbc.Col([dbc.Label("Vecinos mínimos (min_samples)"), dcc.Slider(id="d-vecinos", min=5, max=50, step=5, value=20,
+                                                                        marks={i: str(i) for i in (5, 20, 35, 50)})],
+                md=4),
+        dbc.Col([dbc.Label("Radio eps (vacío: el sugerido)"), dbc.Input(id="d-eps", type="number", step=0.05,
+                                                                        min=0.05, debounce=True)], md=4)])),
 ])
 
 
@@ -116,7 +125,9 @@ def distribucion(v, log, lineas, clases, meses):
     med = m.groupby("y_tarde")[v].median()
     txt_h = (f"Mediana de {nombre(v).lower()}: {es(med.get(1, np.nan), 2)} en las tardías y {es(med.get(0, np.nan), 2)} "
              f"en las a tiempo. Asimetría {es(m[v].skew(), 1)}: "
-             + ("cola larga, por eso la escala logarítmica." if abs(m[v].skew()) > 2 else "sin cola larga."))
+             + ("cola larga, por eso la escala logarítmica." if abs(m[v].skew()) > 2 else "sin cola larga.")
+             + " La caja prueba la normalidad de cada clase en la escala que se ve: con miles de posiciones rechaza ante "
+             "cualquier desvío, así que pesan más la asimetría y la curtosis que el p. Ningún modelo del proyecto la supone.")
     x = m[v].dropna()
     q1, q3 = x.quantile([.25, .75])
     fuera = ((x < q1 - 1.5 * (q3 - q1)) | (x > q3 + 1.5 * (q3 - q1))).mean() if q3 > q1 else 0
@@ -160,25 +171,47 @@ def correlacion_y_vacios(lineas, clases, meses):
             txt_v)
 
 
-@callback(Output("g-stl", "figure"), Output("t-stl", "children"), Output("g-acf", "figure"),
-          Output("t-acf", "children"), *ENTRADAS)
-def tiempo(lineas, clases, meses):
-    _, s = filtrar(lineas, clases, meses)
-    if len(s) < 24:
-        aviso = "La descomposición necesita al menos 24 meses: amplíe el rango de fechas."
-        return plots.go.Figure(), aviso, plots.go.Figure(), aviso
-    d = descomponer(s)
-    e = estacionariedad(s.tasa).set_index("prueba").p
-    a = autocorrelacion(s.tasa)
-    est = d.groupby(d.fecha.dt.month).estacionalidad.mean()     # perfil medio de cada mes
-    amp = est.max() - est.min()
-    txt_s = (f"La tendencia pasa de {pct(d.tendencia.iloc[0])} a {pct(d.tendencia.iloc[-1])}; la estacionalidad "
-             f"mueve la tasa en {es(100 * amp, 1)} puntos entre el mes más bajo ({MES[est.idxmin()]}) y el más alto ({MES[est.idxmax()]}), "
-             "en promedio.")
-    estacionaria = e["ADF"] < 0.05 and e["KPSS"] >= 0.05
-    txt_a = (f"ADF: p = {es(e['ADF'], 3)}; KPSS: p = {es(e['KPSS'], 3)}. "
-             + ("La serie se comporta como estacionaria." if estacionaria else
-                "La serie no es estacionaria (cambia de nivel), así que la partición cronológica es obligatoria y un "
-                "modelo entrenado con años viejos puede sobrestimar el retraso.")
-             + f" La autocorrelación del primer rezago es {es(a.ACF.iloc[1], 2)}: un mes se parece al anterior.")
-    return plots.stl(d), txt_s, plots.acf_pacf(a), txt_a
+PUNTOS_DBSCAN = 5000
+
+
+@callback(Output("g-pca-var", "figure"), Output("t-pca-var", "children"), Output("g-pca", "figure"),
+          Output("t-pca", "children"), *ENTRADAS)
+def componentes(lineas, clases, meses):
+    m, _ = filtrar(lineas, clases, meses)
+    if len(m) < 50:
+        return dash.no_update, "", dash.no_update, ""
+    var, z, cargas = multivariado.pca(m, TOP)
+    k80 = int(np.searchsorted(np.cumsum(var), 0.8)) + 1
+    txt_v = (f"La primera componente resume el {pct(var[0], 0)} de la variación de las 12 numéricas y las dos primeras el "
+             f"{pct(var[:2].sum(), 0)}; hacen falta {k80} para llegar al 80 %. La información está repartida: no hay un "
+             "par de ejes que la contenga casi toda.")
+    c1 = cargas.PC1.abs().idxmax()
+    txt_p = (f"La flecha más larga sobre PC1 es {nombre(c1).lower()}. Las clases se solapan en el plano: lo que separa las "
+             "tardías no es una dirección lineal de las numéricas, y por eso los árboles y las entidades pesan tanto.")
+    i = np.random.default_rng(2026).choice(len(m), min(len(m), 6000), replace=False)
+    return (plots.pca_varianza(var), txt_v,
+            plots.pca_plano(z[i], m.y_tarde.to_numpy()[i], cargas, {v: nombre(v) for v in TOP}, var), txt_p)
+
+
+@callback(Output("g-dbscan", "figure"), Output("t-dbscan", "children"), Input("d-k", "value"),
+          Input("d-vecinos", "value"), Input("d-eps", "value"), *ENTRADAS)
+def grupos(k, vecinos, eps, lineas, clases, meses):
+    m, _ = filtrar(lineas, clases, meses)
+    if len(m) < 50:
+        return dash.no_update, ""
+    m = m.sample(min(len(m), PUNTOS_DBSCAN), random_state=2026)
+    z = multivariado.pca(m, TOP)[1][:, :k]
+    sugerido = multivariado.eps_sugerido(z, vecinos)
+    eps = eps or sugerido
+    et = multivariado.dbscan(z, eps, vecinos)
+    r = multivariado.resumen_grupos(et, m.y_tarde)
+    g = r[r.grupo >= 0]
+    ruido = r.loc[r.grupo < 0, "posiciones"].sum() / len(m)
+    t_ruido = r.loc[r.grupo < 0, "tasa"].iloc[0] if ruido else np.nan
+    detalle = "; ".join(f"{f.nombre}: {es(f.posiciones)} posiciones, {pct(f.tasa, 0)} tarde" for _, f in g.head(4).iterrows())
+    txt = (f"Con {k} componentes, min_samples = {vecinos} y eps = {es(eps, 2)} (sugerido por el codo de las distancias al "
+           f"vecino {vecinos}: {es(sugerido, 2)}), DBSCAN encuentra {len(g)} grupo(s) y deja el {pct(ruido, 0)} como ruido "
+           f"en {es(len(m))} posiciones. {detalle}" + (f"; ruido: {pct(t_ruido, 0)} tarde. " if ruido else ". ")
+           + "El ruido son las posiciones que no tienen vecinas parecidas: compras atípicas. Si llegan tarde mucho más que "
+           "los grupos, lo raro es un riesgo en sí, y conviene marcarlo (una variable de atipicidad).")
+    return plots.dbscan_plano(z, et), txt

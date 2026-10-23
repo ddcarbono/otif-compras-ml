@@ -66,15 +66,35 @@ def histograma_por_clase(df, v, nombre, unidad="", log=False, bins=40):
     cortes = np.linspace(lim[0], lim[1], bins + 1)
     centro, ancho = (cortes[:-1] + cortes[1:]) / 2, np.diff(cortes)
     fig = go.Figure()
+    caja = ["<b>Normalidad</b> (D'Agostino-Pearson K²)"]
     for k, et in CLASE.items():
-        xs = x[(df.y_tarde == k).to_numpy()].dropna().clip(lim[0], lim[1])
+        crudo = x[(df.y_tarde == k).to_numpy()].dropna()
+        xs = crudo.clip(lim[0], lim[1])
         dens = np.histogram(xs, cortes)[0] / max(len(xs), 1) / ancho
         fig.add_trace(go.Bar(x=centro, y=dens, width=ancho, name=et, marker_color=COLOR_CLASE[et], opacity=0.6,
                              hovertemplate="%{x:.2f}: densidad %{y:.3f}<extra>" + et + "</extra>"))
+        caja.append(f"{et}: " + _normalidad(crudo))
     eje = f"{nombre} ({unidad})" if unidad and unidad != "—" else nombre
-    fig.update_layout(barmode="overlay", title=nombre, xaxis_title=("signo · log10(1 + |x|) de " if log else "") + eje,
-                      yaxis_title="densidad")
+    fig.add_annotation(text="<br>".join(caja), xref="paper", yref="paper", x=1, y=1.01, xanchor="right", yanchor="bottom",
+                       showarrow=False, align="left", bgcolor="rgba(255,255,255,0.9)", bordercolor="#BBBBBB",
+                       borderwidth=1, borderpad=6, font=dict(size=11))
+    fig.update_layout(barmode="overlay", title=dict(text=nombre, y=0.97, yanchor="top"), margin=dict(t=120, b=95), legend_y=-0.3,
+                      xaxis_title=("signo · log10(1 + |x|) de " if log else "") + eje, yaxis_title="densidad")
     return fig
+
+
+def _normalidad(x):
+    """K² de D'Agostino y Pearson (asimetría y curtosis juntas), con n, asimetría y curtosis en exceso. Sirve con miles de
+    filas, donde Shapiro-Wilk ya no aplica; con tantas, cualquier desvío pequeño rechaza."""
+    from scipy import stats
+    x = np.asarray(x, float)
+    if len(x) < 20 or np.ptp(x) == 0:
+        return "sin datos suficientes"
+    k2, p = stats.normaltest(x)
+    es = lambda v, d=0: f"{v:,.{d}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    pt = "p < 0,001" if p < 0.001 else f"p = {es(p, 3)}"
+    return (f"K² = {es(k2)}, {pt} (n = {es(len(x))}; asimetría {es(stats.skew(x), 2)}, "
+            f"curtosis {es(stats.kurtosis(x), 2)})")
 
 
 def caja_por_clase(df, v, nombre):
@@ -429,4 +449,50 @@ def log_perdida(p):
     fig.update_layout(title=f"Log-pérdida con p = {p:.2f}".replace(".", ","), xaxis_title="probabilidad predicha de tarde, p",
                       yaxis_title="pérdida", yaxis_range=[0, 5.3], xaxis_range=[0, 1], height=400,
                       legend=dict(y=-0.3), margin=dict(b=90))
+    return fig
+
+
+# --- exploración multivariada (página EDA) ------------------------------------------------------------------------------
+def pca_varianza(var):
+    """Varianza explicada por componente (barras) y acumulada (línea)."""
+    k = np.arange(1, len(var) + 1)
+    fig = go.Figure(go.Bar(x=k, y=var, marker_color=AZUL, name="por componente",
+                           hovertemplate="PC%{x}: %{y:.1%}<extra></extra>"))
+    fig.add_trace(go.Scatter(x=k, y=np.cumsum(var), mode="lines+markers", line=dict(color=ORO), name="acumulada",
+                             hovertemplate="hasta PC%{x}: %{y:.1%}<extra></extra>"))
+    fig.update_layout(title="Varianza explicada", xaxis_title="componente", yaxis_title="varianza explicada",
+                      yaxis_tickformat=".0%", xaxis_dtick=1)
+    return fig
+
+
+def pca_plano(puntajes, y, cargas, nombres, var):
+    """Las posiciones en el plano PC1-PC2 por clase, con las cargas de cada variable como flechas."""
+    fig = go.Figure()
+    for k, et in CLASE.items():
+        s = np.asarray(y) == k
+        fig.add_trace(go.Scattergl(x=puntajes[s, 0], y=puntajes[s, 1], mode="markers", name=et,
+                                   marker=dict(size=4, opacity=0.3, color=COLOR_CLASE[et])))
+    esc = 0.8 * np.abs(puntajes[:, :2]).max(axis=0) / np.abs(cargas.to_numpy()).max()
+    for v, (a, b) in cargas.iterrows():
+        x, y_ = a * esc.min(), b * esc.min()
+        fig.add_annotation(x=x, y=y_, ax=0, ay=0, xref="x", yref="y", axref="x", ayref="y", showarrow=True, arrowhead=2,
+                           arrowcolor=MARRON, text="")
+        fig.add_annotation(x=x, y=y_, xref="x", yref="y", showarrow=False, text=nombres.get(v, v), font=dict(size=10),
+                           xanchor="left" if x >= 0 else "right", yanchor="bottom" if y_ >= 0 else "top",
+                           bgcolor="rgba(255,255,255,0.7)")
+    fig.update_layout(title="Plano de las dos primeras componentes", xaxis_title=f"PC1 ({var[0]:.0%})",
+                      yaxis_title=f"PC2 ({var[1]:.0%})", height=520)
+    return fig
+
+
+def dbscan_plano(puntajes, etiquetas):
+    """Los grupos de DBSCAN en el plano PC1-PC2; el ruido en gris."""
+    fig = go.Figure()
+    for i, g in enumerate(sorted(set(etiquetas))):
+        s = etiquetas == g
+        nombre = "ruido" if g < 0 else f"grupo {g + 1}"
+        fig.add_trace(go.Scattergl(x=puntajes[s, 0], y=puntajes[s, 1], mode="markers", name=nombre,
+                                   marker=dict(size=4, opacity=0.25 if g < 0 else 0.5,
+                                               color=GRIS if g < 0 else PALETA[[0, 1, 2, 4][(g) % 4]])))
+    fig.update_layout(title="Grupos de DBSCAN en el plano PC1-PC2", xaxis_title="PC1", yaxis_title="PC2", height=460)
     return fig
