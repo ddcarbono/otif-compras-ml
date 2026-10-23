@@ -2,13 +2,15 @@
 (validación anidada en 8 bloques semestrales, con Friedman, Nemenyi, Wilcoxon, DeLong y BCa), el mejor modelo en la
 prueba 2026 con SHAP y la comparación 2 × 2 con la propuesta original, y el modelo base (regresión logística).
 Todo se lee de ``data/modelos`` (lo escribe ``src.preparar`` a partir de ``src.modelo_base``): aquí no se entrena."""
+import json
+
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Input, Output, callback, dash_table, dcc, html
 
 from src import plots
-from src.data import diccionario, modelo
+from src.data import DATA, diccionario, modelo
 from src.vista_prediccion import vista
 from src.vista_original import vista as vista_original
 
@@ -120,6 +122,7 @@ def pestana_2026():
                  cifra(_n(XG.ECE), "error de calibración esperado (ECE), con Platt")]),
         tarjeta_formula(1),
         tarjeta_formula(3, None),
+        flujo("Pipeline final", PIPE_XGB),
         tabla_simple(m),
         dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("p26_curvas"), "ROC", P26.reset_index()),
                                    config=CONFIG), lg=6),
@@ -193,6 +196,7 @@ def pestana_original():
                  cifra(_n(pr.ECE), "error de calibración esperado (ECE)")]),
         tarjeta_formula(2),
         tarjeta_formula(3, None),
+        flujo("Pipeline final", PIPE_ORIGINAL),
         tabla_simple(m),
         html.H4("Modelo × información: la comparación 2 × 2", className="mt-4"),
         html.P("Separa lo que aporta el modelo de lo que aporta la información: cada modelo con las 136 variables del "
@@ -261,6 +265,48 @@ FORMULAS = [
      "proveedor, la de su región): con pocas posiciones pesa la del padre, y un valor nuevo recibe la del padre. Se "
      "calcula fuera de pliegue y agrupada por orden, para que una posición no vea su propio objetivo ni el de su orden. "
      "La usan la logística y XGBoost para las 11 entidades; el original, para las 7 que no llevan efecto aleatorio."),
+]
+
+
+def flujo(titulo, pasos):
+    """El pipeline final de un modelo: una fila de pasos (título y detalle) unidos por flechas."""
+    cajas = []
+    for k, (t, d) in enumerate(pasos):
+        if k:
+            cajas.append(html.Div("→", className="align-self-center text-muted fs-4 px-1"))
+        cajas.append(dbc.Card(dbc.CardBody([html.H6(f"{k + 1}. {t}", className="mb-1"), html.Small(d)]),
+                              className="paso", style={"flex": "1 1 160px", "minWidth": "150px"}))
+    return html.Div([html.H4(titulo, className="mt-4"), html.Div(cajas, className="d-flex flex-wrap gap-1 mb-2")])
+
+
+ART = DATA.parent / "artifacts"
+FX = json.loads((ART / "xgboost.metadata.json").read_text(encoding="utf-8"))
+FO = json.loads((ART / "original_servido.json").read_text(encoding="utf-8"))
+CO = json.loads((DATA.parent / "original" / "original_congelado.json").read_text(encoding="utf-8"))
+_e = lambda v, d=3: f"{v:.{d}f}".replace(".", ",")
+HX = FX["hiperparametros"]
+PIPE_XGB = [
+    ("Entrada", "136 variables conocidas el día de la liberación."),
+    ("Preprocesamiento", "Numéricas (83): signo · log, mediana, estandarización. Categóricas (42): one-hot, las de menos "
+                         "de 30 filas juntas. Entidades (11): tasa encogida (M = 20), fuera de pliegue. Todo se ajusta "
+                         "solo con el entrenamiento."),
+    ("XGBoost", f"{HX['n_estimators']} árboles, profundidad {HX['max_depth']}, η = {_e(HX['learning_rate'])}, "
+                f"{_e(HX['subsample'], 2)} de las filas y {_e(HX['colsample_bytree'], 2)} de las columnas por árbol; "
+                "sin balanceo, elegido con Optuna. Reentrenado con 2021-2025."),
+    ("Platt", f"σ({_e(FX['platt'][0])} · F + {_e(FX['platt'][1])}), ajustado en la validación 2025 y congelado."),
+    ("Umbral", f"Alerta si el riesgo ≥ {_e(FX['umbral'])} (máximo F1 en 2025)."),
+]
+PIPE_ORIGINAL = [
+    ("Entrada", "136 variables más 32 de plazo real previo (mediana y p80 de las últimas 20 entregas, holguras)."),
+    ("Entidades y categóricas", "Proveedor, material, solicitante y comprador: efecto aleatorio b, ordenado por "
+                                "semestre (K3). Las otras 7: tasa encogida (M = 20). Categóricas: nativas de LightGBM."),
+    ("Plazo log-normal", "Un LightGBM de regresión sin las variables de la promesa estima μ, el plazo real esperado; "
+                         "z mide cuánto alcanza la promesa."),
+    ("Cortes ordinales", "Cada posición se repite en c ∈ {0, 1, 5, 15} con la etiqueta [días de retraso > c]."),
+    ("LightGBM", f"{FO['arboles']} árboles, {CO['prm']['num_leaves']} hojas, η = {_e(CO['prm']['learning_rate'])}, "
+                 "monótono decreciente en c; Σ b como desplazamiento del logit. Reentrenado con 2021-2025."),
+    ("Platt", f"σ({_e(FO['platt'][0])} · logit + {_e(FO['platt'][1])}) en c = 1, ajustado en 2025 y congelado."),
+    ("Umbral", f"Alerta si el riesgo ≥ {_e(FO['umbral'])} (máximo F1 en 2025)."),
 ]
 
 

@@ -484,15 +484,3 @@ def pca_plano(puntajes, y, cargas, nombres, var):
                       yaxis_title=f"PC2 ({var[1]:.0%})", height=520)
     return fig
 
-
-def dbscan_plano(puntajes, etiquetas):
-    """Los grupos de DBSCAN en el plano PC1-PC2; el ruido en gris."""
-    fig = go.Figure()
-    for i, g in enumerate(sorted(set(etiquetas))):
-        s = etiquetas == g
-        nombre = "ruido" if g < 0 else f"grupo {g + 1}"
-        fig.add_trace(go.Scattergl(x=puntajes[s, 0], y=puntajes[s, 1], mode="markers", name=nombre,
-                                   marker=dict(size=4, opacity=0.25 if g < 0 else 0.5,
-                                               color=GRIS if g < 0 else PALETA[[0, 1, 2, 4][(g) % 4]])))
-    fig.update_layout(title="Grupos de DBSCAN en el plano PC1-PC2", xaxis_title="PC1", yaxis_title="PC2", height=460)
-    return fig

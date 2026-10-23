@@ -1,7 +1,7 @@
 """Sección 2: análisis exploratorio con filtros globales (línea, clase de compra y rango de meses) que actualizan todos
 los gráficos. Las distribuciones salen de la muestra de 30.000 posiciones del entrenamiento; las series, de los
 agregados mensuales de todo el entrenamiento. Cada gráfico lleva una frase de lectura. Cierra con la exploración
-multivariada: PCA y DBSCAN sobre las 12 numéricas principales (``src/multivariado.py``)."""
+multivariada: PCA sobre las 12 numéricas principales (``src/multivariado.py``)."""
 import dash
 import dash_bootstrap_components as dbc
 import numpy as np
@@ -69,15 +69,6 @@ layout = html.Div([
     dbc.Row([dbc.Col(tarjeta("g-corr", "t-corr"), lg=7), dbc.Col(tarjeta("g-vacios", "t-vacios"), lg=5)]),
     html.H4("Componentes principales (PCA)"),
     dbc.Row([dbc.Col(tarjeta("g-pca-var", "t-pca-var"), lg=5), dbc.Col(tarjeta("g-pca", "t-pca"), lg=7)]),
-    html.H4("Grupos por densidad (DBSCAN)"),
-    tarjeta("g-dbscan", "t-dbscan", dbc.Row([
-        dbc.Col([dbc.Label("Componentes que usa"), dcc.Slider(id="d-k", min=2, max=6, step=1, value=3,
-                                                              marks={i: str(i) for i in range(2, 7)})], md=4),
-        dbc.Col([dbc.Label("Vecinos mínimos (min_samples)"), dcc.Slider(id="d-vecinos", min=5, max=50, step=5, value=20,
-                                                                        marks={i: str(i) for i in (5, 20, 35, 50)})],
-                md=4),
-        dbc.Col([dbc.Label("Radio eps (vacío: el sugerido)"), dbc.Input(id="d-eps", type="number", step=0.05,
-                                                                        min=0.05, debounce=True)], md=4)])),
 ])
 
 
@@ -171,9 +162,6 @@ def correlacion_y_vacios(lineas, clases, meses):
             txt_v)
 
 
-PUNTOS_DBSCAN = 5000
-
-
 @callback(Output("g-pca-var", "figure"), Output("t-pca-var", "children"), Output("g-pca", "figure"),
           Output("t-pca", "children"), *ENTRADAS)
 def componentes(lineas, clases, meses):
@@ -191,27 +179,3 @@ def componentes(lineas, clases, meses):
     i = np.random.default_rng(2026).choice(len(m), min(len(m), 6000), replace=False)
     return (plots.pca_varianza(var), txt_v,
             plots.pca_plano(z[i], m.y_tarde.to_numpy()[i], cargas, {v: nombre(v) for v in TOP}, var), txt_p)
-
-
-@callback(Output("g-dbscan", "figure"), Output("t-dbscan", "children"), Input("d-k", "value"),
-          Input("d-vecinos", "value"), Input("d-eps", "value"), *ENTRADAS)
-def grupos(k, vecinos, eps, lineas, clases, meses):
-    m, _ = filtrar(lineas, clases, meses)
-    if len(m) < 50:
-        return dash.no_update, ""
-    m = m.sample(min(len(m), PUNTOS_DBSCAN), random_state=2026)
-    z = multivariado.pca(m, TOP)[1][:, :k]
-    sugerido = multivariado.eps_sugerido(z, vecinos)
-    eps = eps or sugerido
-    et = multivariado.dbscan(z, eps, vecinos)
-    r = multivariado.resumen_grupos(et, m.y_tarde)
-    g = r[r.grupo >= 0]
-    ruido = r.loc[r.grupo < 0, "posiciones"].sum() / len(m)
-    t_ruido = r.loc[r.grupo < 0, "tasa"].iloc[0] if ruido else np.nan
-    detalle = "; ".join(f"{f.nombre}: {es(f.posiciones)} posiciones, {pct(f.tasa, 0)} tarde" for _, f in g.head(4).iterrows())
-    txt = (f"Con {k} componentes, min_samples = {vecinos} y eps = {es(eps, 2)} (sugerido por el codo de las distancias al "
-           f"vecino {vecinos}: {es(sugerido, 2)}), DBSCAN encuentra {len(g)} grupo(s) y deja el {pct(ruido, 0)} como ruido "
-           f"en {es(len(m))} posiciones. {detalle}" + (f"; ruido: {pct(t_ruido, 0)} tarde. " if ruido else ". ")
-           + "El ruido son las posiciones que no tienen vecinas parecidas: compras atípicas. Si llegan tarde mucho más que "
-           "los grupos, lo raro es un riesgo en sí, y conviene marcarlo (una variable de atipicidad).")
-    return plots.dbscan_plano(z, et), txt
