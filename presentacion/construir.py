@@ -501,7 +501,7 @@ notas(s, '1:00', 'B', 'criterio 5', 'Por qué cada métrica. La ganancia de XGBo
 s = nueva()
 wl = wil[wil.contra == 'logistica'].iloc[0]
 cabecera(s, 'Tablero: una predicción en vivo, y la prueba de diferencias', 'CRITERIO 5  ·  PANTALLA EN VIVO')
-captura(s, 'tablero_modelos.png', 1.3, 3.6, 11.4)
+captura(s, 'tablero_modelos.png', 1.3, 3.6, 10.8)
 banda(s, 1.3, 11.0, 11.4, 2.1, [('En vivo:  ', True, ORO_CL), ('cargar una posición real, cambiar el plazo hábil al liberar '
                                  'y ver cómo se mueven el riesgo y sus contribuciones.', False, BLANCO)], VERDE, tam=10.5)
 figura(s, 'rangos_cd.png', 13.4, 3.2, w=10.8)

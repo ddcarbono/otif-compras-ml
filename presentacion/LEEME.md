@@ -1,31 +1,31 @@
 # Diapositivas de la sustentación
 
-`sustentacion_otif.pptx` (y su PDF): 14 diapositivas de 25,4 × 14,29 cm con la plantilla Uninorte de las
-sustentaciones de GLM (`plantilla_uninorte.py`, la misma de la regresión Beta: barra verde, filete oro, logo, tarjetas
-de color, Calibri). Siguen los siete criterios de la rúbrica de sustentación, con la teoría (criterio 3, 25 % de la
-nota) en tres diapositivas con fórmulas y el análisis de errores y sobreajuste en una propia.
+`sustentacion_otif.pptx` (y su PDF): 21 diapositivas de 25,4 × 14,29 cm con la plantilla Uninorte de las
+sustentaciones de GLM (`plantilla_uninorte.py`, la misma de la regresión Beta). Siguen la rúbrica de 20 minutos, con la
+tabla de `entregables/diapositivas.md` y el mejor benchmark (XGBoost) en la teoría: 18 minutos de exposición y 2 de
+preguntas.
 
-| # | criterio | contenido | expone |
-|---|---|---|---|
-| 1 | — | portada con las tres direcciones | A |
-| 2 | 1 | problema, x, y, p(x), umbral, objetivos | A |
-| 3-5 | 2 | datos y partición; EDA (AUC univariado, faltantes, atípicos); tiempo, fuga y validación adversaria | A |
-| 6-8 | 3 | XGBoost: objetivo y Taylor; peso de hoja y ganancia; hiperparámetros, supuestos y complejidad medida | B |
-| 9-10 | 4 | diseño anidado de las 112, reproducibilidad; optimizadores | B |
-| 11-12 | 5 | tabla de líderes, Friedman, Nemenyi y Wilcoxon, línea base 2026; sobreajuste y calibración | A, B |
-| 13 | 6 | conclusiones y limitaciones | A |
-| 14 | 7 | preguntas | A y B |
+| # | criterio | min | contenido | expone |
+|---|---|---|---|---|
+| 1-3 | 1 | 2:00 | portada; el problema con su magnitud y la literatura; formulación (Bernoulli, log-pérdida, umbral) | A |
+| 4-8 | 2 | 3:00 | tablero en vivo (Contexto y EDA); datos y partición; descriptiva y calidad; relaciones y fuga; tiempo y validación adversaria | A |
+| 9-12 | 3 | 5:00 | XGBoost: modelo y pérdida; Taylor con la derivación de g y h; peso de hoja y ganancia; regularización, supuestos y complejidad medida | B |
+| 13-15 | 4 | 3:00 | diseño anidado; implementación y espacio de búsqueda; tablero en vivo (las 112 y los optimizadores) | B, A |
+| 16-18 | 5 | 3:00 | métricas y línea base; tablero en vivo (predicción) con Friedman, Nemenyi y Wilcoxon; errores y sobreajuste | B, A |
+| 19-20 | 6 | 2:00 | conclusiones con el veredicto de cada objetivo; limitaciones y mejoras | A, B |
+| 21 | 7 | 2:00 | preguntas | A y B |
 
-A = Daniel Carbonó, B = Luis Pérez (reparto de `entregables/diapositivas.md`). Tiempos y guion en `notas.md` y en las
-notas de cada diapositiva: 10 minutos de exposición más preguntas.
+A = Daniel Carbonó, B = Luis Pérez. Guion y tiempos en `notas.md` y en las notas de cada diapositiva. Las pantallas del
+tablero llevan su captura (`capturar_tablero.py`) por si Render no carga.
 
-**Pendiente** (caja gris en las diapositivas 11 y 12, espera la evaluación final 2026): XGBoost en la prueba 2026,
+**Pendiente** (caja gris en las diapositivas 16 y 18, espera la evaluación final 2026): XGBoost en la prueba 2026,
 tabla de brecha, matriz de confusión por línea, errores con entidades nuevas, un falso negativo típico y SHAP.
 
 ## Regenerar
 
 ```
 "C:\Users\Daniel Carbono\.conda\envs\ml_venv\python.exe" presentacion/figuras.py   # img/*.png: figuras y fórmulas (matplotlib)
+python presentacion/capturar_tablero.py              # img/tablero_*.png desde Render
 python presentacion/construir.py                     # sustentacion_otif.pptx y notas.md (python-pptx, Python base)
 python presentacion/revisar_pptx.py presentacion/sustentacion_otif.pptx            # cajas fuera del lienzo o desbordadas
 python presentacion/exportar.py presentacion/sustentacion_otif.pptx presentacion/render 1600
