@@ -145,7 +145,7 @@ def serie_tasa(t, titulo="Tasa de tarde y volumen por mes", color_por=None):
             fig.add_trace(go.Scatter(x=d.fecha_pedido, y=d.tasa, name=str(g), mode="lines",
                                      line=dict(color=PALETA[i % 5])), secondary_y=False)
     else:
-        fig.add_trace(go.Bar(x=t.fecha_pedido, y=t.filas, name="posiciones", marker_color="#DCE3EA"), secondary_y=True)
+        fig.add_trace(go.Bar(x=t.fecha_pedido, y=t.filas, name="posiciones", marker_color=GRIS, opacity=0.2), secondary_y=True)
         fig.add_trace(go.Scatter(x=t.fecha_pedido, y=t.tasa, name="tasa de tarde", mode="lines+markers",
                                  line=dict(color=ORO), marker=dict(size=4)), secondary_y=False)
     fig.update_yaxes(title_text="tasa de tarde", tickformat=".0%", secondary_y=False, rangemode="tozero")
@@ -306,8 +306,10 @@ MODELO = {"xgboost": "XGBoost", "random_forest": "Random Forest", "logistica": "
 BALANCEO = {"ninguno": "ninguno", "smote": "SMOTE", "adasyn": "ADASYN", "pesos": "pesos de clase"}
 OPTIMIZADOR = {"grid": "Grid", "random": "Random", "optuna": "Optuna (TPE)", "deap": "DEAP (genético)"}
 COLOR_OPT = {"grid": GRIS, "random": AZUL, "optuna": ORO, "deap": VERDE}
-COLOR_MOD = {"xgboost": ORO, "random_forest": VERDE, "logistica": AZUL, "svm": "#8FB3CC", "arbol": MARRON,
-             "knn": GRIS, "naive_bayes": "#BBBBBB"}
+COLOR_MOD = {"xgboost": ORO, "random_forest": VERDE, "logistica": AZUL, "svm": AZUL, "arbol": MARRON,
+             "knn": GRIS, "naive_bayes": GRIS}
+# siete modelos y cinco colores: los dos que repiten color van punteados
+DASH_MOD = {"svm": "dot", "naive_bayes": "dot"}
 
 
 def auc_por_bloque(m, nombres):
@@ -316,7 +318,7 @@ def auc_por_bloque(m, nombres):
     orden = m.drop(columns="bloque").mean().sort_values(ascending=False).index
     for c in orden:
         fig.add_trace(go.Scatter(x=m.bloque, y=m[c], mode="lines+markers", name=nombres.get(c, c),
-                                 line=dict(color=COLOR_MOD.get(c, AZUL)),
+                                 line=dict(color=COLOR_MOD.get(c, AZUL), dash=DASH_MOD.get(c, "solid")),
                                  hovertemplate="%{x}: AUC %{y:.3f}<extra>" + nombres.get(c, c) + "</extra>"))
     fig.update_layout(title="ROC-AUC por bloque externo (mejor combinación de cada modelo)", xaxis_title="bloque evaluado",
                       yaxis_title="ROC-AUC")
@@ -503,7 +505,7 @@ def entidades_nuevas(t):
     """Porcentaje de posiciones con un valor de cada entidad que el entrenamiento no vio, en la validación y la prueba."""
     t = t[(t["nuevo en validacion (%)"] > 0) | (t["nuevo en prueba (%)"] > 0)].iloc[::-1]
     fig = go.Figure()
-    for col, et, color in [("nuevo en validacion (%)", "validación 2025", AZUL), ("nuevo en prueba (%)", "prueba 2026", ORO)]:
+    for col, et, color in [("nuevo en validacion (%)", "validación 2025", GRIS), ("nuevo en prueba (%)", "prueba 2026", AZUL)]:
         fig.add_trace(go.Bar(y=t.nombre, x=t[col], orientation="h", name=et, marker_color=color,
                              hovertemplate="%{y}: %{x:.1f} %<extra>" + et + "</extra>"))
     fig.update_layout(title="Posiciones con una entidad que el entrenamiento no vio", xaxis_title="% de posiciones",

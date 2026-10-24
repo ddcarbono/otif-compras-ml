@@ -32,7 +32,6 @@ OPC_COLOR = [{"label": "Clase (a tiempo / tarde)", "value": "y_tarde"}, {"label"
 ASO = agregado("asociacion")
 NUEVAS = agregado("entidades_nuevas")
 ADV = agregado("similitud_auc")
-ADV_IMP = agregado("similitud_importancia")
 
 
 def fija(fig, texto):
@@ -44,13 +43,10 @@ def fija(fig, texto):
 def asociacion():
     auc = ASO.sort_values("AUC", ascending=False).head(15)
     cram = ASO.dropna(subset=["V de Cramér"]).sort_values("V de Cramér", ascending=False).head(12)
-    t_auc = (f"La que más separa sola es {auc.nombre.iloc[0].lower()} (AUC {es(auc.AUC.iloc[0], 3)}); ninguna de las "
-             f"{len(ASO)} pasa de 0,75. Una variable que sola separara casi perfecto sería sospechosa de traer el desenlace "
-             "(fuga). El AUC univariado es la probabilidad de que, tomando una tardía y una a tiempo al azar, la variable "
-             "ordene bien el par.")
-    t_cram = (f"La V de Cramér es la asociación de una categórica con la clase, de 0 (ninguna) a 1 (la determina): "
-              f"√(χ² / n). La más alta es {cram.nombre.iloc[0].lower()} ({es(cram['V de Cramér'].iloc[0], 2)}). Son "
-              "asociaciones débiles una a una; el modelo las combina.")
+    t_auc = (f"La que más separa sola: {auc.nombre.iloc[0].lower()} ({es(auc.AUC.iloc[0], 3)}). Ninguna pasa de 0,75, "
+             "el corte de sospecha de fuga.")
+    t_cram = (f"V de Cramér = √(χ² / n), de 0 a 1. La más alta: {cram.nombre.iloc[0].lower()} "
+              f"({es(cram['V de Cramér'].iloc[0], 2)}). Débiles una a una.")
     return dbc.Row([
         dbc.Col(fija(plots.barras_horizontales(auc, "AUC", "nombre", "AUC univariado (las 15 que más separan)", "AUC",
                                                ".3f", referencia=0.75), t_auc), lg=6),
@@ -60,20 +56,14 @@ def asociacion():
 
 def particiones():
     nv = NUEVAS.set_index("variable")
-    t_nv = (f"Una de cada nueve posiciones de 2026 trae un proveedor que no estaba en 2021-2024 "
-            f"({es(nv.loc['proveedor', 'nuevo en prueba (%)'], 1)} %) y una de cada diez, un material nuevo "
-            f"({es(nv.loc['material', 'nuevo en prueba (%)'], 1)} %). Es el arranque en frío: para ellos no hay "
-            "historial, y reciben la tasa de su nivel superior.")
+    t_nv = (f"En 2026, proveedor nuevo en el {es(nv.loc['proveedor', 'nuevo en prueba (%)'], 1)} % y material nuevo en el "
+            f"{es(nv.loc['material', 'nuevo en prueba (%)'], 1)} %: reciben la tasa de su nivel superior.")
     adv = ADV.assign(nombre=ADV.particion.str.replace("cronológica: ", "", regex=False))
-    imp = ADV_IMP[ADV_IMP.particion == ADV.particion.iloc[0]].head(3).columna.str.split("__").str[1].map(nombre)
-    t_adv = (f"Un XGBoost intenta adivinar de qué partición viene cada posición. Con órdenes al azar no puede "
-             f"(AUC {es(ADV.AUC.iloc[2], 3)}); con el corte por año acierta siempre ({es(ADV.AUC.iloc[0], 3)}), y sigue en "
-             f"{es(ADV.AUC.iloc[1], 3)} sin las variables que fechan la fila. Lo que más lo delata: "
-             f"{', '.join(v.lower() for v in imp)}. Los años son poblaciones distintas: por eso la partición es "
-             "cronológica y la validación, por ventanas que crecen.")
+    t_adv = (f"Un XGBoost adivina la partición: al azar no puede ({es(ADV.AUC.iloc[2], 3)}), por año sí "
+             f"({es(ADV.AUC.iloc[0], 3)}). Los años son poblaciones distintas: partición cronológica.")
     return dbc.Row([
         dbc.Col(fija(plots.entidades_nuevas(NUEVAS), t_nv), lg=6),
-        dbc.Col(fija(plots.barras_horizontales(adv, "AUC", "nombre", "Validación adversaria", "AUC", ".3f", color=plots.MARRON, referencia=0.5),
+        dbc.Col(fija(plots.barras_horizontales(adv, "AUC", "nombre", "Validación adversaria", "AUC", ".3f", referencia=0.5),
                      t_adv), lg=6)])
 
 
@@ -172,8 +162,7 @@ def distribucion(v, log, lineas, clases, meses):
     txt_h = (f"Mediana de {nombre(v).lower()}: {es(med.get(1, np.nan), 2)} en las tardías y {es(med.get(0, np.nan), 2)} "
              f"en las a tiempo. Asimetría {es(m[v].skew(), 1)}: "
              + ("cola larga, por eso la escala logarítmica." if abs(m[v].skew()) > 2 else "sin cola larga.")
-             + " La caja prueba la normalidad de cada clase en la escala que se ve: con miles de posiciones rechaza ante "
-             "cualquier desvío, así que pesan más la asimetría y la curtosis que el p. Ningún modelo del proyecto la supone.")
+             + " Con miles de posiciones la prueba de la caja rechaza siempre: se leen la asimetría y la curtosis.")
     x = m[v].dropna()
     q1, q3 = x.quantile([.25, .75])
     fuera = ((x < q1 - 1.5 * (q3 - q1)) | (x > q3 + 1.5 * (q3 - q1))).mean() if q3 > q1 else 0
@@ -225,12 +214,10 @@ def componentes(lineas, clases, meses):
         return dash.no_update, "", dash.no_update, ""
     var, z, cargas = multivariado.pca(m, TOP)
     k80 = int(np.searchsorted(np.cumsum(var), 0.8)) + 1
-    txt_v = (f"La primera componente resume el {pct(var[0], 0)} de la variación de las 12 numéricas y las dos primeras el "
-             f"{pct(var[:2].sum(), 0)}; hacen falta {k80} para llegar al 80 %. La información está repartida: no hay un "
-             "par de ejes que la contenga casi toda.")
+    txt_v = (f"Dos componentes resumen el {pct(var[:2].sum(), 0)}; hacen falta {k80} para el 80 %. La información está "
+             "repartida.")
     c1 = cargas.PC1.abs().idxmax()
-    txt_p = (f"La flecha más larga sobre PC1 es {nombre(c1).lower()}. Las clases se solapan en el plano: lo que separa las "
-             "tardías no es una dirección lineal de las numéricas, y por eso los árboles y las entidades pesan tanto.")
+    txt_p = (f"PC1 la lleva {nombre(c1).lower()}. Las clases se solapan: no las separa una dirección lineal.")
     i = np.random.default_rng(2026).choice(len(m), min(len(m), 6000), replace=False)
     return (plots.pca_varianza(var), txt_v,
             plots.pca_plano(z[i], m.y_tarde.to_numpy()[i], cargas, {v: nombre(v) for v in TOP}, var), txt_p)
@@ -248,7 +235,6 @@ def tramos(v, lineas, clases, meses):
                   f"{es(i.left, 2)} a {es(i.right, 2)}" for i in t[v]]
     vac = m[x.isna()].y_tarde
     alto, bajo = t.loc[t.tasa.idxmax()], t.loc[t.tasa.idxmin()]
-    txt = (f"La tasa de tarde va de {pct(bajo.tasa, 0)} (tramo {bajo.tramo}) a {pct(alto.tasa, 0)} (tramo {alto.tramo}). "
-           "La forma importa: si no sube o baja en línea recta, un modelo lineal la aproxima mal y los árboles la ven "
-           "sola." + (f" Las {es(len(vac))} posiciones sin dato llegan tarde el {pct(vac.mean(), 0)}." if len(vac) else ""))
+    txt = (f"De {pct(bajo.tasa, 0)} (tramo {bajo.tramo}) a {pct(alto.tasa, 0)} (tramo {alto.tramo})."
+           + (f" Sin dato: {pct(vac.mean(), 0)}." if len(vac) else ""))
     return plots.tasa_por_tramo(t, nombre(v), m.y_tarde.mean()), txt

@@ -37,3 +37,5 @@ a { color: var(--oro); } a:hover { color: #7A5F1F; }
 /* la página seleccionada: fondo blanco, letra verde y el filete oro debajo */
 .navbar-otif .nav-link.active { background: #FFFFFF; color: var(--verde) !important; border-radius: 4px 4px 0 0;
   padding-left: .7rem !important; padding-right: .7rem !important; }
+.marca-carrito { height: 40px; width: 40px; border-radius: 50%; background: #FFFFFF; padding: 2px; margin-right: .6rem; vertical-align: middle; }
+.navbar-otif { padding-top: .25rem; padding-bottom: .25rem; } .navbar-otif .navbar-brand { padding: 0; }
