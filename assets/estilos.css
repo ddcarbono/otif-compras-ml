@@ -39,5 +39,6 @@ a { color: var(--oro); } a:hover { color: #7A5F1F; }
   padding-left: .7rem !important; padding-right: .7rem !important; }
 /* portada de la app Compras de Qlik: el fondo blanco de la imagen se funde con el de la página */
 .portada { width: 220px; max-width: 100%; mix-blend-mode: multiply; }
+.portada-pagina { width: 150px; }
 /* en celular la barra fija se dobla (111 px) y tapaba el comienzo de cada página */
-@media (max-width: 767px) { .portada { width: 150px; } .contenido { padding-top: 6rem !important; } }
+@media (max-width: 767px) { .portada { width: 150px; } .portada-pagina { width: 110px; } .contenido { padding-top: 6rem !important; } }

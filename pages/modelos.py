@@ -11,6 +11,7 @@ from dash import Input, Output, callback, dash_table, dcc, html
 
 from src import plots
 from src.data import DATA, diccionario, modelo
+from src.encabezado import encabezado
 from src.vista_prediccion import vista
 from src.vista_original import vista as vista_original
 
@@ -369,7 +370,7 @@ def layout(pestana="t-base", **_):
     """La página; ``?pestana=t-prediccion`` abre otra pestaña (la usa ``presentacion/capturar_tablero.py``)."""
     pestana = pestana if pestana in PESTANAS else "t-base"
     return html.Div([
-        html.H2("Modelos"),
+        encabezado(html.H2("Modelos"), "portada portada-pagina"),
         dbc.Tabs([
             dbc.Tab(html.Div([
                 html.H3("Modelo base: regresión logística"),

@@ -4,6 +4,7 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import dash_table, html
 
+from src.encabezado import encabezado
 from src.data import diccionario, es, pct, resumen
 
 dash.register_page(__name__, path="/", name="Contexto", order=0, title="Contexto · órdenes de compra")
@@ -33,16 +34,11 @@ tabla_dic = dash_table.DataTable(
 
 layout = html.Div([
     html.Section([
-        dbc.Row([
-            dbc.Col([
+        encabezado([
                 html.H1("¿Va a llegar tarde esta orden de compra?", className="titulo"),
                 html.P("Estima, el día en que una orden sale hacia el proveedor, la probabilidad de que cada posición "
                        "llegue más de un día hábil después de la fecha prometida. Datos de un grupo agroindustrial "
-                       "colombiano de la palma de aceite.", className="lead")],
-                md=9, className="order-2 order-md-1"),
-            # portada de la app Compras de Qlik Sense (ejemplos/2026-10-23_portada_compras en el repo de estudio)
-            dbc.Col(html.Img(src=dash.get_asset_url("portada_compras.jpg"), className="portada", alt=""),
-                    md=3, className="order-1 order-md-2 text-center text-md-end")], className="align-items-center"),
+                       "colombiano de la palma de aceite.", className="lead")]),
         dbc.Row([
             dbc.Col(cifra(pct(R["tasa_total"], 0), "de las posiciones llega tarde",
                           f"{es(R['filas'])} posiciones de {es(R['ordenes'])} órdenes, 2021-2026"), md=4, className="mb-3"),

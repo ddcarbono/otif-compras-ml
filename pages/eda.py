@@ -11,6 +11,7 @@ from dash import Input, Output, callback, dcc, html
 from src import plots
 from src.data import agregado, es, muestra, nombre, pct, serie_mensual, unidad
 from src import multivariado
+from src.encabezado import encabezado
 
 dash.register_page(__name__, path="/eda", name="EDA", order=1, title="EDA · órdenes de compra")
 
@@ -83,9 +84,9 @@ filtros = dbc.Card(dbc.CardBody(dbc.Row([
 ])), className="mb-4 filtros sticky-top")
 
 layout = html.Div([
-    html.H2("Análisis exploratorio"),
-    html.P("Entrenamiento: órdenes de 2021 a 2024. Los filtros cambian los gráficos, salvo asociación y particiones.",
-           className="text-muted"),
+    encabezado([html.H2("Análisis exploratorio"),
+                html.P("Entrenamiento: órdenes de 2021 a 2024. Los filtros cambian los gráficos, salvo asociación y "
+                       "particiones.", className="text-muted")], "portada portada-pagina"),
     filtros,
     html.Div(id="eda-alerta"),
     html.H4("La variable objetivo"),
