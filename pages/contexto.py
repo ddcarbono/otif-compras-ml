@@ -36,9 +36,9 @@ layout = html.Div([
         dbc.Row([
             dbc.Col([
                 html.H1("¿Va a llegar tarde esta orden de compra?", className="titulo"),
-                html.P("Un clasificador binario que estima, el día en que una orden de compra sale hacia el proveedor, "
-                       "la probabilidad de que cada posición llegue más de un día hábil después de la fecha prometida. "
-                       "Datos de un grupo agroindustrial colombiano de la palma de aceite.", className="lead")],
+                html.P("Estima, el día en que una orden sale hacia el proveedor, la probabilidad de que cada posición "
+                       "llegue más de un día hábil después de la fecha prometida. Datos de un grupo agroindustrial "
+                       "colombiano de la palma de aceite.", className="lead")],
                 md=9, className="order-2 order-md-1"),
             # portada de la app Compras de Qlik Sense (ejemplos/2026-10-23_portada_compras en el repo de estudio)
             dbc.Col(html.Img(src=dash.get_asset_url("portada_compras.jpg"), className="portada", alt=""),
@@ -56,9 +56,8 @@ layout = html.Div([
         ]),
     ]),
     html.H3("Por qué importa"),
-    html.P("Un repuesto que llega tarde a una extractora o un insumo que llega tarde a una plantación detiene un "
-           "proceso, obliga a comprar de urgencia o a mantener inventario de más. Saber el día de la liberación qué "
-           "posiciones tienen más riesgo permite hacerles seguimiento a esas, y no a todas."),
+    html.P("Un repuesto o un insumo que llega tarde detiene un proceso, obliga a comprar de urgencia o a mantener "
+           "inventario de más. Saber desde la liberación qué posiciones tienen más riesgo permite seguir solo esas."),
     html.H3("Pregunta de investigación y objetivos"),
     html.P(html.Strong("¿Se puede predecir, el día en que la orden se libera hacia el proveedor, si cada posición va a "
                        "llegar tarde, con lo que se sabe ese día?")),
@@ -83,7 +82,7 @@ layout = html.Div([
         ]), md=6),
     ]),
     html.H5("Diccionario de variables", className="mt-2"),
-    html.P("Escriba en la fila de filtro para buscar; por ejemplo, «proveedor» en la columna nombre.",
+    html.P("Filtre en la fila de encabezado; por ejemplo, «proveedor» en nombre.",
            className="text-muted small"),
     tabla_dic,
     html.H3("Metodología", className="mt-4"),
@@ -96,13 +95,13 @@ layout = html.Div([
             className="g-2"),
     html.H3("Limitaciones, ética y sesgos", className="mt-4"),
     html.Ul([
-        html.Li("Censura al final del periodo: las posiciones sin ninguna entrada no entran, y cerca del corte una "
-                "posición muy atrasada todavía no tiene entrada."),
+        html.Li("Censura al final del periodo: no entran las posiciones sin ninguna entrada, y cerca del corte una "
+                "muy atrasada aún no la tiene."),
         html.Li("Los maestros de proveedor y material son la foto actual del ERP, no la del día de la orden; los que se "
                 "ajustan después de ver retrasos se retiraron."),
         html.Li("Una sola empresa: los resultados describen su proceso y sus proveedores."),
-        html.Li("Personas con seudónimo y terceros con código. El modelo no evalúa compradores: su historial es contexto "
-                "del proceso. El conjunto completo no se publica; este tablero solo carga una muestra de "
+        html.Li("Personas con seudónimo y terceros con código. El modelo no evalúa compradores: su historial es contexto. "
+                "El conjunto completo no se publica; el tablero carga una muestra de "
                 f"{es(R['muestra'])} posiciones."),
     ]),
     html.Hr(),

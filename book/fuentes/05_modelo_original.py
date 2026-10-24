@@ -6,9 +6,9 @@
 # etiqueta que es el corte de una variable continua, los días de retraso. La propuesta ataca esas tres cosas y suma
 # información que ningún modelo de las 112 tenía: cuánto tardó de verdad el proveedor en sus entregas anteriores.
 #
-# **La propuesta** tiene tres piezas:
+# **La propuesta, BOREAL** (*Boosting Ordinal de Retraso con Efectos ALeatorios*), tiene tres piezas:
 #
-# 1. **K3**, un *boosting* de árboles con efectos aleatorios cruzados por entidad, sobre la reducción ordinal de los días
+# 1. el **boosting mixto**, un *boosting* de árboles con efectos aleatorios cruzados por entidad, sobre la reducción ordinal de los días
 #    de retraso, con los efectos ordenados en el tiempo al entrenar;
 # 2. un **modelo log-normal del plazo**, que da al clasificador la probabilidad de que el plazo prometido no alcance;
 # 3. **32 variables nuevas** de plazo real y holgura empírica.
@@ -50,9 +50,9 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 #   absorbe la dependencia entre posiciones de la misma orden y se descarta al predecir. La **corrección C** centra cada
 #   efecto en cada barrido, para que el nivel medio lo lleve el árbol; por eso una entidad nueva, que recibe 0, recibe
 #   el efecto medio.
-# - **Efectos ordenados (K3)** {cite}`prokhorenkova2018`. Si los árboles se entrenan con el efecto de cada entidad
+# - **Efectos ordenados** {cite}`prokhorenkova2018`. Si los árboles se entrenan con el efecto de cada entidad
 #   estimado con todo el periodo, cada fila ve un efecto que incluye su propio futuro, y al predecir una entidad nueva
-#   recibe 0: el entrenamiento y la predicción no se parecen. K3 entrena los árboles con efectos estimados solo con los
+#   recibe 0: el entrenamiento y la predicción no se parecen. El boosting mixto entrena los árboles con efectos estimados solo con los
 #   semestres anteriores al de cada fila (0 en el primero y para la entidad que aún no había aparecido). Es la idea del
 #   ordenamiento de CatBoost aplicada a efectos aleatorios. Al predecir se usan los efectos con todo el entrenamiento.
 #
@@ -123,14 +123,14 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 #
 # - **Combinar** el modelo de efectos con otro *boosting* (promedio de logits, enrutado por entidad nueva, compuerta por
 #   experiencia, residual) no sumó: cada combinación quedó donde el modelo de efectos solo, o no le ganó a su control.
-# - **Contra el arranque en frío**, cuatro vías: apagar el efecto en la primera fecha de la entidad (K2), ordenar los
-#   efectos en el tiempo (K3), un corrector con atributos e interacción proveedor-material y el texto de la posición
-#   (TF-IDF, SVD y k-means). Solo K3 corrigió la falla en la validación; la factorización proveedor-material eligió no
+# - **Contra el arranque en frío**, cuatro vías: apagar el efecto en la primera fecha de la entidad, ordenar los
+#   efectos en el tiempo, un corrector con atributos e interacción proveedor-material y el texto de la posición
+#   (TF-IDF, SVD y k-means). Solo ordenar los efectos corrigió la falla en la validación; la factorización proveedor-material eligió no
 #   usar memoria, y el texto no ayudó con los materiales nuevos. El corrector se hizo a partir de un prototipo escrito
 #   con asistencia de IA, y así se declara.
 # - **Ganancias de validación que no se sostienen.** En 2025 los modelos con efectos por entidad ganaban de 0,003 a
 #   0,007; en 2026, el modelo de efectos sin ordenar empató con un LightGBM de referencia, ajustado con Optuna en la
-#   misma validación (0,852 los dos). Esa fue la primera mirada a la prueba; K3, elegido después en la validación, fue
+#   misma validación (0,852 los dos). Esa fue la primera mirada a la prueba; el modelo con efectos ordenados, elegido después en la validación, fue
 #   la segunda (0,854). Por eso se adoptó la validación por cuatro semestres, y por eso las miradas siguientes a 2026 se
 #   declaran exploratorias.
 #
@@ -138,7 +138,7 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 #
 # Para separar lo que aporta el modelo de lo que aporta la información, se cruzan dos modelos (el XGBoost ganador de
 # las 112, con los hiperparámetros de su bloque más reciente, y la propuesta) con dos conjuntos de variables (las 136
-# del dataset y 136 + las 32 nuevas). Se agrega la ablación de K3 sin el modelo log-normal. Las seis celdas se
+# del dataset y 136 + las 32 nuevas). Se agrega la ablación de BOREAL sin el modelo log-normal. Las seis celdas se
 # entrenaron con 2021-2024, se calibraron con Platt y fijaron su umbral en 2025, y se congelaron
 # (`original/config_2x2/`) antes de entrenar con 2021-2025 y medir en 2026. Es la tercera mirada a la prueba:
 # exploratoria. Los intervalos son BCa al 95 % por órdenes (1.000 réplicas).
@@ -165,7 +165,7 @@ tabla(k[["contraste", "diferencia", "ΔROC-AUC", "intervalo"]].rename(columns={"
 #
 # ## Qué deja este capítulo
 #
-# La propuesta (K3 + log-normal + plazo real) es el mejor modelo medido en 2026: AUC 0,860, F1 0,685, ECE 0,013. Le
+# BOREAL (boosting mixto + log-normal + plazo real) es el mejor modelo medido en 2026: AUC 0,860, F1 0,685, ECE 0,013. Le
 # gana al ganador de las 112 por 0,012, con un intervalo lejos de cero. La 2 × 2 muestra de dónde sale esa ganancia: la
 # información nueva sola da 0,010 y la estructura sola 0,008, pero juntas dan 0,012, porque se sustituyen entre sí. Para
 # el negocio, la consecuencia práctica es que medir el plazo real de cada proveedor vale tanto como el modelo más

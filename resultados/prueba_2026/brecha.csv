@@ -1,4 +1,4 @@
 modelo,validación interna (8 bloques),bloques externos (8),validación 2025,prueba 2026
 XGBoost (las 112),0.8542327321177907,0.8516632494201393,0.8338,0.8484706902930075
-Propuesta (K3 + log-normal + nuevas),,,0.859,0.8601717909969129
+BOREAL (propuesta),,,0.859,0.8601717909969129
 Regresión logística,,,0.8302766099869192,0.8253279372550623

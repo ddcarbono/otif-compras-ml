@@ -1,7 +1,7 @@
 """El modelo elegido en las 112 (XGBoost) en la prueba 2026, frente a la logística base y a la propuesta del Entregable 3.
 
 Lee las probabilidades por posición de la comparación 2x2 (``maestria/machine_learning/otif/evaluar_2x2_otif.py``, ya con
-Platt): «XGBoost 136» y «Propuesta 136 + nuevas», con los umbrales de máximo F1 congelados en la validación 2025
+Platt): «XGBoost 136» y «BOREAL 136 + nuevas», con los umbrales de máximo F1 congelados en la validación 2025
 (``resultados/prueba_2026/config_*.json``). La logística base se predice aquí con ``artifacts/logistica.joblib``
 (entrenada con 2021-2025, umbral de su metadata). Nada se elige mirando 2026; es la tercera mirada a la prueba y se lee
 como exploratoria.
@@ -34,16 +34,16 @@ from .modelo_base import ece
 
 P26 = datos.RAIZ / "resultados" / "prueba_2026"
 MB = datos.RAIZ / "resultados" / "modelo_base"
-XGB, PROP, LOG = "XGBoost (las 112)", "Propuesta (K3 + log-normal + nuevas)", "Regresión logística"
-CELDAS = ["XGBoost 136", "XGBoost 136 + nuevas", "K3 136 (ablación)", "K3 136 + nuevas (ablación)", "Propuesta 136",
-          "Propuesta 136 + nuevas"]
-CONTRASTES = [("propuesta completa contra el ganador de las 112", "Propuesta 136 + nuevas", "XGBoost 136"),
-              ("modelo, con las 136", "Propuesta 136", "XGBoost 136"),
-              ("modelo, con 136 + nuevas", "Propuesta 136 + nuevas", "XGBoost 136 + nuevas"),
+XGB, PROP, LOG = "XGBoost (las 112)", "BOREAL (propuesta)", "Regresión logística"
+CELDAS = ["XGBoost 136", "XGBoost 136 + nuevas", "Boosting mixto 136 (ablación)", "Boosting mixto 136 + nuevas (ablación)", "BOREAL 136",
+          "BOREAL 136 + nuevas"]
+CONTRASTES = [("propuesta completa contra el ganador de las 112", "BOREAL 136 + nuevas", "XGBoost 136"),
+              ("modelo, con las 136", "BOREAL 136", "XGBoost 136"),
+              ("modelo, con 136 + nuevas", "BOREAL 136 + nuevas", "XGBoost 136 + nuevas"),
               ("información, en XGBoost", "XGBoost 136 + nuevas", "XGBoost 136"),
-              ("información, en la propuesta", "Propuesta 136 + nuevas", "Propuesta 136"),
-              ("log-normal, con las 136", "Propuesta 136", "K3 136 (ablación)"),
-              ("log-normal, con 136 + nuevas", "Propuesta 136 + nuevas", "K3 136 + nuevas (ablación)")]
+              ("información, en la propuesta", "BOREAL 136 + nuevas", "BOREAL 136"),
+              ("log-normal, con las 136", "BOREAL 136", "Boosting mixto 136 (ablación)"),
+              ("log-normal, con 136 + nuevas", "BOREAL 136 + nuevas", "Boosting mixto 136 + nuevas (ablación)")]
 
 
 def calibracion(y, p, modelo):
@@ -71,7 +71,7 @@ def main():
     assert (d[datos.OBJETIVO] == d.y_2x2).all()
     meta = json.loads((datos.RAIZ / "artifacts" / "logistica.metadata.json").read_text(encoding="utf-8"))
     d[LOG] = joblib.load(datos.RAIZ / "artifacts" / "logistica.joblib").predict_proba(pru[meta["entrada"]])[:, 1]
-    d[XGB], d[PROP] = d["XGBoost 136"], d["Propuesta 136 + nuevas"]
+    d[XGB], d[PROP] = d["XGBoost 136"], d["BOREAL 136 + nuevas"]
     modelos = {XGB: cfg["xgb136"]["umbral"], PROP: cfg["prop_nuevas"]["umbral"], LOG: meta["umbral"]}
     y = d.y_tarde.to_numpy().astype(int)
     grupo = pd.factorize(d.oc_id)[0]

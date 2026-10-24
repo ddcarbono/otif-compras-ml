@@ -118,7 +118,7 @@ servido = {"modelo": m.modelo.booster_.model_to_string(num_iteration=m.arboles_u
 art = REPO / "artifacts"
 joblib.dump(servido, art / "original_servido.joblib", compress=3)
 (art / "original_servido.json").write_text(json.dumps({
-    "modelo": "Modelo original: K3 + plazo log-normal + 32 variables nuevas, con Platt", "entrenado_con": "órdenes de 2021-2025",
+    "modelo": "BOREAL: boosting mixto + plazo log-normal + 32 variables nuevas, con Platt", "entrenado_con": "órdenes de 2021-2025",
     "umbral": cfg["umbral"], "arboles": m.arboles_usados, "platt": [a, b], "reproduccion_2x2": rep,
     "versiones": {"lightgbm": lgb.__version__, "pandas": pd.__version__, "numpy": np.__version__}},
     ensure_ascii=False, indent=1), encoding="utf-8")

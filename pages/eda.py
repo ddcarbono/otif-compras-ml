@@ -84,7 +84,7 @@ filtros = dbc.Card(dbc.CardBody(dbc.Row([
 
 layout = html.Div([
     html.H2("Análisis exploratorio"),
-    html.P("Entrenamiento: órdenes de 2021 a 2024. Los filtros cambian todos los gráficos de esta página.",
+    html.P("Entrenamiento: órdenes de 2021 a 2024. Los filtros cambian los gráficos, salvo asociación y particiones.",
            className="text-muted"),
     filtros,
     html.Div(id="eda-alerta"),
@@ -142,12 +142,11 @@ def objetivo(lineas, clases, meses):
         return dash.no_update, "", dash.no_update, "", alerta
     t = m.y_tarde.mean()
     txt_b = (f"En la selección llega tarde el {pct(t)} de las posiciones ({es(len(m))} en la muestra), frente al "
-             f"{pct(TASA_GLOBAL)} de todo el entrenamiento. Con una clase de un tercio no hay un desbalance fuerte: "
-             "se mide con AUC y F1, no con exactitud.")
+             f"{pct(TASA_GLOBAL)} de todo el entrenamiento. Con una clase de un tercio el desbalance es leve: AUC y F1, "
+             "no exactitud.")
     pico = s.loc[s.tasa.idxmax()]
     txt_s = (f"La tasa mensual va de {pct(s.tasa.min())} a {pct(s.tasa.max())}; el mes más alto es "
-             f"{pico.fecha_pedido:%m/%Y}. Baja de 2021 a 2023 y se estabiliza: el modelo se valida en el tiempo, "
-             "nunca mezclando años.")
+             f"{pico.fecha_pedido:%m/%Y}. Baja de 2021 a 2023 y se estabiliza.")
     return (plots.balance(m.y_tarde, "Posiciones por clase"), txt_b,
             plots.serie_tasa(s, "Tasa de tarde y volumen por mes (todo el entrenamiento)"), txt_s, None)
 
@@ -161,13 +160,13 @@ def distribucion(v, log, lineas, clases, meses):
     med = m.groupby("y_tarde")[v].median()
     txt_h = (f"Mediana de {nombre(v).lower()}: {es(med.get(1, np.nan), 2)} en las tardías y {es(med.get(0, np.nan), 2)} "
              f"en las a tiempo. Asimetría {es(m[v].skew(), 1)}: "
-             + ("cola larga, por eso la escala logarítmica." if abs(m[v].skew()) > 2 else "sin cola larga.")
+             + ("cola larga: escala logarítmica." if abs(m[v].skew()) > 2 else "sin cola larga.")
              + " Con miles de posiciones la prueba de la caja rechaza siempre: se leen la asimetría y la curtosis.")
     x = m[v].dropna()
     q1, q3 = x.quantile([.25, .75])
     fuera = ((x < q1 - 1.5 * (q3 - q1)) | (x > q3 + 1.5 * (q3 - q1))).mean() if q3 > q1 else 0
-    txt_c = (f"El {pct(fuera)} de los valores cae fuera de las cercas de Tukey (1,5 veces el rango intercuartílico). "
-             "No se eliminan: una compra grande o un plazo largo son casos reales, no errores.")
+    txt_c = (f"El {pct(fuera)} de los valores cae fuera de las cercas de Tukey (1,5 rangos intercuartílicos). "
+             "No se eliminan: son casos reales, no errores.")
     return (plots.histograma_por_clase(m, v, nombre(v), unidad(v), log=bool(log)), txt_h,
             plots.caja_por_clase(m, v, nombre(v)), txt_c)
 
@@ -179,8 +178,8 @@ def bivariado(x, y, color, lineas, clases, meses):
     if len(m) < 50:
         return dash.no_update, ""
     rho = m[[x, y]].corr(method="spearman").iloc[0, 1]
-    txt = (f"Correlación de Spearman entre las dos: {es(rho, 2)}. Si los colores se separan en alguna zona del plano, "
-           "esa combinación ayuda a distinguir las tardías aunque cada variable sola no lo haga.")
+    txt = (f"Spearman entre las dos: {es(rho, 2)}. Si los colores se separan en alguna zona del plano, la "
+           "combinación distingue las tardías aunque cada variable sola no.")
     return plots.dispersion(m.sample(min(len(m), 6000), random_state=2026), x, y, color,
                             {v: nombre(v) for v in TOP}), txt
 
@@ -194,13 +193,11 @@ def correlacion_y_vacios(lineas, clases, meses):
     c = m[TOP].corr(method="spearman")
     par = c.where(~np.eye(len(c), dtype=bool)).abs().stack().idxmax()
     txt_c = (f"El par más correlacionado es {nombre(par[0]).lower()} con {nombre(par[1]).lower()} "
-             f"(ρ = {es(c.loc[par], 2)}). Las variables de plazo se mueven juntas: en los modelos lineales hay que "
-             "vigilar la colinealidad.")
+             f"(ρ = {es(c.loc[par], 2)}). Las variables de plazo se mueven juntas: colinealidad en los modelos lineales.")
     vac = (m[TOP].isna().mean().sort_values(ascending=False) * 100).rename("vacios").reset_index()
     vac["n"] = vac["index"].map(nombre)
-    txt_v = ("Los vacíos son estructurales: faltan los datos de solicitud cuando la orden no viene de una solicitud, "
-             "y el historial cuando el proveedor o el material son nuevos. No se imputan con modelos: una marca "
-             "conserva la información del vacío.")
+    txt_v = ("Los vacíos son estructurales: faltan los datos de solicitud si la orden no viene de una, y el historial "
+             "si el proveedor o el material son nuevos. No se imputan: una marca conserva la información.")
     return (plots.mapa_correlacion(c, {v: nombre(v) for v in TOP}, "Correlación de Spearman (12 principales)"), txt_c,
             plots.barras_horizontales(vac, "vacios", "n", "Vacíos en las 12 principales", "% de posiciones", ".1f"),
             txt_v)
@@ -214,8 +211,7 @@ def componentes(lineas, clases, meses):
         return dash.no_update, "", dash.no_update, ""
     var, z, cargas = multivariado.pca(m, TOP)
     k80 = int(np.searchsorted(np.cumsum(var), 0.8)) + 1
-    txt_v = (f"Dos componentes resumen el {pct(var[:2].sum(), 0)}; hacen falta {k80} para el 80 %. La información está "
-             "repartida.")
+    txt_v = (f"Dos componentes resumen el {pct(var[:2].sum(), 0)}; hacen falta {k80} para el 80 %.")
     c1 = cargas.PC1.abs().idxmax()
     txt_p = (f"PC1 la lleva {nombre(c1).lower()}. Las clases se solapan: no las separa una dirección lineal.")
     i = np.random.default_rng(2026).choice(len(m), min(len(m), 6000), replace=False)

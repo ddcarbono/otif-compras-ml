@@ -440,7 +440,7 @@ tarda 3,2 minutos: se puede reentrenar cada mes. En números: gana los ocho bloq
 en 2026 Δ 0,023 [0,017; 0,030], DeLong z = 22,5. Por qué «crítica» es el stock: la marca de pieza crítica es constante
 en los datos y la razón cantidad/stock está vacía en el 73 % de 2026.
 
-**¿Y en otros datos?** Se midió K3 (la pieza central de la propuesta) contra el XGBoost de las 112 en siete conjuntos
+**¿Y en otros datos?** Se midió el boosting mixto (la pieza central de BOREAL) contra el XGBoost de las 112 en siete conjuntos
 públicos de OpenML, con el mismo protocolo (Optuna con 20 evaluaciones, una medida en la prueba, DeLong con Holm). Gana en
 dos (reingreso hospitalario +0,016 [0,008; 0,024]; citas no asistidas +0,005 [0,003; 0,008]), empata en tres (vuelos,
 buses de Nueva York, transporte de Zúrich) y pierde en dos (Amazon −0,013, Click −0,008). F1 mayor en 5 de 7. Wilcoxon

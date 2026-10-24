@@ -201,7 +201,7 @@ def dispersion(df, x, y, color, nombres, log_x=False, log_y=False):
 
 # --- modelos ---------------------------------------------------------------------------------------------------------
 COLOR_MODELO = {"Dummy (tasa del entrenamiento)": GRIS, "Regla del proveedor": MARRON, "Regresión logística": AZUL,
-                "XGBoost (las 112)": ORO, "Propuesta (K3 + log-normal + nuevas)": VERDE}
+                "XGBoost (las 112)": ORO, "BOREAL (propuesta)": VERDE}
 
 
 def curva_roc_pr(c, curva, metricas=None):

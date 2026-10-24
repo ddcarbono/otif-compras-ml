@@ -1,5 +1,5 @@
 {
- "modelo": "Modelo original: K3 + plazo log-normal + 32 variables nuevas, con Platt",
+ "modelo": "BOREAL: boosting mixto + plazo log-normal + 32 variables nuevas, con Platt",
  "entrenado_con": "órdenes de 2021-2025",
  "umbral": 0.3484857059162891,
  "arboles": 881,

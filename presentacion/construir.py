@@ -574,11 +574,11 @@ notas(s, '0:45', 'B', 'criterio 5', 'Sobreajuste en dos vistas: interno contra e
 s = nueva()
 cabecera(s, f'El modelo original le gana al óptimo de las 112 por {n(k26["ΔROC-AUC"], 3)} de AUC',
          'CRITERIO 6  ·  MODELO ORIGINAL (ENTREGABLE 3)')
-texto(s, 1.3, 3.2, 14.5, 0.6, 'Efectos por entidad sobre un boosting, con cortes ordenados', tam=12, color=VERDE,
+texto(s, 1.3, 3.2, 14.5, 0.6, 'BOREAL: efectos por entidad sobre un boosting, con cortes ordenados', tam=12, color=VERDE,
       negrita=True)
 figura(s, 'f_original.png', 1.4, 3.9, w=14.3)
 texto(s, 1.3, 4.7, 14.5, 1.5, 'd_i: días de retraso; se predice en c = 1 (y_tarde) y aprende también de cuánto se atrasó. '
-      'b_e: intercepto aleatorio por proveedor, material, solicitante y comprador, encogido hacia 0 (σ²_e por EM). K3: '
+      'b_e: intercepto aleatorio por proveedor, material, solicitante y comprador, encogido hacia 0 (σ²_e por EM). Al entrenar, '
       'los árboles ven efectos estimados solo con los semestres anteriores, como al predecir.', tam=9.5, color=GRIS)
 texto(s, 1.3, 6.2, 14.5, 0.6, 'f es un LightGBM, no un XGBoost', tam=12, color=VERDE, negrita=True)
 texto(s, 1.3, 6.8, 14.5, 1.5, 'Misma suma de árboles, misma log-pérdida y mismo peso de hoja −G/(H + λ) (diapositiva 11). '
@@ -594,8 +594,8 @@ c26 = leer(R, 'prueba_2026', 'dos_por_dos.csv').set_index('celda')
 q26 = leer(R, 'prueba_2026', 'contrastes.csv').set_index('contraste')
 filas_o = [['2026, AUC [BCa 95 %]', '136 del dataset', '136 + 32 nuevas']]
 for et, a, b in [('XGBoost', 'XGBoost 136', 'XGBoost 136 + nuevas'),
-                 ('K3, sin log-normal', 'K3 136 (ablación)', 'K3 136 + nuevas (ablación)'),
-                 ('Propuesta', 'Propuesta 136', 'Propuesta 136 + nuevas')]:
+                 ('BOREAL sin log-normal', 'Boosting mixto 136 (ablación)', 'Boosting mixto 136 + nuevas (ablación)'),
+                 ('Propuesta', 'BOREAL 136', 'BOREAL 136 + nuevas')]:
     filas_o.append([et] + [f'{n(c26.loc[k, "ROC-AUC"], 3)} [{n(c26.loc[k, "inf"], 3)}; {n(c26.loc[k, "sup"], 3)}]'
                            for k in (a, b)])
 tabla(s, 16.2, 3.3, 8.0, 3.6, filas_o, anchos=[2.6, 2.7, 2.7], tam=9)
@@ -627,7 +627,7 @@ cabecera(s, 'En otros datos, la propuesta gana donde hay historia por entidad', 
 NPUB = {'airlines': 'Vuelos (Airlines)', 'amazon': 'Acceso (Amazon)', 'click': 'Publicidad (Click)',
         'nyc_bus': 'Buses de Nueva York', 'zurich': 'Transporte de Zúrich', 'diabetes': 'Reingreso (Diabetes130US)',
         'noshow': 'Citas no asistidas'}
-filas_p = [['conjunto', 'AUC XGBoost', 'AUC K3', 'Δ [IC 95 %]', 'p Holm', 'veredicto']]
+filas_p = [['conjunto', 'AUC XGBoost', 'AUC boosting mixto', 'Δ [IC 95 %]', 'p Holm', 'veredicto']]
 for _, r in pub.iterrows():
     filas_p.append([NPUB[r.conjunto], n(r.auc_xgb, 3), n(r.auc_k3, 3), f'{n(r.dif, 3)} [{n(r.ic_lo, 3)}; {n(r.ic_hi, 3)}]',
                     '< 0,001' if r.p_holm < 0.001 else n(r.p_holm, 3), r.veredicto])
@@ -635,9 +635,9 @@ tabla(s, 1.3, 3.3, 14.4, 7.2, filas_p, anchos=[4.4, 1.8, 1.6, 3.6, 1.4, 1.8], ta
 texto(s, 1.3, 10.7, 14.4, 2.4, 'Mismo protocolo para los dos: Optuna con 20 evaluaciones en validación, una medida en la '
       'prueba, DeLong pareado con Holm sobre los siete. La segunda ronda (filas 4 a 7) se eligió con un criterio fijado '
       'antes de correr. El plazo log-normal y las variables nuevas no aplican fuera de OTIF.', tam=10, color=GRIS)
-tarjeta(s, 16.3, 3.3, 7.9, 6.4, 'Lectura', [f'Gana {(pub.veredicto == "K3 gana").sum()}, empata '
+tarjeta(s, 16.3, 3.3, 7.9, 6.4, 'Lectura', [f'Gana {(pub.veredicto == "boosting mixto gana").sum()}, empata '
                                            f'{(pub.veredicto == "empate").sum()}, pierde '
-                                           f'{(pub.veredicto == "K3 pierde").sum()}; Wilcoxon p = 0,81: no hay '
+                                           f'{(pub.veredicto == "boosting mixto pierde").sum()}; Wilcoxon p = 0,81: no hay '
                                            'superioridad general.',
                                            'Gana donde la entidad vuelve (el paciente), como el proveedor en OTIF.',
                                            'Empata en transporte; pierde sin tiempo ni desenlace continuo.'],

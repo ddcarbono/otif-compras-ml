@@ -68,7 +68,7 @@ Lo que corre una vez (en el servidor o en local) y deja sus tablas en `resultado
 | `src/modelo_final.py` | Entrena ese modelo con 2021-2025 (`artifacts/xgboost.joblib`), comprueba que reproduce las probabilidades de la comparación 2 × 2 y calcula SHAP en 2026. `python -m src.modelo_final <predicciones_prueba_2x2.csv>` |
 | `src/prueba_2026.py` | XGBoost, la logística y la propuesta en la prueba 2026 con BCa por órdenes y DeLong; la tabla de brecha y la 2 × 2. `python -m src.prueba_2026 <predicciones_prueba_2x2.csv>` |
 | `src/xgb_vs_logistica.py` | Por qué XGBoost y no la logística: tardías de más atrapadas con el mismo presupuesto de alertas, en total y en material sin stock (BCa por órdenes), forma del efecto del plazo (SHAP) y costo. `python -m src.xgb_vs_logistica <predicciones_prueba_2x2.csv>` |
-| `original/` | El modelo original del Entregable 3 (K3 + log-normal + variables nuevas) y su validación en siete conjuntos públicos (`publicos_otif.py`); ver `original/LEEME.md`. |
+| `original/` | El modelo original del Entregable 3 (BOREAL: boosting mixto + log-normal + variables nuevas) y su validación en siete conjuntos públicos (`publicos_otif.py`); ver `original/LEEME.md`. |
 
 ## Datos
 

@@ -54,19 +54,19 @@ def campo(c):
 def vista():
     _, ficha = original_servido()
     return html.Div([
-        html.P(["Estime el riesgo con el modelo original. El botón carga una posición real de la prueba 2026, que el "
-                "modelo no vio al entrenar; los campos se pueden cambiar. Modelo servido: ", html.Strong(ficha["modelo"]),
+        html.P(["Estime el riesgo con el modelo original. El botón carga una posición real de la prueba 2026 (que el "
+                "modelo no vio); los campos se pueden cambiar. Modelo servido: ", html.Strong(ficha["modelo"]),
                 f", entrenado con {ficha['entrenado_con']}; umbral de alerta {_n(ficha['umbral'], 3)}. Las entidades "
-                "llegan como números (efectos y tasas), sin sus códigos."]),
+                "entran como números (efectos y tasas), sin códigos."]),
         dbc.Row([dbc.Col(dbc.Button("Cargar una posición real", id="o-ejemplo", color="secondary"), width="auto"),
                  dbc.Col(dbc.Button("Predecir", id="o-predecir", color="primary"), width="auto"),
                  dbc.Col(html.Div(id="o-origen", className="small text-muted pt-2"))], className="mb-3 g-2"),
         dcc.Store(id="o-indice", data=0),
         dbc.Row([campo(c) for c in rangos_original().index]),
         dcc.Loading(html.Div(id="o-resultado"), type="default"),
-        html.P("Cómo leer las contribuciones: cada barra es cuánto sube (oro) o baja (verde) el logit de llegar tarde. Las "
-               "variables son valores SHAP exactos del LightGBM en el corte c = 1; los efectos por entidad se suman tal "
-               "cual. Su suma, con el valor base, es el logit que Platt convierte en el riesgo.",
+        html.P("Cada barra sube (oro) o baja (verde) el logit de llegar tarde. Las variables son valores SHAP exactos del "
+               "LightGBM en el corte c = 1; los efectos por entidad se suman tal cual. Todo, con el valor base, da el "
+               "logit que Platt convierte en riesgo.",
                className="small text-muted mt-2"),
     ])
 
@@ -112,7 +112,7 @@ def _predecir(_, vals, ids, i):
     tarjeta = dbc.Alert([html.H4(f"{_n(100 * p, 1)} % de riesgo de llegar tarde", className="mb-1"),
                          html.Div("Alerta: supera el umbral; conviene hacerle seguimiento." if alerta else
                                   "Sin alerta: por debajo del umbral."),
-                         html.Small(f"El plazo log-normal solo, sin el resto del modelo, daría {_n(100 * p_ln, 1)} %.",
+                         html.Small(f"Solo con el plazo log-normal: {_n(100 * p_ln, 1)} %.",
                                     className="d-block mt-1")],
                         color="warning" if alerta else "success", className="mb-2")
     aviso = (dbc.Alert("Fuera del rango de desarrollo: " + ", ".join(fuera) + ". El modelo extrapola.",
