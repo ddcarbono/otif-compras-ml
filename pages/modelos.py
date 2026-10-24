@@ -183,12 +183,11 @@ def pestana_original():
         "p (Holm)": ["< 0,001" if v < 0.001 else _n(v) for v in p.p_holm], "veredicto": p.veredicto,
         "F1 XGBoost": [_n(v) for v in p.f1_xgb], "F1 K3": [_n(v) for v in p.f1_k3]})
     return html.Div([
-        html.H3("Modelo original: efectos por entidad, plazo log-normal y plazo real"),
-        html.P("La propuesta del Entregable 3 tiene tres piezas: K3, un boosting de árboles con efectos aleatorios por "
-               "proveedor, material, creador de la solicitud y comprador, sobre los días de retraso en cortes ordenados; "
-               "un modelo log-normal del plazo, que da la probabilidad de que el plazo prometido no alcance; y 32 "
-               "variables nuevas de plazo real del proveedor y holgura. Se eligió con validación y se congeló (Platt y "
-               "umbral ajustados en 2025) antes de medir 2026. Intervalos por remuestreo de órdenes."),
+        html.H3("Modelo original: boosting mixto ordinal"),
+        html.P("LightGBM con efectos aleatorios por entidad sobre los días de retraso en cortes, con el plazo "
+               "log-normal y 32 variables de plazo real. Congelado (Platt y umbral de 2025) antes de medir 2026; "
+               "intervalos por remuestreo de órdenes."),
+        flujo("El modelo en cuatro fases", FASES_ORIGINAL),
         dbc.Row([cifra(_n(pr["ROC-AUC"]), f"ROC-AUC en 2026 [{_n(pr['ROC-AUC inf'])}; {_n(pr['ROC-AUC sup'])}]"),
                  cifra(_n(pr.F1), f"F1 al umbral {_n(pr.umbral)}"),
                  cifra(f"+{_n(k0['ΔROC-AUC'])}", f"de AUC sobre el ganador de las 112 [{_n(k0.inf)}; {_n(k0.sup)}]"),
@@ -302,6 +301,15 @@ PIPE_XGB = [
     ("Platt", f"σ({_e(FX['platt'][0])} · F + {_e(FX['platt'][1])}), ajustado en la validación 2025 y congelado."),
     ("Umbral", f"Alerta si el riesgo ≥ {_e(FX['umbral'])} (máximo F1 en 2025)."),
 ]
+# las cuatro fases del original, en el orden en que corren: cuáles son modelos y para qué
+FASES_ORIGINAL = [
+    ("Plazo log-normal", "Modelo (LightGBM de regresión): estima el plazo real esperado. Entrega dist_mu y dist_z."),
+    ("Cortes ordinales", "Repite cada posición en c = 0, 1, 5 y 15 días de retraso."),
+    ("Boosting mixto", "Modelo (LightGBM + efectos aleatorios por entidad): da el riesgo. Efectos por semestre, "
+                       "con el pasado (K3)."),
+    ("Platt", "Modelo (logística de dos parámetros): vuelve el puntaje un riesgo calibrado."),
+]
+
 PIPE_ORIGINAL = [
     ("Entrada", "136 variables más 32 de plazo real previo (mediana y p80 de las últimas 20 entregas, holguras)."),
     ("Entidades y categóricas", "Proveedor, material, solicitante y comprador: efecto aleatorio b, ordenado por "
