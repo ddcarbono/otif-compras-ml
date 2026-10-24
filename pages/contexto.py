@@ -33,10 +33,16 @@ tabla_dic = dash_table.DataTable(
 
 layout = html.Div([
     html.Section([
-        html.H1("¿Va a llegar tarde esta orden de compra?", className="titulo"),
-        html.P("Un clasificador binario que estima, el día en que una orden de compra sale hacia el proveedor, la "
-               "probabilidad de que cada posición llegue más de un día hábil después de la fecha prometida. Datos de "
-               "un grupo agroindustrial colombiano de la palma de aceite.", className="lead"),
+        dbc.Row([
+            dbc.Col([
+                html.H1("¿Va a llegar tarde esta orden de compra?", className="titulo"),
+                html.P("Un clasificador binario que estima, el día en que una orden de compra sale hacia el proveedor, "
+                       "la probabilidad de que cada posición llegue más de un día hábil después de la fecha prometida. "
+                       "Datos de un grupo agroindustrial colombiano de la palma de aceite.", className="lead")],
+                md=9, className="order-2 order-md-1"),
+            # portada de la app Compras de Qlik Sense (ejemplos/2026-10-23_portada_compras en el repo de estudio)
+            dbc.Col(html.Img(src=dash.get_asset_url("portada_compras.jpg"), className="portada", alt=""),
+                    md=3, className="order-1 order-md-2 text-center text-md-end")], className="align-items-center"),
         dbc.Row([
             dbc.Col(cifra(pct(R["tasa_total"], 0), "de las posiciones llega tarde",
                           f"{es(R['filas'])} posiciones de {es(R['ordenes'])} órdenes, 2021-2026"), md=4, className="mb-3"),

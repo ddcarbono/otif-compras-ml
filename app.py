@@ -17,12 +17,9 @@ server = app.server
 navbar = dbc.NavbarSimple(
     children=[dbc.NavItem(dbc.NavLink(p["name"], href=p["relative_path"], active="exact"))
               for p in dash.page_registry.values()],
-    # portada de la app Compras de Qlik Sense (ejemplos/2026-10-23_portada_compras en el repo de estudio)
-    brand=html.Span([html.Img(src=dash.get_asset_url("carrito_compras.png"), className="marca-carrito", alt=""),
-                     "Incumplimiento de órdenes de compra"]),
-    color="primary", dark=True, fixed="top", className="navbar-otif")
+    brand="Incumplimiento de órdenes de compra", color="primary", dark=True, fixed="top", className="navbar-otif")
 
-app.layout = html.Div([navbar, dbc.Container(dash.page_container, fluid="lg", className="pt-5 mt-4 pb-5")])
+app.layout = html.Div([navbar, dbc.Container(dash.page_container, fluid="lg", className="contenido pt-5 mt-4 pb-5")])
 
 if __name__ == "__main__":
     app.run(debug=False, port=int(os.environ.get("PORT", 8050)))
