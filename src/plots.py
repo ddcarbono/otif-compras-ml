@@ -16,8 +16,10 @@ FUENTE = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
 pio.templates["otif"] = go.layout.Template(layout=dict(
     font=dict(family=FUENTE, size=13, color="#333333"), colorway=PALETA, paper_bgcolor="white", plot_bgcolor="white",
     title=dict(x=0, xanchor="left", font=dict(size=15)), margin=dict(l=60, r=20, t=60, b=50),
-    xaxis=dict(showgrid=False, linecolor="#BBBBBB", ticks="outside"),
-    yaxis=dict(gridcolor="#EEEEEE", linecolor="#BBBBBB", zeroline=False),
+    # automargin: el margen crece hasta que quepan las etiquetas (los nombres largos de las barras horizontales se
+    # cortaban con el margen fijo de 60 px)
+    xaxis=dict(showgrid=False, linecolor="#BBBBBB", ticks="outside", automargin=True),
+    yaxis=dict(gridcolor="#EEEEEE", linecolor="#BBBBBB", zeroline=False, automargin=True),
     legend=dict(orientation="h", y=-0.18, x=0), hoverlabel=dict(font_family=FUENTE),
     separators=",."))
 pio.templates.default = "otif"
@@ -361,7 +363,7 @@ def rangos_cd(r, cd, nombres):
     fig.add_shape(type="rect", x0=x0, x1=x0 + cd, y0=-0.5, y1=len(r) - 0.5, fillcolor=ORO, opacity=0.12, line_width=0)
     fig.add_annotation(x=x0 + cd, y=len(r) - 0.5, text=f"diferencia crítica {cd:.2f}".replace(".", ","), showarrow=False,
                        yanchor="bottom", xanchor="right")
-    fig.update_layout(title="Rango medio en los 8 bloques (Friedman) y diferencia crítica de Nemenyi (α = 0,05)",
+    fig.update_layout(title="Rango medio (Friedman) y diferencia crítica de Nemenyi",
                       xaxis_title="rango medio (1 = mejor)", xaxis_range=[0.5, 7.5], yaxis_autorange="reversed",
                       showlegend=False, height=380, margin=dict(l=150))
     return fig

@@ -7,7 +7,7 @@ import json
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
-from dash import Input, Output, callback, dash_table, dcc, html
+from dash import Input, Output, callback, clientside_callback, dash_table, dcc, html
 
 from src import plots
 from src.data import DATA, diccionario, modelo
@@ -475,11 +475,23 @@ def layout(pestana="t-base", **_):
             dbc.Tab(pestana_2026(), label="Modelo óptimo", tab_id="t-2026", className="pt-3"),
             dbc.Tab(pestana_original(), label="Modelo original", tab_id="t-original", className="pt-3"),
             dbc.Tab(pestana_prediccion(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
-        ], active_tab=pestana),
+        ], id="m-pestanas", active_tab=pestana),
+        dcc.Store(id="m-redimensionado"),
         dbc.Alert("La predicción en vivo sirve el modelo original, que le gana al óptimo de las 112 por 0,012 de AUC en 2026, "
                   "y deja comparar con XGBoost.", color="light",
                   className="mt-3"),
     ])
+
+
+# Las gráficas de una pestaña oculta se dibujan con el ancho por defecto de Plotly (700 px) y al abrirla no se ajustan a
+# su columna: se cortaban a la derecha y las etiquetas del eje quedaban apretadas. Al cambiar de pestaña se redimensionan.
+clientside_callback(
+    """function(t) {
+        setTimeout(function() {
+            document.querySelectorAll(".tab-pane.active .js-plotly-plot").forEach(function(g) { Plotly.Plots.resize(g); });
+        }, 60);
+        return t;
+    }""", Output("m-redimensionado", "data"), Input("m-pestanas", "active_tab"))
 
 
 @callback(Output("m-mapa-fig", "figure"), Input("m-mapa", "value"))
