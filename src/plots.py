@@ -484,3 +484,28 @@ def pca_plano(puntajes, y, cargas, nombres, var):
                       yaxis_title=f"PC2 ({var[1]:.0%})", height=520)
     return fig
 
+
+
+def tasa_por_tramo(t, nombre, tasa_global):
+    """Tasa de tarde por tramo (cuantil) de una numérica, con el número de posiciones de cada tramo en el hover y la tasa
+    global como referencia (``t``: columnas tramo, tasa, posiciones)."""
+    fig = go.Figure(go.Scatter(x=t.tramo, y=t.tasa, mode="lines+markers", line=dict(color=ORO), marker=dict(size=8),
+                               customdata=t.posiciones, hovertemplate="%{x}<br>tasa de tarde %{y:.1%}<br>"
+                                                                      "%{customdata:,} posiciones<extra></extra>"))
+    fig.add_hline(y=tasa_global, line=dict(color=GRIS, dash="dot"), annotation_text="tasa de la selección",
+                  annotation_position="top left")
+    fig.update_layout(title=f"Tasa de tarde por tramo de {nombre.lower()}", xaxis_title=f"{nombre} (tramo por cuantiles)",
+                      yaxis_title="tasa de tarde", yaxis_tickformat=".0%", yaxis_rangemode="tozero")
+    return fig
+
+
+def entidades_nuevas(t):
+    """Porcentaje de posiciones con un valor de cada entidad que el entrenamiento no vio, en la validación y la prueba."""
+    t = t[(t["nuevo en validacion (%)"] > 0) | (t["nuevo en prueba (%)"] > 0)].iloc[::-1]
+    fig = go.Figure()
+    for col, et, color in [("nuevo en validacion (%)", "validación 2025", AZUL), ("nuevo en prueba (%)", "prueba 2026", ORO)]:
+        fig.add_trace(go.Bar(y=t.nombre, x=t[col], orientation="h", name=et, marker_color=color,
+                             hovertemplate="%{y}: %{x:.1f} %<extra>" + et + "</extra>"))
+    fig.update_layout(title="Posiciones con una entidad que el entrenamiento no vio", xaxis_title="% de posiciones",
+                      barmode="group", height=max(320, 40 * len(t) + 120), margin=dict(l=250))
+    return fig

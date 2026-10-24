@@ -44,6 +44,11 @@ def main():
     eda.serie(ent, por=["linea", "clase_compras"]).to_csv(sal / "agregados" / "serie_mensual.csv", index=False)
     for t in TABLAS:
         shutil.copy(res / f"{t}.csv", sal / "agregados" / f"{t}.csv")
+    # validación adversaria (capítulo de tiempo y fuga): AUC del clasificador que adivina la partición y sus columnas
+    for t in ("auc", "importancia"):
+        f = datos.RAIZ / "resultados" / "similitud" / f"{t}.csv"
+        if f.exists():
+            shutil.copy(f, sal / "agregados" / f"similitud_{t}.csv")
 
     tam = pd.read_csv(res / "tamano.csv").set_index("partición")
     resumen = {"filas": int(tam.loc["total", "filas"]), "ordenes": int(tam.loc["total", "órdenes"]),

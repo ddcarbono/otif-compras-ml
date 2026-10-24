@@ -121,7 +121,6 @@ def pestana_2026():
                  cifra(f"+{_n(d.diferencia)}", f"de AUC sobre la logística [{_n(d['BCa inf'])}; {_n(d['BCa sup'])}]"),
                  cifra(_n(XG.ECE), "error de calibración esperado (ECE), con Platt")]),
         tarjeta_formula(1),
-        tarjeta_formula(3, None),
         flujo("Pipeline final", PIPE_XGB),
         tabla_simple(m),
         dbc.Row([dbc.Col(dcc.Graph(figure=plots.curva_roc_pr(modelo("p26_curvas"), "ROC", P26.reset_index()),
@@ -196,6 +195,7 @@ def pestana_original():
                  cifra(_n(pr.ECE), "error de calibración esperado (ECE)")]),
         tarjeta_formula(2),
         tarjeta_formula(3, None),
+        tarjeta_formula(4, None),
         flujo("Pipeline final", PIPE_ORIGINAL),
         tabla_simple(m),
         html.H4("Modelo × información: la comparación 2 × 2", className="mt-4"),
@@ -265,6 +265,12 @@ FORMULAS = [
      "proveedor, la de su región): con pocas posiciones pesa la del padre, y un valor nuevo recibe la del padre. Se "
      "calcula fuera de pliegue y agrupada por orden, para que una posición no vea su propio objetivo ni el de su orden. "
      "La usan la logística y XGBoost para las 11 entidades; el original, para las 7 que no llevan efecto aleatorio."),
+    ("Platt: del puntaje al riesgo",
+     r"$$\hat p = \sigma(a\,z + b), \qquad (a, b) = \arg\min_{a, b} \sum_{i \in 2025} \ell\big(y_i, \sigma(a\,z_i + b)\big)$$",
+     "z es el logit crudo del modelo (aquí, el del LightGBM más los efectos, en c = 1). Platt es una regresión logística "
+     "de y sobre z, ajustada en la validación 2025 y congelada antes de 2026: a < 1 encoge una confianza excesiva y b "
+     "corrige el nivel. Como es creciente en z, no cambia el orden ni el AUC; solo hace que el número se lea como "
+     "riesgo. La usan XGBoost y el original; la logística ya sale calibrada."),
 ]
 
 
@@ -322,7 +328,6 @@ def formulacion():
     """La de la logística, con la log-pérdida que comparten los tres modelos y su gráfica interactiva."""
     return html.Div([
         tarjeta_formula(0),
-        tarjeta_formula(3, None),
         html.P("Los tres modelos (base, óptimo y original) estiman la misma probabilidad con la logística σ y minimizan "
                "la misma pérdida, la log-pérdida (menos la log-verosimilitud de Bernoulli); cambia la forma de la "
                "función.", className="mb-0"),
