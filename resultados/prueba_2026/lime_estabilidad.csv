@@ -1,0 +1,4 @@
+caso,semillas,en las 5 principales con todas las semillas,distintas que aparecen entre las 5 principales
+verdadero positivo,5,2,11
+falso negativo,5,0,15
+falso positivo,5,2,9

@@ -614,11 +614,11 @@ tarjeta(s, 16.2, 7.1, 8.0, 3.9, 'Lectura de la 2 × 2', [
         VERDECL, tam_c=9)
 banda(s, 1.3, 11.2, 22.9, 1.9, [('En el tablero:  ', True, ORO_CL),
                                 ('la pestaña Predicción lo sirve con posiciones reales de 2026, sin códigos de entidad. Es la '
-                                 'tercera mirada a 2026: exploratoria. En las órdenes con alguna entidad nueva no gana: '
+                                 'cuarta mirada a 2026: exploratoria. En las órdenes con alguna entidad nueva no gana: '
                                  'el arranque en frío sigue abierto.', False, BLANCO)], VERDE, tam=10.5)
-pie(s, 'libro, capítulo 9: resultados/prueba_2026/dos_por_dos.csv y contrastes.csv; tablero: Modelos → Modelo original')
+pie(s, 'libro, capítulo 11: resultados/prueba_2026/dos_por_dos.csv y contrastes.csv; tablero: Modelos → Modelo original')
 notas(s, '1:00', 'A', 'criterio 6', 'Qué es la propuesta y qué aporta cada parte. La 2 × 2 separa modelo de información: '
-      'los efectos por entidad y el plazo real son dos caminos a la misma ganancia. Decir que es la tercera mirada a '
+      'los efectos por entidad y el plazo real son dos caminos a la misma ganancia. Decir que es la cuarta mirada a '
       '2026 y que por eso se lee como exploratoria.')
 
 # ============================================================== 20 LA PROPUESTA EN OTROS DATOS
@@ -637,15 +637,15 @@ texto(s, 1.3, 10.7, 14.4, 2.4, 'Mismo protocolo para los dos: Optuna con 20 eval
       'antes de correr. El plazo log-normal y las variables nuevas no aplican fuera de OTIF.', tam=10, color=GRIS)
 tarjeta(s, 16.3, 3.3, 7.9, 6.4, 'Lectura', [f'Gana {(pub.veredicto == "boosting mixto gana").sum()}, empata '
                                            f'{(pub.veredicto == "empate").sum()}, pierde '
-                                           f'{(pub.veredicto == "boosting mixto pierde").sum()}; Wilcoxon p = 0,81: no hay '
+                                           f'{(pub.veredicto == "boosting mixto pierde").sum()}; Wilcoxon p = 0,69: no hay '
                                            'superioridad general.',
-                                           'Gana donde la entidad vuelve (el paciente), como el proveedor en OTIF.',
-                                           'Empata en transporte; pierde sin tiempo ni desenlace continuo.'],
+                                           'Gana donde la entidad vuelve (el paciente, el bus), como el proveedor en OTIF.',
+                                           'Empata con entidades pocas y estables, o sin tiempo ni desenlace continuo.'],
         VERDECL, tam_c=10)
-banda(s, 16.3, 10.0, 7.9, 3.1, [('Cuidado:  ', True, ORO_CL), ('esa separación se vio después de la segunda ronda; '
-                                'confirmarla pide una tercera fijada antes de correr.', False, BLANCO)], VERDE, tam=10.5)
-pie(s, 'libro, capítulo 10: original/publicos_otif_resumen.csv (OpenML); tablero: Modelos → Modelo original')
-notas(s, '1:00', 'A', 'criterio 6', 'Responde «¿y en otros datos?». La ganancia de la propuesta en OTIF (0,012) depende de '
+banda(s, 16.3, 10.0, 7.9, 3.1, [('Cuidado:  ', True, ORO_CL), ('la segunda ronda se eligió por parecerse a OTIF: '
+                                'dice dónde sirve, no que sea mejor en general.', False, BLANCO)], VERDE, tam=10.5)
+pie(s, 'libro, capítulo 12: original/publicos_otif_resumen.csv (OpenML); tablero: Modelos → Modelo original')
+notas(s, '1:00', 'A', 'criterio 6', 'Responde «¿y en otros datos?». La ganancia de la propuesta en OTIF (0,011) depende de '
       'rasgos del caso: entidades con historia en el tiempo, desenlace continuo y plazo prometido. Airlines no trae el '
       'año: su partición es por mes. No decir que generaliza: es una hipótesis con apoyo.')
 
@@ -673,7 +673,7 @@ banda(s, 15.4, 8.6, 8.8, 4.5, [('Para el negocio:  ', True, ORO_CL),
                                 'con retraso.', False, BLANCO)], VERDE, tam=11.5)
 pie(s, 'libro, capítulos 2 a 10')
 notas(s, '1:00', 'A', 'criterio 6', 'Responder la pregunta con cifras y el veredicto de cada objetivo. El modelo original '
-      'del Entregable 3 le gana al óptimo de las 112 por 0,012 en 2026 (pestaña Modelo original del tablero); la pestaña '
+      'del Entregable 3 le gana al óptimo de las 112 por 0,011 en 2026 (pestaña Modelo original del tablero); la pestaña '
       'Predicción lo sirve en vivo, con XGBoost al lado para comparar.')
 
 # ============================================================== 21 LIMITACIONES Y MEJORAS

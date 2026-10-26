@@ -34,7 +34,7 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 #                         + b_{\text{comp}(i)}\big),
 # $$
 #
-# con $\sigma$ la logística, $f$ un *boosting* de árboles (LightGBM) y $b_e$ un intercepto aleatorio por nivel de cada
+# con $\sigma$ la logística, $f$ un *boosting* de árboles de histograma escrito para este trabajo y $b_e$ un intercepto aleatorio por nivel de cada
 # entidad: proveedor, material, creador de la solicitud y comprador. Se predice en $c = 1$, que es la etiqueta
 # `y_tarde`.
 #
@@ -56,7 +56,7 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 #   semestres anteriores al de cada fila (0 en el primero y para la entidad que aún no había aparecido). Es la idea del
 #   ordenamiento de CatBoost aplicada a efectos aleatorios. Al predecir se usan los efectos con todo el entrenamiento.
 #
-# **Modelo log-normal del plazo.** Un LightGBM de regresión estima $\mu_i = E[\log(1 + \text{plazo real}_i)]$ sin las
+# **Modelo log-normal del plazo.** Un *boosting* de regresión (los mismos árboles, con pérdida cuadrática) estima $\mu_i = E[\log(1 + \text{plazo real}_i)]$ sin las
 # variables de la promesa, fuera de pliegue por orden al entrenar. El clasificador recibe $\mu_i$ y
 #
 # $$
@@ -83,7 +83,7 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 # 1. efectos con todo el periodo:
 #      b ← 0 para cada entidad y para la OC;  σ² ← 0,5
 #      repetir 3 veces:
-#        f ← LightGBM sobre [d > 1] con desplazamiento Σ b            (474 árboles)
+#        f ← boosting de árboles sobre [d > 1] con desplazamiento Σ b   (474 árboles)
 #        para cada entidad e, 2 barridos:
 #          3 pasos de Newton: b_e ← b_e + (Σ (y − p) − b_e/σ²_e) / (Σ p(1 − p) + 1/σ²_e)
 #          b_e ← b_e − media(b_e)                                       (corrección C)
@@ -91,7 +91,7 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 #      se guardan los b de las cuatro entidades; el de la OC se descarta
 # 2. efectos ordenados: para cada semestre t, repetir 1 con las filas anteriores a t y asignar a las filas de t
 # 3. ampliar: cada fila × cada corte, con la variable «corte» y la etiqueta [d > c]
-# 4. LightGBM con desplazamiento = efectos ordenados, restricción monótona −1 en «corte»   (766 árboles al validar)
+# 4. boosting de árboles con desplazamiento = efectos ordenados, restricción monótona −1 en «corte»
 # 5. Platt y umbral de máximo F1 en la validación 2025; congelar
 # predicción: f(x, c = 1) + Σ b_e (0 para una entidad nueva), luego Platt
 # ```
@@ -99,7 +99,65 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 # **Complejidad.** Con $n$ posiciones, $p$ columnas, $T$ árboles y $V$ vueltas de estimación de efectos, el
 # entrenamiento cuesta $O(V \cdot T_0 \cdot n p)$ para los efectos más $O(T \cdot 4n \cdot p)$ para el *boosting*
 # ordinal, que ve cuatro copias de cada fila. Los pasos de Newton son $O(n)$ por entidad. Los efectos ordenados repiten
-# la estimación una vez por semestre. Predecir cuesta lo mismo que un LightGBM más una búsqueda por entidad.
+# la estimación una vez por semestre. Predecir cuesta recorrer los árboles más una búsqueda por entidad.
+#
+# ## Implementación propia
+#
+# Todo BOREAL está escrito con numpy y scipy (`original/`); de scikit-learn solo se heredan `BaseEstimator` y
+# `ClassifierMixin`. Son dos módulos:
+#
+# - **`arboles_propios.py`, el aprendiz base.** Un *boosting* de árboles de histograma como el de LightGBM, que con
+#   400.000 posiciones por cuatro cortes no se puede hacer con árboles exactos. Cada variable se discretiza una vez en
+#   hasta 255 tramos por cuantiles (el tramo 0 es el vacío; una categórica usa su código). Por nodo se suman el
+#   gradiente $g_i = p_i - y_i$ y la curvatura $h_i = p_i(1-p_i)$ por tramo, y el hermano se obtiene restando el
+#   histograma del hijo menor al del padre. La hoja de mayor ganancia se parte primero (crecimiento por hoja), con
+#   $w^* = -T_\alpha(G)/(H+\lambda)$ y la ganancia $T_\alpha(G)^2/(H+\lambda)$, donde $T_\alpha$ es el
+#   umbral suave de la penalización L1. Los vacíos se prueban a la izquierda y a la derecha; una categórica se parte
+#   ordenando sus categorías por $G/(H + \text{cat\_smooth})$ (Fisher 1958), o una contra el resto si tiene cuatro o
+#   menos. La restricción monótona acota cada hoja entre los valores de sus vecinas. Submuestreo de filas y columnas
+#   por árbol, objetivo binario o cuadrático, y valores SHAP exactos de árbol {cite}`lundberg2020`, calculados por
+#   camino de hoja y validados contra el valor de Shapley por fuerza bruta.
+# - **`modelo_original_otif.py`, el modelo.** `BoostingMixtoOrdinal` hace la estimación por bloques de la sección
+#   anterior; `efectos_ordenados` reparte los semestres entre procesos; `Boreal` es la clase de scikit-learn:
+#
+# ```python
+# from modelo_original_otif import Boreal
+# m = Boreal(entidades=["proveedor", "material", "sp_creador", "creador_oc"], columna_oc="oc_id")
+# m.fit(X, y, dias=dias_de_retraso)        # sin dias, cae a un solo corte: [y = 1]
+# m.predict_proba(X_nuevo)[:, 1]           # una entidad que no vio recibe efecto 0
+# ```
+#
+# **Pruebas** (`tests/test_boreal.py`, con `pytest`): aprende un caso sintético con efectos conocidos (AUC > 0,85 y
+# correlación > 0,8 entre el efecto estimado y el verdadero), da lo mismo con la misma semilla, respeta la monotonía en
+# el corte, funciona con `sklearn.base.clone`, da efecto 0 a un nivel nuevo, rechaza entradas inválidas (no es un
+# `DataFrame`, falta una entidad, la etiqueta no es binaria, largos distintos, predecir sin ajustar), la regresión
+# cuadrática baja el error, el módulo solo importa numpy y scipy, y el TreeSHAP propio coincide con Shapley.
+#
+# **Lo que cuesta.** El aprendiz propio es unas 30 veces más lento que LightGBM, que está escrito en C++. Por eso las
+# celdas se entrenaron en un servidor de 32 núcleos, con los semestres de los efectos ordenados y los pliegues del
+# log-normal en paralelo (`srvgdai/boreal.sh`). Durante la exploración (las rondas de la sección siguiente) el aprendiz
+# fue LightGBM; las cifras de la comparación 2 × 2 son las de la implementación propia, que se volvió a validar en 2025
+# y a congelar antes de medir en 2026.
+#
+# **Complejidad medida.** El análisis de arriba dice que ajustar crece como $n \cdot p$ por árbol y que predecir cuesta
+# lo mismo por fila sea cual sea $n$. Para contrastarlo, BOREAL se ajustó con datos sintéticos (como los de las pruebas)
+# variando $n$ con $p = 10$ y $p$ con $n = 16.000$, con 50 árboles, un solo proceso y la mediana de tres repeticiones
+# (`original/complejidad_boreal.py`):
+
+# %%
+cx = pd.read_csv(datos.RAIZ / "resultados" / "original" / "complejidad_boreal.csv")
+tabla(cx[["barrido", "n", "p", "segundos_ajuste", "ms_prediccion_por_1000"]]
+      .rename(columns={"segundos_ajuste": "ajuste (s)", "ms_prediccion_por_1000": "predicción (ms por 1.000 filas)"}),
+      dec=2, enteros=["n", "p"])
+cp = pd.read_csv(datos.RAIZ / "resultados" / "original" / "complejidad_boreal_pendientes.csv")
+tabla(cp, dec=2)
+
+# %% [markdown]
+# Predecir cuesta lo mismo por fila con cualquier $n$ y casi con cualquier $p$ (exponentes cercanos a 0), como dice la
+# teoría: una fila recorre un camino por árbol. El ajuste crece menos que linealmente en el rango medido (exponente
+# 0,32 en $n$ y 0,48 en $p$) porque con pocas filas pesa el costo fijo de cada árbol (ordenar hojas, armar los cortes
+# categóricos, la estimación de los efectos); de 32.000 a 64.000 filas el tiempo casi se duplica (6,9 a 12,8 s), que es
+# el régimen lineal que predice $O(n \cdot p)$ y el que rige a 400.000 posiciones.
 #
 # ## Cómo se eligió: validación y negativos
 #
@@ -140,8 +198,10 @@ P = datos.RAIZ / "resultados" / "prueba_2026"
 # las 112, con los hiperparámetros de su bloque más reciente, y la propuesta) con dos conjuntos de variables (las 136
 # del dataset y 136 + las 32 nuevas). Se agrega la ablación de BOREAL sin el modelo log-normal. Las seis celdas se
 # entrenaron con 2021-2024, se calibraron con Platt y fijaron su umbral en 2025, y se congelaron
-# (`original/config_2x2/`) antes de entrenar con 2021-2025 y medir en 2026. Es la tercera mirada a la prueba:
-# exploratoria. Los intervalos son BCa al 95 % por órdenes (1.000 réplicas).
+# (`original/config_2x2/`) antes de entrenar con 2021-2025 y medir en 2026. La 2 × 2 se midió primero con LightGBM
+# como aprendiz de las cuatro celdas de la propuesta (tercera mirada a la prueba); con la implementación propia se
+# repitieron la validación y el congelamiento en 2025 antes de volver a 2026, que es la cuarta mirada: exploratoria.
+# Las celdas de XGBoost no cambian. Los intervalos son BCa al 95 % por órdenes (1.000 réplicas).
 
 # %%
 c = pd.read_csv(P / "dos_por_dos.csv")
@@ -152,21 +212,64 @@ k = k.assign(intervalo=[f"[{a:.4f}; {b:.4f}]".replace(".", ",") for a, b in zip(
 tabla(k[["contraste", "diferencia", "ΔROC-AUC", "intervalo"]].rename(columns={"intervalo": "BCa 95 %"}), dec=4)
 
 # %% [markdown]
-# - **La propuesta completa supera al ganador de las 112** por 0,012 de AUC [0,004; 0,018]: 0,860 contra 0,848. Su F1
-#   es 0,685 contra 0,675, y su calibración es mejor (ECE 0,013 contra 0,022; capítulo anterior).
+# - **La propuesta completa supera al ganador de las 112** por 0,011 de AUC [0,003; 0,017]: 0,860 contra 0,848. Su F1
+#   es 0,690 contra 0,675, y su calibración es mejor (ECE 0,014 contra 0,022; capítulo anterior).
 # - **El modelo y la información son dos caminos a la misma ganancia.** Con las mismas 136 variables, la estructura de
-#   la propuesta le gana a XGBoost por 0,008 [0,003; 0,014]. Con el plazo real, XGBoost sube 0,010 [0,006; 0,014], llega
-#   a 0,858, y la ventaja de la estructura baja a 0,002, sin significancia. Lo que los efectos por entidad le sacan al
+#   la propuesta le gana a XGBoost por 0,009 [0,003; 0,015]. Con el plazo real, XGBoost sube 0,010 [0,006; 0,014], llega
+#   a 0,858, y la ventaja de la estructura baja a 0,001, sin significancia. Lo que los efectos por entidad le sacan al
 #   historial de cada proveedor, las variables de plazo real se lo dan a cualquier *boosting*.
-# - **El log-normal suma poco al AUC**: 0,002 a 0,003, con el intervalo tocando el cero. Su papel es dar una
-#   probabilidad de que el plazo prometido alcance, que se puede leer por sí sola, no subir el AUC.
+# - **El log-normal suma poco al AUC**: 0,003 con las dos versiones de las variables, con el intervalo tocando el cero.
+#   Su papel es dar una probabilidad de que el plazo prometido alcance, que se puede leer por sí sola, no subir el AUC.
 # - **Entidades nuevas.** En las órdenes con alguna entidad nueva ninguna diferencia entre la propuesta y XGBoost es
-#   significativa. La ganancia está en las órdenes donde todo es conocido. El arranque en frío sigue abierto.
+#   significativa. La ganancia está en las órdenes donde todo es conocido (0,869 contra 0,856). El arranque en frío
+#   sigue abierto.
+# - **El aprendiz propio no cambia el resultado.** Con LightGBM como aprendiz, las cuatro celdas de la propuesta daban
+#   en 2026 0,860, 0,856, 0,858 y 0,854; con la implementación propia dan 0,860, 0,858, 0,857 y 0,854 (BOREAL completo,
+#   BOREAL con las 136 y las dos ablaciones, en ese orden). Las diferencias están en la tercera cifra.
+#
+# ## SHAP de BOREAL contra el de XGBoost
+#
+# El TreeSHAP propio de `arboles_propios.py` da la contribución de cada variable al logit del *boosting* en el corte
+# c = 1; las entidades con efecto aleatorio (proveedor, material, quien crea la solicitud y quien crea la orden) entran
+# con su efecto, que se suma al logit tal cual. Se compara la media de |SHAP| por variable: la de BOREAL en 5.000
+# posiciones al azar de 2026 (el TreeSHAP propio es más lento que el de XGBoost) y la de XGBoost en todo 2026
+# ({doc}`03d_mejor_modelo`). Las dos están en la escala del logit, antes de Platt.
+
+# %%
+so = pd.read_csv(P / "shap_global_original.csv")
+sx = pd.read_csv(P / "shap_global.csv")
+ambos = so.merge(sx, on="variable", how="inner", suffixes=(" BOREAL", " XGBoost"))
+ambos = ambos.assign(**{"puesto BOREAL": ambos["shap_abs_medio BOREAL"].rank(ascending=False).astype(int),
+                        "puesto XGBoost": ambos["shap_abs_medio XGBoost"].rank(ascending=False).astype(int)})
+top = ambos[(ambos["puesto BOREAL"] <= 12) | (ambos["puesto XGBoost"] <= 12)].sort_values("puesto BOREAL")
+tabla(top[["variable", "puesto BOREAL", "shap_abs_medio BOREAL", "puesto XGBoost", "shap_abs_medio XGBoost"]]
+      .rename(columns={"shap_abs_medio BOREAL": "|SHAP| BOREAL", "shap_abs_medio XGBoost": "|SHAP| XGBoost"}), dec=3,
+      enteros=["puesto BOREAL", "puesto XGBoost"])
+rho = ambos["shap_abs_medio BOREAL"].corr(ambos["shap_abs_medio XGBoost"], method="spearman")
+comunes10 = len(set(ambos.nsmallest(10, "puesto BOREAL").variable) & set(ambos.nsmallest(10, "puesto XGBoost").variable))
+solo_boreal = sorted(set(so.variable) - set(sx.variable))
+print(f"{len(ambos)} variables en los dos modelos | Spearman de |SHAP| medio {rho:.2f} | comparten {comunes10} de las 10 "
+      f"primeras | solo en BOREAL: {len(solo_boreal)}, entre ellas las 32 nuevas y las dos del plazo log-normal")
+
+# %% [markdown]
+# Los dos modelos leen el problema de la misma manera: en las 126 variables comunes la correlación de Spearman entre sus
+# |SHAP| medios es 0,89, comparten seis de las diez primeras, y arriba están en los dos quién provee y el plazo hábil
+# que le queda al proveedor al liberar. Las diferencias tienen explicación:
+#
+# - **El plazo lo resume el log-normal.** La variable que más pesa en BOREAL es `dist_z`, cuántas desviaciones del plazo
+#   real esperado de ese proveedor y material cubre el plazo prometido, con `dist_mu` en el tercer puesto. Por eso el
+#   plazo hábil al liberar, primero en XGBoost con 0,85, baja en BOREAL a 0,23: la información es la misma, repartida.
+# - **Las entidades suben.** Quien crea la solicitud, quien crea la orden y el material quedan entre los cinco primeros de
+#   BOREAL y del séptimo al decimonoveno en XGBoost. En BOREAL entran como efectos aleatorios encogidos; en XGBoost, como
+#   tasas codificadas que compiten con el resto.
+# - **La carga del proveedor baja.** Posiciones abiertas y órdenes previas con el centro pesan menos en BOREAL, porque
+#   las variables nuevas de plazo real ya cubren buena parte de esa historia.
 #
 # ## Qué deja este capítulo
 #
-# BOREAL (boosting mixto + log-normal + plazo real) es el mejor modelo medido en 2026: AUC 0,860, F1 0,685, ECE 0,013. Le
-# gana al ganador de las 112 por 0,012, con un intervalo lejos de cero. La 2 × 2 muestra de dónde sale esa ganancia: la
-# información nueva sola da 0,010 y la estructura sola 0,008, pero juntas dan 0,012, porque se sustituyen entre sí. Para
+# BOREAL (boosting mixto + log-normal + plazo real) es el mejor modelo medido en 2026: AUC 0,860, F1 0,690, ECE 0,014. Le
+# gana al ganador de las 112 por 0,011, con un intervalo que no toca el cero. La 2 × 2 muestra de dónde sale esa
+# ganancia: la información nueva sola da 0,010 y la estructura sola 0,009, pero juntas dan 0,011, porque se sustituyen
+# entre sí. Si esa ventaja se sostiene en el tiempo lo examina el capítulo siguiente. Para
 # el negocio, la consecuencia práctica es que medir el plazo real de cada proveedor vale tanto como el modelo más
 # elaborado. Lo que no se logró es mejorar las órdenes con entidades nuevas, aunque se intentó por cuatro vías.

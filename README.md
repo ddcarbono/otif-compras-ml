@@ -30,10 +30,10 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `src/prediccion.py` | Prepara el modelo que sirve el tablero sin tablas de entidades (`artifacts/servido.joblib`), los ejemplos reales y los rangos de desarrollo. |
 | `src/vista_prediccion.py` | La predicción en vivo con XGBoost, en la pestaña Predicción de la página Modelos. |
 | `src/vista_original.py` | La predicción en vivo con el modelo original (la opción por defecto de la pestaña Predicción). |
-| `original/servir_original.py` | Entrena el modelo original con 2021-2025 para el tablero (`artifacts/original_servido.joblib`: el LightGBM del modelo y el del plazo log-normal, Platt y umbral), comprueba que reproduce la 2x2 en 2026 y escribe 300 posiciones de 2026 sin códigos (`data/prediccion/ejemplos_original.parquet`). |
-| `srvgdai/` | Guiones para correr los 112 en el servidor: subir el código, piloto, preparar las matrices y correr (30 trabajos a la vez). |
+| `original/servir_original.py` | Entrena el modelo original con 2021-2025 para el tablero (`artifacts/original_servido.joblib`: los árboles propios del modelo y del plazo log-normal con sus discretizadores, Platt y umbral), comprueba que reproduce la 2x2 en 2026 y escribe 300 posiciones de 2026 sin códigos (`data/prediccion/ejemplos_original.parquet`). |
+| `srvgdai/` | Guiones para correr en el servidor los 112 (subir el código, piloto, preparar las matrices y correr 30 trabajos a la vez) y BOREAL (`subir_boreal.sh`, `boreal.sh` con validacion, prueba o publicos). |
 | `src/preparar.py` | Escribe `data/` para el tablero a partir del dataset completo y de las tablas del libro. |
-| `artifacts/` | El modelo que sirve el tablero (`servido.joblib` y `servido.json`: transformaciones, modelo, umbral, versiones y métricas) y la ficha del modelo base. El *pipeline* completo no se publica: sus tablas de entidades llevan los códigos. |
+| `artifacts/` | Los dos modelos que sirve el tablero, cada uno con su ficha JSON (versiones, semilla, hiperparámetros, Platt, umbral, métricas): XGBoost (`servido.joblib`) y BOREAL (`original_servido.joblib`); más las fichas `logistica.metadata.json` y `xgboost.metadata.json`. Los *pipelines* completos no se publican: sus tablas de entidades llevan los códigos. |
 | `data/` | Lo liviano y anonimizado que usa el tablero: muestra de 30.000 posiciones, agregados, diccionario y resumen. |
 | `resultados/` | Tablas que calculan el libro (`resultados/eda/`) y los scripts de modelos (`resultados/modelo_base/`, `resultados/experimentos/` con un JSON por trabajo y `resultados/tabla_maestra.csv`) y que después leen el tablero y las láminas. |
 | `presentacion/` | Diapositivas de la sustentación (PPTX y PDF con la plantilla Uninorte), notas del expositor y guía de estudio; ver `presentacion/LEEME.md`. |
@@ -45,7 +45,7 @@ predictoras. La partición es cronológica: entrenamiento 2021-2024, validación
 | `requirements.txt` | Dependencias del tablero (versiones exactas). |
 | `book/requirements.txt` | Dependencias del libro y de los cálculos (versiones exactas). |
 | `render.yaml` | Blueprint de Render para desplegar el tablero. |
-| `tests/` | Pruebas con pytest: preprocesamiento y codificación por objetivo, series de tiempo, modelo servido, arranque del tablero y que `data/` no publique identificadores. Usan datos sintéticos y lo que trae el repositorio, no el dataset completo. |
+| `tests/` | Pruebas con pytest: preprocesamiento y codificación por objetivo, series de tiempo, los dos modelos servidos y su ida y vuelta por joblib, el modelo original (`test_boreal.py`: aprendizaje sintético, reproducibilidad, entradas inválidas, `clone`, solo numpy y scipy, TreeSHAP), arranque del tablero y que `data/` no publique identificadores. Usan datos sintéticos y lo que trae el repositorio, no el dataset completo. |
 | `requirements-dev.txt` | Dependencias de las pruebas (el tablero más pytest). |
 | `.github/workflows/ci.yml` | CI: corre las pruebas en cada push a `main`, con Python 3.11.9 como Render. |
 
@@ -67,8 +67,10 @@ Lo que corre una vez (en el servidor o en local) y deja sus tablas en `resultado
 | `src/calibrado.py` | XGBoost con el escalado de Platt congelado en 2025: lo que sirve el tablero. |
 | `src/modelo_final.py` | Entrena ese modelo con 2021-2025 (`artifacts/xgboost.joblib`), comprueba que reproduce las probabilidades de la comparación 2 × 2 y calcula SHAP en 2026. `python -m src.modelo_final <predicciones_prueba_2x2.csv>` |
 | `src/prueba_2026.py` | XGBoost, la logística y la propuesta en la prueba 2026 con BCa por órdenes y DeLong; la tabla de brecha y la 2 × 2. `python -m src.prueba_2026 <predicciones_prueba_2x2.csv>` |
+| `src/lime_xgb.py` | LIME contra SHAP en el XGBoost de 2026: acuerdo en 200 posiciones y estabilidad con cinco semillas. `python -m src.lime_xgb` |
 | `src/xgb_vs_logistica.py` | Por qué XGBoost y no la logística: tardías de más atrapadas con el mismo presupuesto de alertas, en total y en material sin stock (BCa por órdenes), forma del efecto del plazo (SHAP) y costo. `python -m src.xgb_vs_logistica <predicciones_prueba_2x2.csv>` |
-| `original/` | El modelo original del Entregable 3 (BOREAL: boosting mixto + log-normal + variables nuevas) y su validación en siete conjuntos públicos (`publicos_otif.py`); ver `original/LEEME.md`. |
+| `original/` | El modelo original del Entregable 3 (BOREAL: boosting mixto + log-normal + variables nuevas), escrito solo con numpy y scipy (`arboles_propios.py`, `modelo_original_otif.py`, clase `Boreal`), y su validación en siete conjuntos públicos (`publicos_otif.py`); ver `original/LEEME.md`. |
+| `declaracion_autoria_ia.md` | Declaración de autoría y de uso de IA del equipo. |
 
 ## Datos
 

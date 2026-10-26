@@ -1,0 +1,8 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+zurich: 27327 filas | tasa del positivo 0.073 | entrenamiento 16396, validación 5465, prueba 5466 (tasa 0.073) | efectos de ['line_number', 'stop_id', 'linea_sentido'] | cortes [0, 60, 180, 300] | periodo None
+   XGBoost  AUC validación 0.8184 (mejor de 20) | prueba 0.8296 | F1 0.3897 al umbral 0.175 | {'n_estimators': 327, 'learning_rate': 0.05838867079874594, 'max_depth': 5, 'subsample': 0.6845440098490809, 'colsample_bytree': 0.9051590010169366, 'min_child_weight': 4.987640440213655} | 0.5 min
+   efectos de K3 estimados con 16396 filas; varianzas {'line_number': 0.274, 'stop_id': 0.347, 'linea_sentido': 0.075} | 1.7 min
+   efectos de K3 estimados con 21861 filas; varianzas {'line_number': 0.361, 'stop_id': 0.337, 'linea_sentido': 0.073} | 24.4 min
+   K3       AUC validación 0.8158 (mejor de 20) | prueba 0.8361 | F1 0.3900 al umbral 0.155 | {'learning_rate': 0.016423169223467315, 'num_leaves': 17, 'min_child_samples': 13, 'colsample_bytree': 0.659361674261464, 'reg_alpha': 0.08644265291577503, 'arboles': 923} | 25.0 min
+   K3 − XGBoost en la prueba: ΔAUC +0.0065 [-0.0035; +0.0177] | DeLong EE 0.0053, p = 0.2175 | ΔF1 +0.0003

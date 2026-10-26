@@ -1,0 +1,8 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+amazon: 32769 filas | tasa del positivo 0.058 | entrenamiento 19661, validación 6554, prueba 6554 (tasa 0.058) | efectos de ['RESOURCE', 'MGR_ID', 'ROLE_TITLE', 'ROLE_DEPTNAME'] | cortes [0] | periodo None
+   XGBoost  AUC validación 0.8666 (mejor de 20) | prueba 0.8667 | F1 0.4480 al umbral 0.186 | {'n_estimators': 230, 'learning_rate': 0.019124578836049073, 'max_depth': 5, 'subsample': 0.5971502135451819, 'colsample_bytree': 0.7736748329849776, 'min_child_weight': 21.24583664406605} | 0.5 min
+   efectos de K3 estimados con 19661 filas; varianzas {'RESOURCE': 0.478, 'MGR_ID': 0.502, 'ROLE_TITLE': 0.197, 'ROLE_DEPTNAME': 0.274} | 1.3 min
+   efectos de K3 estimados con 26215 filas; varianzas {'RESOURCE': 0.479, 'MGR_ID': 0.523, 'ROLE_TITLE': 0.175, 'ROLE_DEPTNAME': 0.288} | 16.1 min
+   K3       AUC validación 0.8686 (mejor de 20) | prueba 0.8585 | F1 0.4484 al umbral 0.171 | {'learning_rate': 0.03923976823163965, 'num_leaves': 49, 'min_child_samples': 25, 'colsample_bytree': 0.5869947192268925, 'reg_alpha': 9.151208474949666, 'arboles': 776} | 16.3 min
+   K3 − XGBoost en la prueba: ΔAUC -0.0082 [-0.0169; +0.0005] | DeLong EE 0.0046, p = 0.0724 | ΔF1 +0.0005

@@ -1,20 +1,31 @@
 {
- "modelo": "BOREAL: boosting mixto + plazo log-normal + 32 variables nuevas, con Platt",
+ "modelo": "BOREAL: boosting mixto ordinal + plazo log-normal + 32 variables nuevas, con Platt (implementación propia, numpy)",
  "entrenado_con": "órdenes de 2021-2025",
- "umbral": 0.3484857059162891,
+ "umbral": 0.34449121038656444,
  "arboles": 881,
  "platt": [
-  0.8503136943061866,
-  0.06599589084397973
+  0.8453681526083809,
+  0.07949262935946337
  ],
+ "semilla": 2026,
+ "hiperparametros": {
+  "learning_rate": 0.01528,
+  "num_leaves": 154.0,
+  "min_child_samples": 154.0,
+  "subsample": 0.834,
+  "colsample_bytree": 0.3826,
+  "reg_lambda": 0.2642,
+  "reg_alpha": 1.413,
+  "cat_smooth": 2.019,
+  "min_data_per_group": 24.0
+ },
  "reproduccion_2x2": {
   "filas": 51941,
-  "dif_max": 1.1102230246251565e-16,
+  "dif_max": 3.3306690738754696e-16,
   "correlacion": 1.0,
   "misma_decision": 1.0
  },
  "versiones": {
-  "lightgbm": "4.3.0",
   "pandas": "2.1.0",
   "numpy": "1.26.4"
  }

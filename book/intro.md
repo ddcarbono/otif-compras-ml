@@ -17,16 +17,21 @@ conocidas al liberar. La partición es cronológica: entrenamiento 2021-2024, va
 
 | capítulo | qué responde |
 |---|---|
-| {doc}`literatura` | qué se ha publicado sobre predecir retrasos de proveedores y por qué esas cifras no se comparan con estas |
+| {doc}`01_correcciones` | qué observaciones del Entregable 2 se corrigieron y dónde (tabla de trazabilidad) |
 | {doc}`02a_datos` | el problema, la fuente, la población, el diccionario, la calidad de los datos y la ética |
 | {doc}`02b_eda` | cómo se distribuye el objetivo y qué variables se asocian con él |
 | {doc}`02c_tiempo_y_fuga` | cómo cambia el retraso en el tiempo, qué tan distinta es la evaluación del entrenamiento, qué no puede entrar al modelo y cómo se preprocesa |
 | {doc}`03a_modelo_base` | cuánto logra una regresión logística frente a no tener modelo y frente a la regla del proveedor |
 | {doc}`03b_112_combinaciones` | qué modelo, balanceo y optimizador funcionan mejor en la validación anidada, y por qué XGBoost y no la logística |
-| {doc}`03d_mejor_modelo` | cuánto logra el ganador en la prueba 2026 y qué mira (SHAP) |
+| {doc}`03d_mejor_modelo` | cuánto logra el ganador en la prueba 2026, qué mira (SHAP) y cómo se compara LIME |
 | {doc}`03c_fundamentos` | cómo funciona XGBoost por dentro y cuánto cuesta cada modelo, en teoría y medido |
-| {doc}`05_modelo_original` | la propuesta del Entregable 3 (efectos por entidad, plazo log-normal, plazo real), cómo se eligió y la comparación 2 × 2 en 2026 |
-| {doc}`06_validacion` | si la propuesta gana también en siete conjuntos públicos, y dónde no |
+| {doc}`literatura` | qué se ha publicado sobre predecir retrasos de proveedores y por qué esas cifras no se comparan con estas |
+| {doc}`04_novedad` | si alguien propuso ya un método como el original: búsqueda en tres bases, matriz y declaración de novedad (R1) |
+| {doc}`05_modelo_original` | BOREAL: formulación, algoritmo, implementación propia (R2), cómo se eligió y la comparación 2 × 2 en 2026 |
+| {doc}`06_validacion` | si BOREAL gana también en siete conjuntos públicos, y dónde no |
+| {doc}`07_tablero` | qué muestra el tablero, cómo está hecho y cómo se despliega |
+| {doc}`08_conclusiones` | el veredicto sobre R1, R2 y R3, las limitaciones y la declaración de uso de IA |
+| {doc}`09_reproducibilidad` | con qué entorno, en qué orden y con qué semilla se rehace cada número; la tabla maestra |
 | {doc}`glosario` | qué mide y cómo se lee cada estadístico del libro |
 
 ## Cómo reproducirlo

@@ -1,0 +1,2 @@
+conjunto,n,tasa,n_prueba,auc_xgb,auc_k3,dif,ic_lo,ic_hi,p_delong,f1_xgb,f1_k3,auc_val_xgb,auc_val_k3
+amazon,32769,0.0579,6554,0.8667,0.8585,-0.0082,-0.0169,0.0005,0.0724,0.448,0.4484,0.8666,0.8686

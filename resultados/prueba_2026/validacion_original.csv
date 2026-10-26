@@ -1,0 +1,9 @@
+contraste,prueba,unidades,efecto,medida del efecto,estadístico,p,en Holm,p (Holm)
+propuesta completa contra el ganador de las 112,DeLong (AUC de 2026),51941,0.011325563715271159,ΔAUC,12.649380839471156,1.1275993989934368e-36,True,6.765596393960621e-36
+propuesta completa contra el ganador de las 112,"Diebold-Mariano con HLN (pérdida log, semanal)",42,-0.013034244867253634,Δ pérdida log media por semana,-0.7211062104625944,0.474936209988327,True,0.8296838699519329
+propuesta completa contra el ganador de las 112,"Diebold-Mariano con HLN, semanas con 200 posiciones o más (sensibilidad)",36,0.012973985647448267,Δ pérdida log media por semana,2.848965314621891,0.007298939635442904,False,
+propuesta completa contra el ganador de las 112,Wilcoxon (ΔAUC mensual) y delta de Cliff,9,0.20987654320987653,δ de Cliff (pequeña),9.0,0.12890625,True,0.515625
+"modelo, con las 136",DeLong (AUC de 2026),51941,0.009222579416475307,ΔAUC,11.007925428012252,3.4996948338532477e-28,True,1.7498474169266237e-27
+"modelo, con las 136","Diebold-Mariano con HLN (pérdida log, semanal)",42,-0.01455625909370251,Δ pérdida log media por semana,-0.8237605145527751,0.41484193497596644,True,0.8296838699519329
+"modelo, con las 136","Diebold-Mariano con HLN, semanas con 200 posiciones o más (sensibilidad)",36,0.009976423257015865,Δ pérdida log media por semana,2.57645832715911,0.014359123612950967,False,
+"modelo, con las 136",Wilcoxon (ΔAUC mensual) y delta de Cliff,9,0.13580246913580246,δ de Cliff (despreciable),12.0,0.25,True,0.75

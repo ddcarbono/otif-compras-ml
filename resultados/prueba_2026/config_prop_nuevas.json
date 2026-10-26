@@ -2,12 +2,12 @@
   "celda": "prop_nuevas",
   "nombre": "Propuesta 136 + nuevas",
   "platt": [
-    0.8503136943061866,
-    0.06599589084397973
+    0.8453681526083809,
+    0.07949262935946337
   ],
-  "umbral": 0.3484857059162891,
+  "umbral": 0.34449121038656444,
   "auc_validacion": 0.859,
-  "f1_validacion": 0.6766,
+  "f1_validacion": 0.6756,
   "variables_nuevas": [
     "prov_tasa_ult10",
     "prov_tasa_ult30",

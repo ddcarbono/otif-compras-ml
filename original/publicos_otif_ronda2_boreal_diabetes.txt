@@ -1,0 +1,8 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+diabetes: 101766 filas | tasa del positivo 0.112 | entrenamiento 61059, validación 20353, prueba 20354 (tasa 0.106) | efectos de ['paciente', 'medical_specialty', 'diag_1', 'diag_2'] | cortes [0, 1] | periodo periodo
+   XGBoost  AUC validación 0.6531 (mejor de 20) | prueba 0.6594 | F1 0.2563 al umbral 0.133 | {'n_estimators': 387, 'learning_rate': 0.05296622208445489, 'max_depth': 4, 'subsample': 0.725441780237071, 'colsample_bytree': 0.9579502024962667, 'min_child_weight': 4.20249735609375} | 0.9 min
+   efectos de K3 estimados con 61059 filas; varianzas {'paciente': 0.462, 'medical_specialty': 0.084, 'diag_1': 0.149, 'diag_2': 0.146} | 11.7 min
+   efectos de K3 estimados con 81412 filas; varianzas {'paciente': 0.462, 'medical_specialty': 0.082, 'diag_1': 0.137, 'diag_2': 0.138} | 86.7 min
+   K3       AUC validación 0.6698 (mejor de 20) | prueba 0.6759 | F1 0.2769 al umbral 0.161 | {'learning_rate': 0.03753788440597465, 'num_leaves': 70, 'min_child_samples': 19, 'colsample_bytree': 0.6156184923318992, 'reg_alpha': 5.750630227531086, 'arboles': 443} | 88.9 min
+   K3 − XGBoost en la prueba: ΔAUC +0.0165 [+0.0085; +0.0245] | DeLong EE 0.0043, p = 0.0001 | ΔF1 +0.0205

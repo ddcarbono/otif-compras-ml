@@ -1,5 +1,8 @@
-"""Junta las dos rondas de conjuntos publicos (publicos_otif.csv y publicos_otif_ronda2.csv): p de DeLong ajustado por Holm
-sobre los siete conjuntos y Wilcoxon de rangos con signo sobre las siete diferencias de AUC (boosting mixto - XGBoost).
+"""Junta las dos rondas de conjuntos publicos: p de DeLong ajustado por Holm sobre los siete conjuntos y Wilcoxon de rangos
+con signo sobre las siete diferencias de AUC (boosting mixto - XGBoost).
+
+Lee un CSV por conjunto, como los deja srvgdai/boreal.sh publicos (publicos_otif_boreal_<c>.csv en la ronda 1 y
+publicos_otif_ronda2_boreal_<c>.csv en la ronda 2).
 
 Uso: python resumir_publicos_otif.py   (deja publicos_otif_resumen.txt y .csv aqui)
 """
@@ -10,7 +13,9 @@ import pandas as pd
 from scipy.stats import wilcoxon
 
 AQUI = Path(__file__).parent
-d = pd.concat([pd.read_csv(AQUI / "publicos_otif.csv").assign(ronda=1), pd.read_csv(AQUI / "publicos_otif_ronda2.csv").assign(ronda=2)])
+r1, r2 = sorted(AQUI.glob("publicos_otif_boreal_*.csv")), sorted(AQUI.glob("publicos_otif_ronda2_boreal_*.csv"))
+assert len(r1) == 3 and len(r2) == 4, f"faltan conjuntos: {len(r1)} de la ronda 1 y {len(r2)} de la ronda 2"
+d = pd.concat([pd.read_csv(f).assign(ronda=1) for f in r1] + [pd.read_csv(f).assign(ronda=2) for f in r2], ignore_index=True)
 p = d.p_delong.to_numpy()
 orden, m, acum, holm = np.argsort(p), len(p), 0.0, np.empty(len(p))
 for k, i in enumerate(orden):

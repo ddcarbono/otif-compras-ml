@@ -2,11 +2,11 @@
   "celda": "k3_nuevas",
   "nombre": "K3 136 + nuevas (ablación)",
   "platt": [
-    0.8730637824430377,
-    0.08171818695458748
+    0.8680267586335596,
+    0.09426247318727263
   ],
-  "umbral": 0.34745235379910233,
-  "auc_validacion": 0.8556,
+  "umbral": 0.33626634625292734,
+  "auc_validacion": 0.8564,
   "f1_validacion": 0.6736,
   "variables_nuevas": [
     "prov_tasa_ult10",

@@ -1,0 +1,2 @@
+conjunto,n,tasa,n_prueba,auc_xgb,auc_k3,dif,ic_lo,ic_hi,p_delong,f1_xgb,f1_k3,auc_val_xgb,auc_val_k3
+click,39948,0.1684,7990,0.7068,0.6994,-0.0074,-0.0126,-0.0022,0.01421,0.3842,0.3787,0.6877,0.679

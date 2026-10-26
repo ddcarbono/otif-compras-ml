@@ -38,7 +38,7 @@ def legible(d):
 # ventana y se mide en el bloque. Como los cortes son por fecha de la orden, ninguna orden queda partida, y el modelo
 # siempre predice un semestre que no ha visto, como pasaría en uso.
 #
-# **El preprocesamiento** es el del capítulo 3 (logaritmo con signo, imputación, estandarización, *one-hot* y
+# **El preprocesamiento** es el del capítulo {doc}`02c_tiempo_y_fuga` (logaritmo con signo, imputación, estandarización, *one-hot* y
 # codificación jerárquica por objetivo fuera de pliegue), ajustado una vez por ventana con su entrenamiento. No tiene
 # hiperparámetros, así que su salida se guarda y los 896 trabajos solo ajustan modelos.
 #
@@ -377,7 +377,7 @@ tabla(nv[nv.bloque == "todos"].drop(columns="bloque").rename(columns={"proveedor
 # %% [markdown]
 # Son el 3,9 % de las posiciones (11.665 de 296.969) y llegan tarde más seguido (40 % contra 31 %). El modelo los
 # ordena peor (AUC 0,806 contra 0,852) y acierta menos cuando los marca (precisión 0,594 contra 0,672). En la prueba
-# pesará más: una de cada nueve posiciones de 2026 trae un proveedor que no estaba en 2021-2024 (capítulo 2), contra
+# pesará más: una de cada nueve posiciones de 2026 trae un proveedor que no estaba en 2021-2024 (capítulo {doc}`02c_tiempo_y_fuga`), contra
 # una de cada 26 aquí.
 #
 # **El perfil de los errores.** Mediana de algunas variables por tipo de caso:

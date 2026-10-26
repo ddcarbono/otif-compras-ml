@@ -254,6 +254,13 @@ def tabla(destino=TRABAJOS):
               F1_desv=("F1", "std"), PR_AUC=("PR_AUC", "mean"), AUC_interno=("AUC_interno", "mean"),
               horas_cpu=("segundos_total", lambda s: s.sum() / 3600),
               ms_inferencia_por_1000=("ms_inferencia_por_1000", "mean"), pico_gb=("pico_gb", "max")).reset_index()
+    # hiperparámetros finales: los que eligió el optimizador en el bloque más reciente (2025-S2), con los que se
+    # reentrena el modelo que se usa después
+    ultimo = df[df.bloque == validacion.BLOQUES[-1]].set_index(["modelo", "balanceo", "optimizador"])
+    t = t.join(ultimo[["E", "params"]].rename(columns={"E": "evaluaciones", "params": "hiperparametros_finales"}),
+               on=["modelo", "balanceo", "optimizador"])
+    t["hiperparametros_finales"] = t.hiperparametros_finales.map(lambda d: json.dumps(d, default=float))
+    t["semilla"] = datos.SEMILLA
     t = t.sort_values("AUC", ascending=False)
     t.to_csv(datos.RAIZ / "resultados" / "tabla_maestra.csv", index=False)
     print(t.head(15).to_string(index=False))

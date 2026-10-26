@@ -1,0 +1,4 @@
+medida,media,p25,p75,posiciones
+Spearman |LIME| contra |SHAP| por variable,0.15657209678072576,0.11565518595889798,0.19359251011990847,200
+"de las 5 principales, comparten",2.125,2.0,3.0,200
+"de las 5 de SHAP, mismo signo en LIME",4.325,4.0,5.0,200

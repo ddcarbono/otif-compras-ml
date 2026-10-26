@@ -185,7 +185,7 @@ def pestana_original():
         "F1 XGBoost": [_n(v) for v in p.f1_xgb], "F1 boosting mixto": [_n(v) for v in p.f1_k3]})
     return html.Div([
         html.H3("Modelo original: BOREAL"),
-        html.P("Boosting Ordinal de Retraso con Efectos ALeatorios: LightGBM con efectos por entidad sobre los días de "
+        html.P("Boosting Ordinal de Retraso con Efectos ALeatorios: un boosting de árboles propio (numpy) con efectos por entidad sobre los días de "
                "retraso en cortes, más el plazo log-normal y 32 variables de plazo real. Congelado (Platt y umbral de "
                "2025) antes de medir 2026; intervalos por órdenes."),
         flujo("El modelo en cuatro fases", FASES_ORIGINAL),
@@ -215,10 +215,10 @@ def pestana_original():
                "aplican fuera de OTIF.", className="small text-muted"),
         tabla_simple(pub),
         html.P(f"boosting mixto gana en {gana}, empata en {emp} y pierde en {pierde}; F1 mayor en {(p.f1_k3 > p.f1_xgb).sum()} de "
-               f"{len(p)}. Wilcoxon sobre las siete diferencias: p = 0,81, sin superioridad general. Gana donde una entidad "
-               "tiene historia propia en el tiempo (el paciente que vuelve), como el proveedor en OTIF; empata en "
-               "transporte, con entidades pocas y estables; pierde sin tiempo ni desenlace continuo. Esa separación se "
-               "vio después de la segunda ronda: confirmarla pide una tercera fijada de antemano.",
+               f"{len(p)}. Wilcoxon sobre las siete diferencias: p = 0,69, sin superioridad general. Gana donde una entidad "
+               "tiene historia propia en el tiempo (el paciente que vuelve, el bus escolar), como el proveedor en OTIF; "
+               "empata donde las entidades son pocas y estables, o sin tiempo ni desenlace continuo. Los conjuntos de la "
+               "segunda ronda se eligieron por parecerse a OTIF: es evidencia de dónde sirve, no de que sea mejor en general.",
                className="small text-muted mt-2"),
     ])
 
@@ -251,8 +251,9 @@ FORMULAS = [
      r"$$P(d_i > c \mid x_i) = \sigma\Big(f(x_i, c) + \sum_{e} b_{e(i)}\Big)$$"
      r"$$c \in \{0, 1, 5, 15\}, \qquad b_e \sim N(0, \sigma_e^2)$$"
      r"$$f(x, c) = \sum_{m} \eta\, f_m(x, c), \qquad w_j^* = -\frac{G_j}{H_j + \lambda}, \qquad \frac{\partial f}{\partial c} \le 0$$",
-     "f es un LightGBM: la misma suma de árboles, log-pérdida y peso de hoja que XGBoost, pero crece por hoja (parte "
-     "la de mayor ganancia, hasta 154 hojas) y no por niveles (XGBoost: profundidad 10). Recibe los efectos como "
+     "f es un boosting de árboles de histograma escrito con numpy (original/arboles_propios.py): la misma suma de "
+     "árboles, log-pérdida y peso de hoja que XGBoost, pero crece por hoja (parte la de mayor "
+     "ganancia) y no por niveles (XGBoost: profundidad 10). Recibe los efectos como "
      "desplazamiento fijo del logit y es monótono decreciente en el corte c. d son los días de retraso; se predice en "
      "c = 1. Cada b es un intercepto aleatorio por proveedor, material, solicitante y comprador, encogido hacia 0 si "
      "tiene pocas posiciones. Entran además el plazo log-normal y las 32 variables de plazo real."),
@@ -264,7 +265,7 @@ FORMULAS = [
      "La usan la logística y XGBoost para las 11 entidades; el original, para las 7 sin efecto aleatorio."),
     ("Platt: del puntaje al riesgo",
      r"$$\hat p = \sigma(a\,z + b), \qquad (a, b) = \arg\min_{a, b} \sum_{i \in 2025} \ell\big(y_i, \sigma(a\,z_i + b)\big)$$",
-     "z es el logit crudo (aquí, el del LightGBM más los efectos, en c = 1). Platt es una regresión logística de y "
+     "z es el logit crudo (aquí, el de los árboles más los efectos, en c = 1). Platt es una regresión logística de y "
      "sobre z, ajustada en la validación 2025 y congelada antes de 2026: a < 1 encoge una confianza excesiva y b "
      "corrige el nivel. Al ser creciente en z, no cambia el orden ni el AUC; solo vuelve el número un riesgo. La usan "
      "XGBoost y el original; la logística ya sale calibrada."),
@@ -285,7 +286,6 @@ def flujo(titulo, pasos):
 ART = DATA.parent / "artifacts"
 FX = json.loads((ART / "xgboost.metadata.json").read_text(encoding="utf-8"))
 FO = json.loads((ART / "original_servido.json").read_text(encoding="utf-8"))
-CO = json.loads((DATA.parent / "original" / "original_congelado.json").read_text(encoding="utf-8"))
 _e = lambda v, d=3: f"{v:.{d}f}".replace(".", ",")
 HX = FX["hiperparametros"]
 PIPE_XGB = [
@@ -301,9 +301,9 @@ PIPE_XGB = [
 ]
 # las cuatro fases del original, en el orden en que corren: cuáles son modelos y para qué
 FASES_ORIGINAL = [
-    ("Plazo log-normal", "Modelo (LightGBM de regresión): estima el plazo real esperado. Entrega dist_mu y dist_z."),
+    ("Plazo log-normal", "Modelo (boosting de regresión propio): estima el plazo real esperado. Entrega dist_mu y dist_z."),
     ("Cortes ordinales", "Repite cada posición en c = 0, 1, 5 y 15 días de retraso."),
-    ("Boosting mixto", "Modelo (LightGBM + efectos aleatorios por entidad): da el riesgo. Efectos por semestre, "
+    ("Boosting mixto", "Modelo (árboles propios + efectos aleatorios por entidad): da el riesgo. Efectos por semestre, "
                        "con el pasado."),
     ("Platt", "Modelo (logística de dos parámetros): vuelve el puntaje un riesgo calibrado."),
 ]
@@ -311,11 +311,12 @@ FASES_ORIGINAL = [
 PIPE_ORIGINAL = [
     ("Entrada", "136 variables más 32 de plazo real previo (mediana y p80 de las últimas 20 entregas, holguras)."),
     ("Entidades y categóricas", "Proveedor, material, solicitante y comprador: efecto aleatorio b, ordenado por "
-                                "semestre. Las otras 7: tasa encogida (M = 20). Categóricas: nativas de LightGBM."),
-    ("Plazo log-normal", "Un LightGBM de regresión sin las variables de la promesa estima μ, el plazo real esperado; "
+                                "semestre. Las otras 7: tasa encogida (M = 20). Categóricas: cortes por grupos de categorías, en los árboles."),
+    ("Plazo log-normal", "Un boosting de regresión sin las variables de la promesa estima μ, el plazo real esperado; "
                          "z mide cuánto alcanza la promesa."),
     ("Cortes ordinales", "Cada posición se repite en c ∈ {0, 1, 5, 15} con la etiqueta [días de retraso > c]."),
-    ("LightGBM", f"{FO['arboles']} árboles, {CO['prm']['num_leaves']} hojas, η = {_e(CO['prm']['learning_rate'])}, "
+    ("Boosting mixto", f"{FO['arboles']} árboles, {FO['hiperparametros']['num_leaves']:.0f} hojas, "
+                       f"η = {_e(FO['hiperparametros']['learning_rate'])}, "
                  "monótono decreciente en c; Σ b como desplazamiento del logit. Reentrenado con 2021-2025."),
     ("Platt", f"σ({_e(FO['platt'][0])} · logit + {_e(FO['platt'][1])}) en c = 1, ajustado en 2025 y congelado."),
     ("Umbral", f"Alerta si el riesgo ≥ {_e(FO['umbral'])} (máximo F1 en 2025)."),
@@ -477,7 +478,7 @@ def layout(pestana="t-base", **_):
             dbc.Tab(pestana_prediccion(), label="Predicción", tab_id="t-prediccion", className="pt-3"),
         ], id="m-pestanas", active_tab=pestana),
         dcc.Store(id="m-redimensionado"),
-        dbc.Alert("La predicción en vivo sirve el modelo original, que le gana al óptimo de las 112 por 0,012 de AUC en 2026, "
+        dbc.Alert("La predicción en vivo sirve el modelo original, que le gana al óptimo de las 112 por 0,011 de AUC en 2026, "
                   "y deja comparar con XGBoost.", color="light",
                   className="mt-3"),
     ])

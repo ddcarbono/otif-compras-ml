@@ -1,0 +1,8 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+nyc_bus: 125706 filas | tasa del positivo 0.183 | entrenamiento 75423, validación 25141, prueba 25142 (tasa 0.188) | efectos de ['Bus_Company_Name', 'Route_Number', 'Schools_Serviced', 'Bus_No'] | cortes [0, 15, 30, 45, 60] | periodo periodo
+   XGBoost  AUC validación 0.7939 (mejor de 20) | prueba 0.8436 | F1 0.5653 al umbral 0.151 | {'n_estimators': 248, 'learning_rate': 0.20925559043980443, 'max_depth': 3, 'subsample': 0.7225338213817927, 'colsample_bytree': 0.6933257224416838, 'min_child_weight': 5.338623090524278} | 0.8 min
+   efectos de K3 estimados con 75423 filas; varianzas {'Bus_Company_Name': 1.349, 'Route_Number': 0.372, 'Schools_Serviced': 0.259, 'Bus_No': 0.361} | 6.1 min
+   efectos de K3 estimados con 100564 filas; varianzas {'Bus_Company_Name': 1.312, 'Route_Number': 0.365, 'Schools_Serviced': 0.238, 'Bus_No': 0.339} | 62.7 min
+   K3       AUC validación 0.7933 (mejor de 20) | prueba 0.8517 | F1 0.5751 al umbral 0.125 | {'learning_rate': 0.018185666217806734, 'num_leaves': 62, 'min_child_samples': 110, 'colsample_bytree': 0.8743772620619588, 'reg_alpha': 0.16175828015761815, 'arboles': 554} | 65.4 min
+   K3 − XGBoost en la prueba: ΔAUC +0.0081 [+0.0051; +0.0104] | DeLong EE 0.0013, p = 0.0000 | ΔF1 +0.0098

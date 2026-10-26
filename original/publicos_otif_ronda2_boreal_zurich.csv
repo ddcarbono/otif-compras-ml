@@ -1,0 +1,2 @@
+conjunto,n,tasa,n_prueba,auc_xgb,auc_k3,dif,ic_lo,ic_hi,p_delong,f1_xgb,f1_k3,auc_val_xgb,auc_val_k3
+zurich,27327,0.073,5466,0.8296,0.8361,0.0065,-0.0035,0.0177,0.21747,0.3897,0.39,0.8184,0.8158

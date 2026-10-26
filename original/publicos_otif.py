@@ -261,12 +261,13 @@ class K3Rapido(mo.BoostingMixtoOrdinal):
 
     def ajustar_arboles(self, X, dias, efectos, d_arboles):
         self.niveles, self.b, self.s2 = efectos["niveles"], efectos["b"], efectos["s2"]
-        Xa, ya = self._ampliar(X, dias)
-        prm = dict(self.prm)
-        if self.monotono:
-            prm["monotone_constraints"] = [0] * X.shape[1] + [-1]
-        self.modelo = mo.lgb.LGBMClassifier(n_estimators=self.arboles, random_state=SEMILLA, verbose=-1, n_jobs=-1, **prm)
-        self.modelo.fit(Xa, ya, init_score=np.tile(d_arboles, len(mo.CORTES)))
+        T = self._discretizar(X)
+        dias = np.asarray(dias, dtype=float)
+        Ta = np.hstack([self._ampliar(T, c) for c in self.cortes])
+        ya = np.concatenate([(dias > c).astype(int) for c in self.cortes])
+        mono = [0] * T.shape[0] + ([-1] if self.monotono and len(self.cortes) > 1 else [0])
+        self.modelo = mo.BoostingHistograma(n_estimators=self.arboles, semilla=SEMILLA, monotonia=mono, **self.prm)
+        self.modelo.fit(Ta, ya, self.cat + [False], init=np.tile(d_arboles, len(self.cortes)))
         self.arboles_usados = self.arboles
         return self
 
@@ -285,12 +286,8 @@ def efectos_k3(c, ent, Xe):
     d = m._estimar_efectos(Xe, y_bin, ge, oc, np.zeros(ent.sum()))
     if c["periodo"]:
         per = df[c["periodo"]][ent].to_numpy()
-        d = np.zeros(ent.sum())
-        for t in sorted(set(per))[1:]:
-            antes, este = per < t, per == t
-            aux = mo.BoostingMixtoOrdinal(mo.PRM_EFECTOS, centrar=True)
-            aux._estimar_efectos(Xe[antes], y_bin[antes], {e: s[antes] for e, s in ge.items()}, oc[antes], np.zeros(antes.sum()))
-            d[este] = aux.desplazamiento({e: s[este] for e, s in ge.items()})
+        d = mo.efectos_ordenados(Xe, y_bin, {e: s.to_numpy() for e, s in ge.items()}, oc.to_numpy(), per, mo.PRM_EFECTOS,
+                                 aviso=lambda s: None)
     anotar(f"   efectos de K3 estimados con {ent.sum()} filas; varianzas {({e: round(v, 3) for e, v in m.s2.items() if e in c['re']})} | {reloj()}")
     return dict(niveles=m.niveles, b=m.b, s2=m.s2, d_arboles=d, dias=dias)
 

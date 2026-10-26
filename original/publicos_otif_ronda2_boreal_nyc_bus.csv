@@ -1,0 +1,2 @@
+conjunto,n,tasa,n_prueba,auc_xgb,auc_k3,dif,ic_lo,ic_hi,p_delong,f1_xgb,f1_k3,auc_val_xgb,auc_val_k3
+nyc_bus,125706,0.1831,25142,0.8436,0.8517,0.0081,0.0051,0.0104,0.0,0.5653,0.5751,0.7939,0.7933

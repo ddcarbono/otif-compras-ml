@@ -1,27 +1,37 @@
-# Solo los capítulos ya escritos. Orden del cuadro 4 del Entregable 3; los demás se agregan cuando existan.
+# Orden del cuadro 4 del Entregable 3: introducción, trazabilidad, datos, benchmarks, literatura y novedad, modelo
+# original, validación, tablero y despliegue, conclusiones, reproducibilidad.
 format: jb-book
 root: intro
 defaults:
   numbered: true
 parts:
-  - caption: Contexto
+  - caption: Trazabilidad
     chapters:
-      - file: literatura
+      - file: 01_correcciones
   - caption: Datos y análisis exploratorio
     chapters:
       - file: 02a_datos
       - file: 02b_eda
       - file: 02c_tiempo_y_fuga
-  - caption: Modelos
+  - caption: Modelos de referencia
     chapters:
       - file: 03a_modelo_base
       - file: 03b_112_combinaciones
       - file: 03d_mejor_modelo
       - file: 03c_fundamentos
+  - caption: Literatura y novedad
+    chapters:
+      - file: literatura
+      - file: 04_novedad
   - caption: Modelo original
     chapters:
       - file: 05_modelo_original
       - file: 06_validacion
+  - caption: Tablero, conclusiones y reproducibilidad
+    chapters:
+      - file: 07_tablero
+      - file: 08_conclusiones
+      - file: 09_reproducibilidad
   - caption: Referencia
     chapters:
       - file: glosario

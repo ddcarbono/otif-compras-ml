@@ -1,0 +1,8 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+airlines: 100000 filas | tasa del positivo 0.156 | entrenamiento 67178, validación 16411, prueba 16411 (tasa 0.173) | efectos de ['UniqueCarrier', 'Origin', 'Dest', 'ruta'] | cortes [0, 15, 30, 60] | periodo periodo
+   XGBoost  AUC validación 0.6547 (mejor de 20) | prueba 0.6371 | F1 0.2117 al umbral 0.221 | {'n_estimators': 475, 'learning_rate': 0.012025181751485953, 'max_depth': 5, 'subsample': 0.9933222028877798, 'colsample_bytree': 0.3581324978846953, 'min_child_weight': 14.540903442447144} | 0.9 min
+   efectos de K3 estimados con 67178 filas; varianzas {'UniqueCarrier': 0.062, 'Origin': 0.072, 'Dest': 0.054, 'ruta': 0.219} | 7.1 min
+   efectos de K3 estimados con 83589 filas; varianzas {'UniqueCarrier': 0.065, 'Origin': 0.063, 'Dest': 0.052, 'ruta': 0.206} | 42.3 min
+   K3       AUC validación 0.6497 (mejor de 20) | prueba 0.6328 | F1 0.3062 al umbral 0.173 | {'learning_rate': 0.010543931320019155, 'num_leaves': 43, 'min_child_samples': 20, 'colsample_bytree': 0.4418387056006285, 'reg_alpha': 0.4830469609132433, 'arboles': 917} | 43.8 min
+   K3 − XGBoost en la prueba: ΔAUC -0.0043 [-0.0086; +0.0008] | DeLong EE 0.0025, p = 0.0880 | ΔF1 +0.0945

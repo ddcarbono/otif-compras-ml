@@ -1,0 +1,13 @@
+{
+  "celda": "prop136",
+  "nombre": "Propuesta 136",
+  "platt": [
+    0.82846982720935,
+    0.0371541114230613
+  ],
+  "umbral": 0.3145165850980288,
+  "auc_validacion": 0.8493,
+  "f1_validacion": 0.6682,
+  "variables_nuevas": [],
+  "xgb_trabajo": null
+}

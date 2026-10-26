@@ -1,6 +1,6 @@
 """Comparacion 2x2 en la prueba 2026 (Daniel, 2026-10-23): modelo {XGBoost ganador de los 112, propuesta original} x
 variables {las 136 del dataset, 136 + nuevas}, mas la ablacion de la propuesta. Separa el aporte del modelo (filas, con la
-misma informacion) del aporte de la informacion (columnas, con el mismo modelo). TERCERA mirada a la prueba 2026:
+misma informacion) del aporte de la informacion (columnas, con el mismo modelo). CUARTA mirada a la prueba 2026 (la tercera fue con LightGBM de aprendiz):
 exploratoria.
 
 Celdas (--celda):
@@ -14,14 +14,20 @@ Celdas (--celda):
                        prometido, estima mu = E[log(1 + plazo real)] (fuera de pliegue por OC al entrenar) y K3 recibe
                        dist_mu y dist_z = (log(1 + plazo prometido + 1,5) - mu) / s, con P(tarde) = 1 - Phi(dist_z) si el
                        plazo fuera log-normal. Es una pieza del modelo (usa las mismas variables), no informacion nueva.
-  k3_nuevas            ablacion: K3 sin el log-normal, con 136 + nuevas. K3 con 136 ya esta medido
-                       (predicciones_prueba_k3.csv, con k3_congelado.json) y se reusa.
+  k3_136, k3_nuevas    ablacion: K3 sin el log-normal, con 136 y con 136 + nuevas.
+Implementacion propia (2026-10-25): BOREAL y el regresor del log-normal son arboles_propios.BoostingHistograma (solo
+numpy), con los hiperparametros congelados de original_congelado.json, PRM_EFECTOS y k3_congelado.json. Las celdas xgb*
+no cambian (XGBoost es el rival, no el modelo propio) y se reusan sus archivos. Los efectos ordenados y los pliegues del
+log-normal se reparten entre procesos (BOREAL_PROCESOS, por defecto 1).
 Variables nuevas: las de variables_nuevas_otif.py que pasaron la regla de mejorar_otif.py (las 32).
 
 Fases:
   --fase validacion --celda C   entrena con 2021-2024, predice 2025, ajusta Platt y el umbral de maximo F1 con toda la
                                 validacion (como modelar_otif.py) y escribe config_2x2/<C>.json. Se commitea antes de la prueba.
-  --fase prueba --celda C       entrena con 2021-2025 y guarda las probabilidades de 2026 en <datos>/2x2/<C>.csv.
+  --fase prueba --celda C       entrena con 2021-2025 y guarda el logit crudo de 2026 en <datos>/2x2/<C>_logit.csv; en
+                                prop_nuevas guarda además las piezas del modelo (<datos>/2x2/prop_nuevas_piezas.joblib,
+                                con las tablas de efectos por código: no se publica) para servir_original.py.
+  --fase platt --celda C        aplica a ese logit el Platt congelado en config_2x2/<C>.json -> <datos>/2x2/<C>.csv.
   --fase comparar               une las celdas y mide en pareja (bootstrap por OC), en toda la prueba y por entidad nueva.
 Las celdas son independientes: se corren en procesos paralelos.
 
@@ -35,7 +41,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import lightgbm as lgb
 from scipy.stats import norm
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
@@ -45,16 +50,22 @@ from sklearn.model_selection import GroupKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, StandardScaler
 
-from modelo_original_otif import CORTE_OBJETIVO, ENTIDADES_RE, PRM_EFECTOS, BoostingMixtoOrdinal, sigmoide
+import multiprocessing as mp
+import os
+
+from arboles_propios import BoostingHistograma, Discretizador
+from modelo_original_otif import (CORTE_OBJETIVO, ENTIDADES_RE, PRM_EFECTOS, BoostingMixtoOrdinal, columnas,
+                                  efectos_ordenados, escalar, sigmoide)
 from otif_comun import cargar, categorias_fijas, codificar_particion, con_intervalo, marcar_nuevos
 
 RUTA = Path(sys.argv[1])
 arg = lambda n, d: type(d)(sys.argv[sys.argv.index(n) + 1]) if n in sys.argv else d
 FASE, CELDA, B = arg("--fase", ""), arg("--celda", ""), arg("--bootstrap", 200)
-CELDAS = ["xgb136", "xgb_nuevas", "prop136", "prop_nuevas", "k3_nuevas"]
-NOMBRE = {"xgb136": "XGBoost 136", "xgb_nuevas": "XGBoost 136 + nuevas", "prop136": "Propuesta 136",
-          "prop_nuevas": "Propuesta 136 + nuevas", "k3_136": "K3 136 (ablación)", "k3_nuevas": "K3 136 + nuevas (ablación)"}
-assert FASE == "comparar" or (FASE in ("validacion", "prueba") and CELDA in CELDAS), "--fase y --celda"
+CELDAS = ["xgb136", "xgb_nuevas", "prop136", "prop_nuevas", "k3_136", "k3_nuevas"]
+NOMBRE = {"xgb136": "XGBoost 136", "xgb_nuevas": "XGBoost 136 + nuevas", "prop136": "BOREAL 136",
+          "prop_nuevas": "BOREAL 136 + nuevas", "k3_136": "Boosting mixto 136 (ablación)",
+          "k3_nuevas": "Boosting mixto 136 + nuevas (ablación)"}
+assert FASE == "comparar" or (FASE in ("validacion", "prueba", "platt") and CELDA in CELDAS), "--fase y --celda"
 AQUI = Path(__file__).parent
 REPO = AQUI.parent  # en la copia de otif-compras-ml/original/, el repositorio es la carpeta de arriba
 DIR_CFG = AQUI / "config_2x2"
@@ -84,7 +95,9 @@ def ece(y, p, tramos=10):
 # --- datos -------------------------------------------------------------------------------------------------------------
 df, numericas, pocas, entidades = cargar(RUTA)
 df["oc_id"] = df.oc_id.astype(str)
-nv = pd.read_parquet(RUTA.with_name("variables_nuevas.parquet")).astype({"oc_id": str})
+# en srvgdai no hay pyarrow: ahí va la copia en csv.gz
+_gz = RUTA.with_name("variables_nuevas.csv.gz")
+nv = (pd.read_csv(_gz) if _gz.exists() else pd.read_parquet(RUTA.with_name("variables_nuevas.parquet"))).astype({"oc_id": str})
 NUEVAS = [c for c in nv.columns if c not in ("oc_id", "posicion")]
 df = df.merge(nv, on=["oc_id", "posicion"], how="left", validate="1:1")
 
@@ -123,18 +136,45 @@ def xgb(e, v, con_nuevas):
     return m.predict(Xv, output_margin=True)
 
 
+_LN = {}
+PIEZAS = {}
+
+
+def _regresion(tarea):
+    """Un ajuste del regresor del plazo: (filas de ajuste, filas a predecir: 'e' + indices o 'v')."""
+    i_a, destino = tarea
+    c = _LN
+    m = BoostingHistograma(n_estimators=escalar(550), semilla=SEMILLA, objetivo="cuadratica", **PRM_EFECTOS)
+    m.fit(c["Te"][:, i_a], c["lt"][i_a], c["cat"])
+    if isinstance(destino, str):
+        return destino, m.predict_raw(c["Tv"]), m
+    return destino, m.predict_raw(c["Te"][:, destino]), None
+
+
 def lognormal(ent, eva, cols):
     """dist_mu y dist_z del modelo log-normal del plazo real, fuera de pliegue por OC en ent (como mejorar_otif.py)."""
     sin_plazo = [c for c in cols if "plazo" not in c and "holgura" not in c and c != "nace_vencida"]
     Xe, Xv = categorias_fijas(ent[sin_plazo], eva[sin_plazo], pocas)
     lt = np.log1p((ent.plazo_habil_al_liberar + ent.dias_retraso).clip(lower=0).to_numpy())
-    reg = lambda X, y, Xa: lgb.LGBMRegressor(n_estimators=550, random_state=SEMILLA, verbose=-1, n_jobs=-1,
-                                             **dict(PRM_EFECTOS, subsample_freq=1)).fit(X, y).predict(Xa)
+    ce, cat = columnas(Xe)
+    disc = Discretizador().fit(ce, cat)
+    _LN.update(Te=disc.transform(ce), Tv=disc.transform(columnas(Xv)[0]), lt=lt, cat=cat)
+    tareas = [(i_a, i_b) for i_a, i_b in GroupKFold(n_splits=3).split(Xe, lt, ent.oc_id)] + [(np.arange(len(lt)), "v")]
+    procesos = int(os.environ.get("BOREAL_PROCESOS", "1"))
+    if procesos > 1 and "fork" in mp.get_all_start_methods():
+        with mp.get_context("fork").Pool(min(procesos, len(tareas))) as pool:
+            resultados = pool.map(_regresion, tareas)
+    else:
+        resultados = map(_regresion, tareas)
     mu_e = np.zeros(len(ent))
-    for i_a, i_b in GroupKFold(n_splits=3).split(Xe, lt, ent.oc_id):
-        mu_e[i_b] = reg(Xe.iloc[i_a], lt[i_a], Xe.iloc[i_b])
-    mu_v = reg(Xe, lt, Xv)
+    for destino, pred, modelo in resultados:
+        if isinstance(destino, str):
+            mu_v, regresor = pred, modelo
+        else:
+            mu_e[destino] = pred
+    _LN.clear()
     s = float(np.std(lt - mu_e))
+    PIEZAS.update(regresor=regresor, disc_ln=disc, s=s, sin_plazo=sin_plazo)
     z = lambda d, mu: (np.log1p(d.plazo_habil_al_liberar.clip(lower=0).to_numpy() + 1.5) - mu) / s
     ze, zv = z(ent, mu_e), z(eva, mu_v)
     anotar(f"   log-normal del plazo: s = {s:.3f}; AUC de 1 - Phi(z) solo en lo predicho "
@@ -155,16 +195,13 @@ def k3(e, v, arboles, con_nuevas, con_dist):
     X = categorias_fijas(ent[cols], ent[cols].iloc[:0], pocas)[0]
     g = {c: ent[c] for c in ENTIDADES_RE}
     y_bin = (ent.dias_retraso.to_numpy() > CORTE_OBJETIVO).astype(int)
-    ordenado = np.zeros(len(ent))
-    for t in sorted(set(sem))[1:]:
-        antes, este = sem < t, sem == t
-        aux = BoostingMixtoOrdinal(cfg_o["prm"], centrar=cfg_o["centrar"])
-        aux._estimar_efectos(X[antes], y_bin[antes], {c: s[antes] for c, s in g.items()}, ent.oc_id[antes], np.zeros(antes.sum()))
-        ordenado[este] = aux.desplazamiento({c: s[este] for c, s in g.items()})
+    ordenado = efectos_ordenados(X, y_bin, {c: s.to_numpy() for c, s in g.items()}, ent.oc_id.to_numpy(), sem,
+                                 cfg_o["prm"], centrar=cfg_o["centrar"], aviso=lambda s: anotar(s + f" | {reloj()}"))
     m = BoostingMixtoOrdinal(cfg_o["prm"], arboles=arboles, monotono=cfg_o["monotono"], centrar=cfg_o["centrar"])
     m.fit(X, ent.dias_retraso, g, ent.oc_id, efectos_ent=ordenado)
     Xv = categorias_fijas(ent[cols], eva[cols], pocas)[1]
     anotar(f"   K3: {len(cols)} columnas, {arboles} árboles | {reloj()}")
+    PIEZAS.update(m=m, cols=cols)
     return m.logit(Xv, {c: eva[c] for c in ENTIDADES_RE})
 
 
@@ -172,7 +209,7 @@ def logit_celda(celda, e, v):
     arboles = cfg_k3["arboles_validacion"] if FASE == "validacion" else int(round(cfg_k3["arboles_validacion"] * 1.15))
     return {"xgb136": lambda: xgb(e, v, False), "xgb_nuevas": lambda: xgb(e, v, True),
             "prop136": lambda: k3(e, v, arboles, False, True), "prop_nuevas": lambda: k3(e, v, arboles, True, True),
-            "k3_nuevas": lambda: k3(e, v, arboles, True, False)}[celda]()
+            "k3_136": lambda: k3(e, v, arboles, False, False), "k3_nuevas": lambda: k3(e, v, arboles, True, False)}[celda]()
 
 
 if FASE == "validacion":
@@ -193,14 +230,28 @@ if FASE == "validacion":
            f"| congelado en config_2x2/{CELDA}.json | {reloj()}")
 
 elif FASE == "prueba":
+    # Entrena con 2021-2025 y guarda el logit crudo de 2026, sin Platt: puede correr en paralelo con la validación,
+    # porque no lee nada de ella. La fase platt aplica después lo congelado en config_2x2/ (solo de 2025).
+    e, v = partir()
+    anotar(f"evaluar_2x2_otif.py --fase prueba --celda {CELDA} | 2021-2025 {e.sum()} -> 2026 {v.sum()} (logit crudo)")
+    z = logit_celda(CELDA, e, v)
+    df.loc[v, ["oc_id", "posicion", "y_tarde"]].assign(z=z).to_csv(DIR_PRED / f"{CELDA}_logit.csv", sep=";", decimal=",",
+                                                                    index=False)
+    if CELDA == "prop_nuevas":
+        import joblib
+        joblib.dump(PIEZAS, DIR_PRED / "prop_nuevas_piezas.joblib", compress=3)
+        anotar("   piezas del modelo en 2x2/prop_nuevas_piezas.joblib (no se publica)")
+    anotar(f"   guardado 2x2/{CELDA}_logit.csv | {reloj()}")
+
+elif FASE == "platt":
     cfg = json.loads((DIR_CFG / f"{CELDA}.json").read_text(encoding="utf-8"))
     assert cfg["variables_nuevas"] in ([], NUEVAS), "las variables nuevas no son las congeladas"
-    e, v = partir()
-    anotar(f"evaluar_2x2_otif.py --fase prueba --celda {CELDA} | TERCERA mirada a 2026, exploratoria | 2021-2025 {e.sum()} -> 2026 {v.sum()}")
     a, b = cfg["platt"]
-    p = sigmoide(a * logit_celda(CELDA, e, v) + b)
-    df.loc[v, ["oc_id", "posicion", "y_tarde"]].assign(p=p).to_csv(DIR_PRED / f"{CELDA}.csv", sep=";", decimal=",", index=False)
-    anotar(f"   guardado 2x2/{CELDA}.csv | {reloj()}")
+    q = pd.read_csv(DIR_PRED / f"{CELDA}_logit.csv", sep=";", decimal=",", dtype={"oc_id": str})
+    q.assign(p=sigmoide(a * q.z.to_numpy() + b)).drop(columns="z").to_csv(DIR_PRED / f"{CELDA}.csv", sep=";", decimal=",",
+                                                                          index=False)
+    anotar(f"evaluar_2x2_otif.py --fase platt --celda {CELDA} | Platt ({a:.3f}, {b:.3f}) de config_2x2/{CELDA}.json "
+           f"-> 2x2/{CELDA}.csv")
 
 else:
     pru = df[df.particion.eq("prueba")][["oc_id", "posicion", "y_tarde"]].reset_index(drop=True)
@@ -211,10 +262,9 @@ else:
     for c in CELDAS:
         p[NOMBRE[c]] = leer(DIR_PRED / f"{c}.csv", "p")
         u[NOMBRE[c]] = json.loads((DIR_CFG / f"{c}.json").read_text(encoding="utf-8"))["umbral"]
-    p[NOMBRE["k3_136"]], u[NOMBRE["k3_136"]] = leer(RUTA.with_name("predicciones_prueba_k3.csv"), "K3 + Platt"), cfg_k3["umbral_f1"]
     p_lgb = leer(RUTA.with_name("predicciones_prueba.csv"), "LightGBM + Platt")
     assert all(np.isfinite(v_).all() for v_ in p.values())
-    anotar(f"evaluar_2x2_otif.py --fase comparar | TERCERA mirada a la prueba 2026, exploratoria | {len(y)} filas (tasa {y.mean():.3f})")
+    anotar(f"evaluar_2x2_otif.py --fase comparar | CUARTA mirada a la prueba 2026 (aprendiz propio), exploratoria | {len(y)} filas (tasa {y.mean():.3f})")
     nuevo, _ = marcar_nuevos(RUTA, df[df.particion.ne("prueba")], df[df.particion.eq("prueba")].reset_index(drop=True), entidades)
     oc = pru.oc_id.to_numpy()
     rng = np.random.default_rng(SEMILLA)

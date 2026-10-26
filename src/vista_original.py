@@ -1,6 +1,6 @@
 """La predicción en vivo con el modelo original, en la pestaña Predicción: el mismo formulario que ``vista_prediccion``
 (campos que más pesan, rango de desarrollo, una posición real que se carga), con posiciones de la prueba 2026 que el
-modelo no vio, la probabilidad del plazo log-normal sola y las contribuciones del LightGBM y de los efectos por entidad."""
+modelo no vio, la probabilidad del plazo log-normal sola y las contribuciones de los árboles y de los efectos por entidad."""
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
@@ -65,7 +65,7 @@ def vista():
         dbc.Row([campo(c) for c in rangos_original().index]),
         dcc.Loading(html.Div(id="o-resultado"), type="default"),
         html.P("Cada barra sube (oro) o baja (verde) el logit de llegar tarde. Las variables son valores SHAP exactos del "
-               "LightGBM en el corte c = 1; los efectos por entidad se suman tal cual. Todo, con el valor base, da el "
+               "boosting propio en el corte c = 1; los efectos por entidad se suman tal cual. Todo, con el valor base, da el "
                "logit que Platt convierte en riesgo.",
                className="small text-muted mt-2"),
     ])

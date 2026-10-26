@@ -1,0 +1,8 @@
+publicos_otif.py | E = 20 por modelo y conjunto | semilla 2026
+
+noshow: 110522 filas | tasa del positivo 0.202 | entrenamiento 66313, validación 22104, prueba 22105 (tasa 0.185) | efectos de ['paciente', 'Neighbourhood'] | cortes [0] | periodo periodo
+   XGBoost  AUC validación 0.7409 (mejor de 20) | prueba 0.7303 | F1 0.4186 al umbral 0.234 | {'n_estimators': 280, 'learning_rate': 0.052472229720495124, 'max_depth': 4, 'subsample': 0.7695420769036487, 'colsample_bytree': 0.9067950524350415, 'min_child_weight': 1.4824425800521899} | 0.6 min
+   efectos de K3 estimados con 66313 filas; varianzas {'paciente': 0.484, 'Neighbourhood': 0.026} | 5.3 min
+   efectos de K3 estimados con 88417 filas; varianzas {'paciente': 0.484, 'Neighbourhood': 0.02} | 34.6 min
+   K3       AUC validación 0.7419 (mejor de 20) | prueba 0.7352 | F1 0.4270 al umbral 0.233 | {'learning_rate': 0.013036111295893866, 'num_leaves': 47, 'min_child_samples': 112, 'colsample_bytree': 0.5967320620409216, 'reg_alpha': 0.10658692445388303, 'arboles': 668} | 35.5 min
+   K3 − XGBoost en la prueba: ΔAUC +0.0049 [+0.0018; +0.0075] | DeLong EE 0.0014, p = 0.0004 | ΔF1 +0.0083

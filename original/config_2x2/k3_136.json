@@ -1,0 +1,13 @@
+{
+  "celda": "k3_136",
+  "nombre": "K3 136 (ablación)",
+  "platt": [
+    0.8866924090393479,
+    0.12114537089295796
+  ],
+  "umbral": 0.32572100594865677,
+  "auc_validacion": 0.8452,
+  "f1_validacion": 0.6619,
+  "variables_nuevas": [],
+  "xgb_trabajo": null
+}

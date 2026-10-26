@@ -64,7 +64,7 @@ tabla(dif.rename(columns={"diferencia": "ΔROC-AUC"}), dec=4)
 # Los intervalos son BCa al 95 % con 1.000 réplicas que remuestrean órdenes completas. XGBoost llega a ROC-AUC 0,848
 # [0,835; 0,860], PR-AUC 0,758 y F1 0,675 a su umbral. Le gana a la logística por 0,023 de AUC [0,017; 0,030] y a la
 # regla del proveedor por 0,18. La propuesta del Entregable 3, que se presenta en el capítulo siguiente, le gana a su
-# vez por 0,012 [0,004; 0,018].
+# vez por 0,011 [0,003; 0,017].
 
 # %%
 cur = pd.read_csv(P / "curvas.csv")
@@ -105,7 +105,7 @@ mostrar(plots.shap_global(sg, NOMBRES))
 # El plazo hábil que le queda al proveedor cuando la orden se libera pesa casi el doble que lo siguiente (0,85 de logit
 # en promedio), y después viene quién provee (0,46, la tasa codificada del proveedor). El resto queda por debajo de 0,13:
 # la promesa en días, la experiencia del proveedor con ese centro, la cuenta contable, los días que tardó la liberación,
-# el material y el creador de la solicitud. Las tres familias de la literatura del capítulo 1 aparecen en ese orden: el
+# el material y el creador de la solicitud. Las tres familias de la literatura del capítulo {doc}`literatura` aparecen en ese orden: el
 # tiempo disponible, el proveedor y el proceso interno.
 #
 # Tres posiciones de 2026 explicadas, las de probabilidad mediana de cada caso (sin códigos de entidad):
@@ -123,10 +123,41 @@ tabla(sl.drop(columns="base"), dec=3)
 # - **Falso positivo** (0,46): el plazo amplio (29 días) baja el riesgo, pero el proveedor, con un retraso medio previo de
 #   11 días, lo sube; esa vez cumplió.
 #
+# ## LIME contra SHAP
+#
+# LIME {cite}`ribeiro2016` explica una predicción de otra forma: genera vecinos de la fila cambiando algunas variables
+# al azar, le pregunta al modelo por cada vecino y ajusta una regresión lineal ponderada por cercanía; sus coeficientes
+# son la explicación. No es exacto ni único: depende del muestreo y de cómo se define el vecino. Se calculó en el espacio
+# de las variables originales (cada categórica y cada entidad como una variable, cada numérica por cuartiles con un
+# tramo propio para el vacío), con 3.000 vecinos, en las tres posiciones de arriba y en 200 de 2026 al azar
+# (`src/lime_xgb.py`). SHAP está en la escala del logit y LIME en la de la probabilidad: se comparan el orden y el signo,
+# no el tamaño.
+
+# %%
+la = pd.read_csv(P / "lime_acuerdo.csv")
+tabla(la, dec=2)
+le = pd.read_csv(P / "lime_estabilidad.csv")
+tabla(le)
+
+# %% [markdown]
+# - **Coinciden en lo grueso.** De las cinco variables principales de SHAP, LIME les da el mismo signo a 4,3 en promedio,
+#   y las dos explicaciones comparten 2 de sus 5 principales (entre 2 y 3 en la mitad central de las posiciones). En las
+#   tres posiciones de arriba, LIME también pone primero el plazo al liberar y el proveedor cuando SHAP lo hace.
+# - **Fuera de las primeras, no.** La correlación de rangos sobre todas las variables es 0,16: en las variables que
+#   pesan poco, el orden de LIME es casi ruido.
+# - **LIME cambia con la semilla.** Con cinco semillas en la misma posición, solo 0 a 2 de sus cinco principales se
+#   repiten siempre, y entre 9 y 15 variables distintas pasan por ese grupo. SHAP de árbol es exacto y da siempre lo mismo.
+# - **Con entidades de miles de niveles, LIME no distingue.** Un vecino casi nunca cae en el mismo proveedor o material
+#   que la fila, así que esas variables valen «igual a la fila» solo en la fila misma y LIME les reparte el mismo peso
+#   (en el falso negativo, proveedor, solicitante y material reciben −0,044 los tres).
+#
+# Por eso el tablero y este libro explican con SHAP: es exacto para árboles, estable y suma el logit. LIME queda como
+# contraste, útil para confirmar el signo de lo principal.
+#
 # ## Qué deja este capítulo
 #
 # XGBoost, elegido en la validación, da en 2026 ROC-AUC 0,848 [0,835; 0,860], F1 0,675 y ECE 0,022 con Platt. No cae de
 # la validación a la prueba. Le gana a la logística por 0,023 de AUC, y lo que la logística ofrece en
 # legibilidad lo dan los valores SHAP. Donde más falla es en las órdenes con entidades nuevas (AUC 0,821) y en
 # ganadería. El tablero sirve este modelo en la predicción en vivo. La propuesta del capítulo siguiente le gana por
-# 0,012.
+# 0,011.
