@@ -1,0 +1,1068 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>4. Tiempo, fuga y preprocesamiento &#8212; Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="_static/translations.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '02c_tiempo_y_fuga';</script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="5. Modelo base: regresión logística" href="03a_modelo_base.html" />
+    <link rel="prev" title="3. Análisis exploratorio" href="02b_eda.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Trazabilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_correcciones.html">1. Correcciones del Entregable 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datos y análisis exploratorio</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a_datos.html">2. Los datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b_eda.html">3. Análisis exploratorio</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. Tiempo, fuga y preprocesamiento</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelos de referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03a_modelo_base.html">5. Modelo base: regresión logística</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b_112_combinaciones.html">6. Las 112 combinaciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03d_mejor_modelo.html">7. El mejor modelo en la prueba 2026</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03c_fundamentos.html">8. Fundamentos: XGBoost y el costo de cada modelo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Literatura y novedad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="literatura.html">9. Literatura</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_novedad.html">10. Literatura y novedad del modelo original</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelo original</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="05_modelo_original.html">11. Modelo original: efectos por entidad, plazo log-normal y plazo real</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_validacion.html">12. La propuesta en otros datos</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tablero, conclusiones y reproducibilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_tablero.html">13. El tablero y su despliegue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">14. Conclusiones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_reproducibilidad.html">15. Reproducibilidad</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="glosario.html">16. Glosario</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/02c_tiempo_y_fuga.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Tiempo, fuga y preprocesamiento</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#componente-temporal">4.1. Componente temporal</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#la-variable-de-tiempo">4.1.1. La variable de tiempo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#serie-tendencia-y-estacionalidad">4.1.2. Serie, tendencia y estacionalidad</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estacionariedad-y-dependencia">4.1.3. Estacionariedad y dependencia</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deriva-entre-periodos">4.1.4. Deriva entre periodos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validacion-adversaria">4.1.5. Validación adversaria</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#componente-espacial">4.2. Componente espacial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#auditoria-de-fuga">4.3. Auditoría de fuga</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocesamiento-dentro-del-pipeline">4.4. Preprocesamiento dentro del pipeline</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="tiempo-fuga-y-preprocesamiento">
+<h1><span class="section-number">4. </span>Tiempo, fuga y preprocesamiento<a class="headerlink" href="#tiempo-fuga-y-preprocesamiento" title="Permalink to this heading">#</a></h1>
+<section id="componente-temporal">
+<h2><span class="section-number">4.1. </span>Componente temporal<a class="headerlink" href="#componente-temporal" title="Permalink to this heading">#</a></h2>
+<section id="la-variable-de-tiempo">
+<h3><span class="section-number">4.1.1. </span>La variable de tiempo<a class="headerlink" href="#la-variable-de-tiempo" title="Permalink to this heading">#</a></h3>
+<p>La fecha de referencia es la de creación de la orden (<code class="docutils literal notranslate"><span class="pre">fecha_pedido</span></code>), que define la partición. Es una fecha sin
+hora ni zona horaria, con órdenes en días irregulares.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tabla</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">huecos</span><span class="p">(</span><span class="n">ent</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_214fb">
+  <thead>
+    <tr>
+      <th id="T_214fb_level0_col0" class="col_heading level0 col0" >medida</th>
+      <th id="T_214fb_level0_col1" class="col_heading level0 col1" >valor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_214fb_row0_col0" class="data row0 col0" >primera fecha</td>
+      <td id="T_214fb_row0_col1" class="data row0 col1" >2021-01-04</td>
+    </tr>
+    <tr>
+      <td id="T_214fb_row1_col0" class="data row1 col0" >última fecha</td>
+      <td id="T_214fb_row1_col1" class="data row1 col1" >2024-12-31</td>
+    </tr>
+    <tr>
+      <td id="T_214fb_row2_col0" class="data row2 col0" >días del periodo</td>
+      <td id="T_214fb_row2_col1" class="data row2 col1" >1458</td>
+    </tr>
+    <tr>
+      <td id="T_214fb_row3_col0" class="data row3 col0" >días con órdenes</td>
+      <td id="T_214fb_row3_col1" class="data row3 col1" >1356</td>
+    </tr>
+    <tr>
+      <td id="T_214fb_row4_col0" class="data row4 col0" >días hábiles (lun-vie) sin órdenes</td>
+      <td id="T_214fb_row4_col1" class="data row4 col1" >15</td>
+    </tr>
+    <tr>
+      <td id="T_214fb_row5_col0" class="data row5 col0" >semanas sin órdenes</td>
+      <td id="T_214fb_row5_col1" class="data row5 col1" >0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>El entrenamiento cubre del 4 de enero de 2021 al 31 de diciembre de 2024 sin semanas vacías. Los días sin órdenes son
+fines de semana y festivos, salvo 15 días hábiles (cierres de fin de año y puentes). No hay fechas duplicadas que
+corregir: varias órdenes por día es lo normal. La frecuencia natural para la serie es el mes (48 puntos).</p>
+</section>
+<section id="serie-tendencia-y-estacionalidad">
+<h3><span class="section-number">4.1.2. </span>Serie, tendencia y estacionalidad<a class="headerlink" href="#serie-tendencia-y-estacionalidad" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mensual</span> <span class="o">=</span> <span class="n">guardar</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">serie</span><span class="p">(</span><span class="n">ent</span><span class="p">),</span> <span class="s2">&quot;serie_mensual&quot;</span><span class="p">)</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">serie_tasa</span><span class="p">(</span><span class="n">mensual</span><span class="p">))</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">serie_tasa</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">serie</span><span class="p">(</span><span class="n">ent</span><span class="p">,</span> <span class="n">por</span><span class="o">=</span><span class="s2">&quot;linea&quot;</span><span class="p">),</span> <span class="s2">&quot;Tasa de tarde por mes y línea de negocio&quot;</span><span class="p">,</span> <span class="n">color_por</span><span class="o">=</span><span class="s2">&quot;linea&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>                            <div id="a68f4b1d-13fb-49a5-a76a-f539e00c2b87" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("a68f4b1d-13fb-49a5-a76a-f539e00c2b87")) {                    Plotly.newPlot(                        "a68f4b1d-13fb-49a5-a76a-f539e00c2b87",                        [{"marker":{"color":"#DCE3EA"},"name":"posiciones","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[3737,5356,4887,4082,4588,4434,4963,5025,5165,5150,5658,4171,4222,5906,6915,5921,5303,4751,5538,6000,5656,5762,6142,4571,5513,6293,7664,5727,6438,5915,5718,6739,6708,6649,6405,4445,5174,7856,6189,6302,5921,5223,6467,6131,7011,6289,5742,4969],"type":"bar","xaxis":"x","yaxis":"y2"},{"line":{"color":"#B08A2D"},"marker":{"size":4},"mode":"lines+markers","name":"tasa de tarde","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.3130853625903131,0.3330843913368185,0.4221403724166155,0.4017638412542871,0.3971229293809939,0.4488046910239062,0.42111626032641547,0.4893532338308458,0.4505324298160697,0.527378640776699,0.4174620007069636,0.48189882522176936,0.38370440549502605,0.45733152726041315,0.5077368040491684,0.4590440803918257,0.44880256458608336,0.37928857082719425,0.2739256049115204,0.309,0.34105374823196605,0.30076362374175636,0.271572777596874,0.28221395755852113,0.24777797932160348,0.28968695375814396,0.34394572025052195,0.23956696350619872,0.23547685616651134,0.20642434488588335,0.3116474291710388,0.2556759163080576,0.24403697078115683,0.2588359151752143,0.3046057767369243,0.2692913385826772,0.2189795129493622,0.2983706720977597,0.3123283244465988,0.366232941923199,0.2916737037662557,0.29312655561937584,0.27880006185248185,0.37090197357690424,0.31322207958921694,0.3730322785816505,0.3065134099616858,0.3415174079291608],"type":"scatter","xaxis":"x","yaxis":"y"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"xaxis":{"anchor":"y","domain":[0.0,0.94],"title":{"text":"mes de creaci\u00f3n de la orden"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"tasa de tarde"},"tickformat":".0%","rangemode":"tozero"},"yaxis2":{"anchor":"x","overlaying":"y","side":"right","title":{"text":"posiciones"},"showgrid":false},"title":{"text":"Tasa de tarde y volumen por mes"}},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div><div class="output text_html"><div>                            <div id="45b0e2d9-87e8-4181-803f-3ce66e2264a0" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("45b0e2d9-87e8-4181-803f-3ce66e2264a0")) {                    Plotly.newPlot(                        "45b0e2d9-87e8-4181-803f-3ce66e2264a0",                        [{"line":{"color":"#405731"},"mode":"lines","name":"banano","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.22039473684210525,0.15633423180592992,0.4666666666666667,0.47468354430379744,0.3225058004640371,0.553030303030303,0.4549019607843137,0.44879518072289154,0.28863636363636364,0.6633663366336634,0.40634920634920635,0.5215605749486653,0.34459459459459457,0.37280701754385964,0.7430249632892805,0.717948717948718,0.416289592760181,0.3794466403162055,0.08901515151515152,0.14526315789473684,0.15839694656488548,0.04380952380952381,0.06973684210526315,0.053452115812917596,0.20588235294117646,0.19805825242718447,0.33093525179856115,0.12448132780082988,0.07391304347826087,0.18209876543209877,0.16666666666666666,0.12371134020618557,0.1978319783197832,0.2167689161554192,0.30619469026548674,0.2905263157894737,0.09326424870466321,0.1977491961414791,0.18287373004354138,0.14799154334038056,0.141399416909621,0.27533460803059273,0.20833333333333334,0.17114914425427874,0.11909262759924386,0.2265625,0.15853658536585366,0.09181141439205956],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#B08A2D"},"mode":"lines","name":"ganaderia","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.2,0.1134020618556701,0.8247422680412371,0.22666666666666666,0.9090909090909091,0.7457627118644068,0.9324324324324325,0.46153846153846156,0.944,0.4032258064516129,0.4827586206896552,0.4,0.8289473684210527,0.8774193548387097,0.7360594795539034,0.8636363636363636,0.11538461538461539,0.1388888888888889,0.2903225806451613,0.05202312138728324,0.013513513513513514,0.020134228187919462,0.0,0.13736263736263737,0.7307692307692307,0.044642857142857144,0.018691588785046728,0.336,0.037383177570093455,0.17699115044247787,0.1864406779661017,0.005405405405405406,0.27586206896551724,0.017543859649122806,0.024691358024691357,0.0851063829787234,0.0,0.12162162162162163,0.0898876404494382,0.018518518518518517,0.17380352644836272,0.05128205128205128,0.034013605442176874,0.029411764705882353,0.16666666666666666,0.0,0.012048192771084338,0.1590909090909091],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#3F6F8F"},"mode":"lines","name":"industrial","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.46788990825688076,0.3851540616246499,0.39331619537275064,0.5,0.44850948509485095,0.5891238670694864,0.48655569782330343,0.4560260586319218,0.4772727272727273,0.37801204819277107,0.41235955056179774,0.5496277915632755,0.36925795053003535,0.3763440860215054,0.5478547854785478,0.41230257689110555,0.542016806722689,0.4125122189638319,0.4637134778510839,0.37727759914255093,0.4381395348837209,0.48677248677248675,0.5268935236004391,0.4643765903307888,0.23311546840958605,0.4855555555555556,0.5825169555388093,0.26556420233463035,0.30360721442885774,0.3340987370838117,0.38666666666666666,0.42524916943521596,0.33661417322834647,0.31754874651810583,0.2876557191392978,0.3297587131367292,0.38685015290519875,0.3492706645056726,0.4211123723041998,0.35684298908480266,0.3462986198243413,0.38922155688622756,0.40899795501022496,0.3197573656845754,0.40165289256198344,0.4513947590870668,0.34857849196538937,0.5449804432855281],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#6B6B6B"},"mode":"lines","name":"palma","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.33193570929419985,0.4945626477541371,0.5669831223628692,0.3697089947089947,0.43380855397148677,0.4168908015061861,0.34637964774951074,0.47266881028938906,0.4053497942386831,0.483054892601432,0.3800253914515446,0.3809128630705394,0.3249400479616307,0.49106344950848974,0.466483731869855,0.44339622641509435,0.3371134020618557,0.35563380281690143,0.2876239758516602,0.3276863504356244,0.32677165354330706,0.31594634873323396,0.2644959857270294,0.3553546592489569,0.2574345317354638,0.36079545454545453,0.3537077257213776,0.2522382249902686,0.28058912386706947,0.22054263565891472,0.3291623218630518,0.29764453961456105,0.27084680025856495,0.30298637286169905,0.3083417764268828,0.3849080532656944,0.287109375,0.33300174086048245,0.3728343728343728,0.43024457457802273,0.4408866995073892,0.30797266514806376,0.36860068259385664,0.47785141262643877,0.33210896847260485,0.4696235557212076,0.37305161066851406,0.3152122079160706],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#7A5526"},"mode":"lines","name":"puerto","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.7170542635658915,0.5918367346938775,0.5431034482758621,0.38308457711442784,0.0759493670886076,0.2768361581920904,0.5059523809523809,0.5106382978723404,0.3900414937759336,0.38028169014084506,0.26436781609195403,0.16568047337278108,0.32038834951456313,0.4745762711864407,0.47,0.16055045871559634,0.3728813559322034,0.4069264069264069,0.2753623188405797,0.24311926605504589,0.33884297520661155,0.10179640718562874,0.37423312883435583,0.22966507177033493,0.3991031390134529,0.3423728813559322,0.240625,0.45664739884393063,0.4618834080717489,0.2109375,0.42857142857142855,0.3069306930693069,0.28343949044585987,0.20245398773006135,0.3,0.12796208530805686,0.2905027932960894,0.48307692307692307,0.5434782608695652,0.4031620553359684,0.23790322580645162,0.48823529411764705,0.41025641025641024,0.4954128440366973,0.5050505050505051,0.4372093023255814,0.5483870967741935,0.4387755102040816],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#405731"},"mode":"lines","name":"transporte","x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.15568862275449102,0.1372657111356119,0.20723684210526316,0.3858858858858859,0.36705882352941177,0.40046838407494145,0.4444444444444444,0.5290284360189573,0.5072830905636478,0.6302570093457944,0.48171701112877585,0.5512129380053908,0.43103448275862066,0.43995633187772926,0.4290709290709291,0.44015444015444016,0.5477445811364968,0.3849734042553192,0.1734019103600294,0.3491335372069317,0.3736318407960199,0.30259806418746815,0.24616171954964175,0.21035169210351692,0.22929936305732485,0.1439960139511709,0.20783132530120482,0.1622769753610875,0.18498498498498497,0.11679336558396683,0.249500998003992,0.13718820861678005,0.13286713286713286,0.14222549742078114,0.3515981735159817,0.1259899208063355,0.10934744268077601,0.18326693227091634,0.1476608187134503,0.3228291316526611,0.11201179071481208,0.2335483870967742,0.12265585402939685,0.24568668046928915,0.26408237431859477,0.20880587058038694,0.16188197767145135,0.34497816593886466],"type":"scatter","xaxis":"x","yaxis":"y"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"xaxis":{"anchor":"y","domain":[0.0,0.94],"title":{"text":"mes de creaci\u00f3n de la orden"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"tasa de tarde"},"tickformat":".0%","rangemode":"tozero"},"yaxis2":{"anchor":"x","overlaying":"y","side":"right","title":{"text":"posiciones"},"showgrid":false},"title":{"text":"Tasa de tarde por mes y l\u00ednea de negocio"}},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div></div>
+</div>
+<p>El volumen crece de unas 4.800 posiciones al mes en 2021 a unas 6.100 en 2023-2024, y la tasa de tarde cae en el mismo
+periodo. De 2021 a 2023 bajan todas las líneas de negocio, así que el cambio fue del proceso de compras y no de una
+sola línea. En 2024 se separan: palma (de 30,0 % a 37,7 %) y puerto (de 31,7 % a 44,3 %) vuelven a subir, mientras
+banano, ganadería y transporte siguen bajando, e industrial se queda alrededor del 39 %. Por eso la línea entra como
+predictora y la deriva se vigila por línea.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">guardar</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">descomponer</span><span class="p">(</span><span class="n">mensual</span><span class="p">),</span> <span class="s2">&quot;stl&quot;</span><span class="p">)</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">stl</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>                            <div id="8de72ed2-5e15-4fb2-b37e-3ba710812f2b" class="plotly-graph-div" style="height:620px; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("8de72ed2-5e15-4fb2-b37e-3ba710812f2b")) {                    Plotly.newPlot(                        "8de72ed2-5e15-4fb2-b37e-3ba710812f2b",                        [{"line":{"color":"#B08A2D"},"mode":"lines","showlegend":false,"x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.3130853625903131,0.3330843913368185,0.4221403724166155,0.4017638412542871,0.3971229293809939,0.4488046910239062,0.42111626032641547,0.4893532338308458,0.4505324298160697,0.527378640776699,0.4174620007069636,0.48189882522176936,0.38370440549502605,0.45733152726041315,0.5077368040491684,0.4590440803918257,0.44880256458608336,0.37928857082719425,0.2739256049115204,0.309,0.34105374823196605,0.30076362374175636,0.271572777596874,0.28221395755852113,0.24777797932160348,0.28968695375814396,0.34394572025052195,0.23956696350619872,0.23547685616651134,0.20642434488588335,0.3116474291710388,0.2556759163080576,0.24403697078115683,0.2588359151752143,0.3046057767369243,0.2692913385826772,0.2189795129493622,0.2983706720977597,0.3123283244465988,0.366232941923199,0.2916737037662557,0.29312655561937584,0.27880006185248185,0.37090197357690424,0.31322207958921694,0.3730322785816505,0.3065134099616858,0.3415174079291608],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#3F6F8F"},"mode":"lines","showlegend":false,"x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[0.4538248571486494,0.449576449410637,0.4453075613751733,0.44101450187961555,0.43669320308474885,0.4323384858127391,0.42794341042969913,0.42349897272037473,0.418992077698141,0.41439664096781587,0.4096447566937976,0.4046265429059215,0.3985428844012242,0.39218235896164044,0.385838961685615,0.38029959810350183,0.37582495739452876,0.3716805544798523,0.3670742155487211,0.36195081520792455,0.35672336221143675,0.3523512690764799,0.3490941352803866,0.3462857585111271,0.34377207270387117,0.34154895502630483,0.3394274692585982,0.3368868731312639,0.3339575427140581,0.3310480398835792,0.3283203246378432,0.3257532024917979,0.3233833288427063,0.32104481954348896,0.3183946177065634,0.3153918904663733,0.3129585911228774,0.3126767023856916,0.31342787733210736,0.31476755985141947,0.3164285201918827,0.31829196990779157,0.32030125084486677,0.32242704458379023,0.32465393644857826,0.32697191746018817,0.3293721128216803,0.33184591387915885],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"line":{"color":"#405731"},"mode":"lines","showlegend":false,"x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[-0.13950627807993043,-0.11672146149094467,-0.022079693554553265,-0.03936756423446189,-0.03976269533874479,0.017976543834114924,-0.005867126862229911,0.06546094013411552,0.022083406596765404,0.11248545643445089,0.00777863375642894,0.0766147155669355,-0.11863421479288394,-0.08194745100517872,-0.009624637321702155,-0.008045222136415078,-0.03404499205776677,0.005256633886444817,-0.01315118155254595,0.05942195442486773,0.004212885165467477,0.08917826965021634,-0.002394908432535857,0.05188357981010408,-0.09991073446145286,-0.04645785698520282,0.0006790553634426215,0.02351115779115604,-0.028066995534042707,-0.008420690293760424,-0.02298355435448424,0.05370570223670426,-0.007985174432001176,0.06622431183693499,-0.01324279967909597,0.027895911106580365,-0.0837779788316919,-0.00987064971153154,0.00834881925393717,0.05547062347328065,-0.021682269841778876,-0.02261931831227472,-0.03542822837812117,0.04841404297923141,-0.014810605245510986,0.04370695183643172,-0.02468838943282762,0.004471322832403195],"type":"scatter","xaxis":"x3","yaxis":"y3"},{"line":{"color":"#6B6B6B"},"mode":"lines","showlegend":false,"x":["2021-01-01T00:00:00","2021-02-01T00:00:00","2021-03-01T00:00:00","2021-04-01T00:00:00","2021-05-01T00:00:00","2021-06-01T00:00:00","2021-07-01T00:00:00","2021-08-01T00:00:00","2021-09-01T00:00:00","2021-10-01T00:00:00","2021-11-01T00:00:00","2021-12-01T00:00:00","2022-01-01T00:00:00","2022-02-01T00:00:00","2022-03-01T00:00:00","2022-04-01T00:00:00","2022-05-01T00:00:00","2022-06-01T00:00:00","2022-07-01T00:00:00","2022-08-01T00:00:00","2022-09-01T00:00:00","2022-10-01T00:00:00","2022-11-01T00:00:00","2022-12-01T00:00:00","2023-01-01T00:00:00","2023-02-01T00:00:00","2023-03-01T00:00:00","2023-04-01T00:00:00","2023-05-01T00:00:00","2023-06-01T00:00:00","2023-07-01T00:00:00","2023-08-01T00:00:00","2023-09-01T00:00:00","2023-10-01T00:00:00","2023-11-01T00:00:00","2023-12-01T00:00:00","2024-01-01T00:00:00","2024-02-01T00:00:00","2024-03-01T00:00:00","2024-04-01T00:00:00","2024-05-01T00:00:00","2024-06-01T00:00:00","2024-07-01T00:00:00","2024-08-01T00:00:00","2024-09-01T00:00:00","2024-10-01T00:00:00","2024-11-01T00:00:00","2024-12-01T00:00:00"],"y":[-0.001233216478405852,0.00022940341712618384,-0.001087495404004546,0.00011690360913341191,0.00019242163498983667,-0.0015103386229478044,-0.0009600232410537646,0.00039332097635552676,0.009456945521163329,0.0004965433744322789,3.8610256737070525e-05,0.0006575667489123749,0.10379573588668578,0.14709661930395146,0.1315224796852556,0.08678970442473893,0.10702259924932139,0.0023513824608971112,-0.07999742908465474,-0.11237276963279227,-0.01988249914493817,-0.1407659149849399,-0.07512644925097672,-0.11595538076271003,0.003916641079185157,-0.0054041442829580455,0.003839195628481118,-0.12083106741622124,-0.07041369101350403,-0.11620300470393546,0.006310658887679843,-0.12378298842044458,-0.0713611836295483,-0.12843321620520964,-0.0005460412905431422,-0.07399646299027646,-0.010201099341823283,-0.004435380576400361,-0.009448372139445715,-0.004005241401501103,-0.003072546583848146,-0.0025460959761410273,-0.006072960614263767,6.088601388259951e-05,0.0033787483861496548,0.0023534092850305832,0.0018296865728331668,0.005200171217598748],"type":"scatter","xaxis":"x4","yaxis":"y4"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"matches":"x4","showticklabels":false},"yaxis":{"anchor":"x","domain":[0.78,1.0]},"xaxis2":{"anchor":"y2","domain":[0.0,1.0],"matches":"x4","showticklabels":false},"yaxis2":{"anchor":"x2","domain":[0.52,0.74]},"xaxis3":{"anchor":"y3","domain":[0.0,1.0],"matches":"x4","showticklabels":false},"yaxis3":{"anchor":"x3","domain":[0.26,0.48]},"xaxis4":{"anchor":"y4","domain":[0.0,1.0]},"yaxis4":{"anchor":"x4","domain":[0.0,0.22]},"annotations":[{"font":{"size":16},"showarrow":false,"text":"observada","x":0.5,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"tendencia","x":0.5,"xanchor":"center","xref":"paper","y":0.74,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"estacionalidad","x":0.5,"xanchor":"center","xref":"paper","y":0.48,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"residuo","x":0.5,"xanchor":"center","xref":"paper","y":0.22,"yanchor":"bottom","yref":"paper"}],"title":{"text":"Descomposici\u00f3n STL de la tasa mensual de tarde"},"height":620},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mes</span> <span class="o">=</span> <span class="n">eda</span><span class="o">.</span><span class="n">tasa_por_grupo</span><span class="p">(</span><span class="n">ent</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">mes_n</span><span class="o">=</span><span class="n">ent</span><span class="o">.</span><span class="n">fecha_pedido</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span><span class="p">),</span> <span class="s2">&quot;mes_n&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;mes_n&quot;</span><span class="p">)</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">objetivo_por</span><span class="p">(</span><span class="n">mes</span><span class="p">,</span> <span class="s2">&quot;mes_n&quot;</span><span class="p">,</span> <span class="s2">&quot;Tasa de tarde por mes de creación&quot;</span><span class="p">,</span> <span class="s2">&quot;mes&quot;</span><span class="p">))</span>
+<span class="n">dia</span> <span class="o">=</span> <span class="n">eda</span><span class="o">.</span><span class="n">tasa_por_grupo</span><span class="p">(</span><span class="n">ent</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">dia</span><span class="o">=</span><span class="n">ent</span><span class="o">.</span><span class="n">fecha_prometida</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofweek</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;lun&quot;</span><span class="p">,</span> <span class="s2">&quot;mar&quot;</span><span class="p">,</span> <span class="s2">&quot;mié&quot;</span><span class="p">,</span> <span class="s2">&quot;jue&quot;</span><span class="p">,</span> <span class="s2">&quot;vie&quot;</span><span class="p">,</span> <span class="s2">&quot;sáb&quot;</span><span class="p">,</span> <span class="s2">&quot;dom&quot;</span><span class="p">])))),</span> <span class="s2">&quot;dia&quot;</span><span class="p">)</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">objetivo_por</span><span class="p">(</span><span class="n">dia</span><span class="p">,</span> <span class="s2">&quot;dia&quot;</span><span class="p">,</span> <span class="s2">&quot;Tasa de tarde por día de la semana de la fecha prometida&quot;</span><span class="p">,</span> <span class="s2">&quot;día&quot;</span><span class="p">,</span>
+                           <span class="n">orden</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lun&quot;</span><span class="p">,</span> <span class="s2">&quot;mar&quot;</span><span class="p">,</span> <span class="s2">&quot;mié&quot;</span><span class="p">,</span> <span class="s2">&quot;jue&quot;</span><span class="p">,</span> <span class="s2">&quot;vie&quot;</span><span class="p">,</span> <span class="s2">&quot;sáb&quot;</span><span class="p">,</span> <span class="s2">&quot;dom&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>                            <div id="e7830aed-697d-4996-af47-f057c9ece5b1" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("e7830aed-697d-4996-af47-f057c9ece5b1")) {                    Plotly.newPlot(                        "e7830aed-697d-4996-af47-f057c9ece5b1",                        [{"customdata":[18646,25411,25655,22032,22250,20323,22686,23895,24540,23850,23947,18156],"hovertemplate":"%{x}\u003cbr\u003etasa de tarde %{y:.1%}\u003cbr\u003e%{customdata:,} posiciones\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#B08A2D"},"text":["28,4 %","34,0 %","39,5 %","36,5 %","33,5 %","32,2 %","31,7 %","34,8 %","33,0 %","35,7 %","32,3 %","34,1 %"],"textposition":"outside","x":["1","2","3","4","5","6","7","8","9","10","11","12"],"y":[0.2836533304730237,0.34048246822242334,0.3953615279672578,0.36483297022512706,0.3346067415730337,0.32199970476799683,0.31702371506656085,0.3477715003138732,0.3296251018744906,0.35706498951781973,0.3232555226124358,0.3411544393038114],"type":"bar"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"shapes":[{"line":{"color":"#6B6B6B","dash":"dot"},"type":"line","x0":0,"x1":1,"xref":"x domain","y0":0.3395580546149283,"y1":0.3395580546149283,"yref":"y"}],"annotations":[{"showarrow":false,"text":"global 34,0 %","x":0,"xanchor":"left","xref":"x domain","y":0.3395580546149283,"yanchor":"bottom","yref":"y"}],"yaxis":{"title":{"text":"tasa de tarde"},"tickformat":".0%","range":[0,0.47443383356070934]},"title":{"text":"Tasa de tarde por mes de creaci\u00f3n"},"xaxis":{"title":{"text":"mes"}}},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div><div class="output text_html"><div>                            <div id="5bb865cc-f342-42bf-bdf6-50fa1259b322" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("5bb865cc-f342-42bf-bdf6-50fa1259b322")) {                    Plotly.newPlot(                        "5bb865cc-f342-42bf-bdf6-50fa1259b322",                        [{"customdata":[36177,43613,35683,36225,49579,38221,31893],"hovertemplate":"%{x}\u003cbr\u003etasa de tarde %{y:.1%}\u003cbr\u003e%{customdata:,} posiciones\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#B08A2D"},"text":["37,2 %","32,8 %","34,1 %","34,3 %","34,7 %","32,3 %","32,2 %"],"textposition":"outside","x":["lun","mar","mi\u00e9","jue","vie","s\u00e1b","dom"],"y":[0.3715620421814965,0.328227821979685,0.34072247288624835,0.34263630089717045,0.3473446418846689,0.32285916119410796,0.32185746088483363],"type":"bar"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"shapes":[{"line":{"color":"#6B6B6B","dash":"dot"},"type":"line","x0":0,"x1":1,"xref":"x domain","y0":0.3395580546149283,"y1":0.3395580546149283,"yref":"y"}],"annotations":[{"showarrow":false,"text":"global 34,0 %","x":0,"xanchor":"left","xref":"x domain","y":0.3395580546149283,"yanchor":"bottom","yref":"y"}],"yaxis":{"title":{"text":"tasa de tarde"},"tickformat":".0%","range":[0,0.4458744506177958]},"title":{"text":"Tasa de tarde por d\u00eda de la semana de la fecha prometida"},"xaxis":{"title":{"text":"d\u00eda"}}},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div></div>
+</div>
+<p>La descomposición STL (tendencia con suavizado local, estacionalidad de periodo 12 y residuo, en su versión robusta a
+atípicos) separa dos cosas:</p>
+<ul class="simple">
+<li><p><strong>Tendencia:</strong> de 45,4 % a comienzos de 2021 a 34,4 % en enero de 2023, y estable desde entonces (33,2 % a final
+de 2024). Es el cambio de régimen que ya mostraba la tasa por año.</p></li>
+<li><p><strong>Estacionalidad:</strong> enero está 11 puntos por debajo de la tendencia y octubre, 8 por encima. Por mes de creación,
+la tasa va de 28,4 % (enero) a 39,5 % (marzo). Por día de la semana de la fecha prometida, los lunes llegan tarde más
+(37,2 %) que el resto (32 % a 35 %): una entrega prometida para el lunes tiene el fin de semana en contra, aunque el
+retraso se cuente en días hábiles. El mes y el día de la semana entran como predictoras.</p></li>
+</ul>
+</section>
+<section id="estacionariedad-y-dependencia">
+<h3><span class="section-number">4.1.3. </span>Estacionariedad y dependencia<a class="headerlink" href="#estacionariedad-y-dependencia" title="Permalink to this heading">#</a></h3>
+<p>ADF tiene como hipótesis nula una raíz unitaria (la serie no vuelve a su media); KPSS, que la serie es estacionaria.
+Se leen juntas: si ADF no rechaza y KPSS sí, la serie no es estacionaria.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tabla</span><span class="p">(</span><span class="n">guardar</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">estacionariedad</span><span class="p">(</span><span class="n">mensual</span><span class="o">.</span><span class="n">tasa</span><span class="p">),</span> <span class="s2">&quot;estacionariedad&quot;</span><span class="p">),</span> <span class="n">dec</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_00267">
+  <thead>
+    <tr>
+      <th id="T_00267_level0_col0" class="col_heading level0 col0" >prueba</th>
+      <th id="T_00267_level0_col1" class="col_heading level0 col1" >H0</th>
+      <th id="T_00267_level0_col2" class="col_heading level0 col2" >estadístico</th>
+      <th id="T_00267_level0_col3" class="col_heading level0 col3" >p</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_00267_row0_col0" class="data row0 col0" >ADF</td>
+      <td id="T_00267_row0_col1" class="data row0 col1" >raíz unitaria</td>
+      <td id="T_00267_row0_col2" class="data row0 col2" >-1,139</td>
+      <td id="T_00267_row0_col3" class="data row0 col3" >0,699</td>
+    </tr>
+    <tr>
+      <td id="T_00267_row1_col0" class="data row1 col0" >KPSS</td>
+      <td id="T_00267_row1_col1" class="data row1 col1" >estacionaria</td>
+      <td id="T_00267_row1_col2" class="data row1 col2" >0,570</td>
+      <td id="T_00267_row1_col3" class="data row1 col3" >0,026</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">guardar</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">autocorrelacion</span><span class="p">(</span><span class="n">mensual</span><span class="o">.</span><span class="n">tasa</span><span class="p">),</span> <span class="s2">&quot;acf&quot;</span><span class="p">)</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">acf_pacf</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>                            <div id="a0b15ff2-41ef-421d-b9b4-6074d27ce097" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("a0b15ff2-41ef-421d-b9b4-6074d27ce097")) {                    Plotly.newPlot(                        "a0b15ff2-41ef-421d-b9b4-6074d27ce097",                        [{"marker":{"color":"#3F6F8F"},"showlegend":false,"x":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],"y":[1.0,0.7585922081031201,0.723518940668411,0.6147133514036741,0.6470125193581389,0.5761193553120584,0.5198732102607652,0.3951894905569063,0.29520206092509665,0.23725000681576355,0.12339975833692547,0.07348179983229733,-0.0036598584123472794,-0.08956806510320633,-0.1779979332231749,-0.23555047229999213,-0.3076830082589602,-0.24545022121787824,-0.2895232767361356],"type":"bar","xaxis":"x","yaxis":"y"},{"marker":{"color":"#3F6F8F"},"showlegend":false,"x":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],"y":[1.0,0.774732467849995,0.38711834402965983,-0.00793297123071534,0.3045967517585646,0.018704616173229455,-0.12544384545720855,-0.24248879077087163,-0.3278444434227706,-0.1173341169823545,-0.39329543117997084,-0.15434935394795885,0.008944846715832257,-0.2472172441732832,-0.1317466242026472,-0.11619606465745917,-0.32068029146285043,0.6519568824316351,0.3356287661074109],"type":"bar","xaxis":"x2","yaxis":"y2"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"xaxis":{"anchor":"y","domain":[0.0,0.45],"title":{"text":"rezago (meses)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0]},"xaxis2":{"anchor":"y2","domain":[0.55,1.0],"title":{"text":"rezago (meses)"}},"yaxis2":{"anchor":"x2","domain":[0.0,1.0]},"annotations":[{"font":{"size":16},"showarrow":false,"text":"ACF","x":0.225,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"PACF","x":0.775,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"}],"shapes":[{"line":{"color":"#6B6B6B","dash":"dot"},"type":"line","x0":0,"x1":1,"xref":"x domain","y0":0.2829016319029166,"y1":0.2829016319029166,"yref":"y"},{"line":{"color":"#6B6B6B","dash":"dot"},"type":"line","x0":0,"x1":1,"xref":"x domain","y0":-0.2829016319029166,"y1":-0.2829016319029166,"yref":"y"},{"line":{"color":"#6B6B6B","dash":"dot"},"type":"line","x0":0,"x1":1,"xref":"x2 domain","y0":0.2829016319029166,"y1":0.2829016319029166,"yref":"y2"},{"line":{"color":"#6B6B6B","dash":"dot"},"type":"line","x0":0,"x1":1,"xref":"x2 domain","y0":-0.2829016319029166,"y1":-0.2829016319029166,"yref":"y2"}],"title":{"text":"Autocorrelaci\u00f3n de la tasa mensual (bandas: \u00b11,96\u002f\u221an)"}},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div></div>
+</div>
+<p>ADF no rechaza la raíz unitaria (p = 0,70) y KPSS rechaza la estacionariedad (p = 0,026): <strong>la tasa mensual no es
+estacionaria</strong> en 2021-2024. La ACF decae despacio (0,76 en el primer rezago y todavía 0,52 en el sexto) y la PACF
+tiene sus picos en los rezagos 1, 2 y 4: es la huella de la tendencia más que de un ciclo corto. Consecuencias:</p>
+<ul class="simple">
+<li><p>la partición train/validación/prueba es <strong>cronológica</strong>, y la validación cruzada de los modelos también (bloques de
+ventana creciente: el modelo nunca ve el futuro de lo que predice);</p></li>
+<li><p>el modelo trabaja por posición, no sobre la serie: no se construyen rezagos de la tasa mensual. El «pasado» entra
+como el historial de cada proveedor, material y persona, cortado en la fecha de creación.</p></li>
+</ul>
+</section>
+<section id="deriva-entre-periodos">
+<h3><span class="section-number">4.1.4. </span>Deriva entre periodos<a class="headerlink" href="#deriva-entre-periodos" title="Permalink to this heading">#</a></h3>
+<p>El índice de estabilidad de la población (PSI) compara la distribución de cada variable del entrenamiento con la de
+2025 y 2026, por deciles del entrenamiento: <span class="math notranslate nohighlight">\(\mathrm{PSI} = \sum_j (a_j - r_j)\ln(a_j / r_j)\)</span>. Menos de 0,1 es
+estable; de 0,1 a 0,25, un cambio moderado; más de 0,25, un cambio fuerte. Solo mira las predictoras: no usa el
+objetivo de 2025 ni de 2026.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">datos</span><span class="o">.</span><span class="n">RAIZ</span> <span class="o">/</span> <span class="s2">&quot;resultados&quot;</span> <span class="o">/</span> <span class="s2">&quot;eda&quot;</span> <span class="o">/</span> <span class="s2">&quot;top_numericas.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">guardar</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">deriva</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">top</span><span class="p">),</span> <span class="s2">&quot;deriva&quot;</span><span class="p">),</span> <span class="n">dec</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_c7440">
+  <thead>
+    <tr>
+      <th id="T_c7440_level0_col0" class="col_heading level0 col0" >variable</th>
+      <th id="T_c7440_level0_col1" class="col_heading level0 col1" >nombre</th>
+      <th id="T_c7440_level0_col2" class="col_heading level0 col2" >PSI 2025</th>
+      <th id="T_c7440_level0_col3" class="col_heading level0 col3" >PSI 2026</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_c7440_row0_col0" class="data row0 col0" >plazo_habil_al_liberar</td>
+      <td id="T_c7440_row0_col1" class="data row0 col1" >Plazo hábil al liberar</td>
+      <td id="T_c7440_row0_col2" class="data row0 col2" >0,100</td>
+      <td id="T_c7440_row0_col3" class="data row0 col3" >0,064</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row1_col0" class="data row1 col0" >prov_retraso_medio_previo</td>
+      <td id="T_c7440_row1_col1" class="data row1 col1" >Retraso medio previo del proveedor</td>
+      <td id="T_c7440_row1_col2" class="data row1 col2" >0,093</td>
+      <td id="T_c7440_row1_col3" class="data row1 col3" >0,102</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row2_col0" class="data row2 col0" >prov_tasa_tarde_previa</td>
+      <td id="T_c7440_row2_col1" class="data row2 col1" >Tasa de retraso previa del proveedor</td>
+      <td id="T_c7440_row2_col2" class="data row2 col2" >0,083</td>
+      <td id="T_c7440_row2_col3" class="data row2 col3" >0,127</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row3_col0" class="data row3 col0" >plazo_prometido_dias</td>
+      <td id="T_c7440_row3_col1" class="data row3 col1" >Plazo prometido</td>
+      <td id="T_c7440_row3_col2" class="data row3 col2" >0,149</td>
+      <td id="T_c7440_row3_col3" class="data row3 col3" >0,081</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row4_col0" class="data row4 col0" >mat_tasa_tarde_previa</td>
+      <td id="T_c7440_row4_col1" class="data row4 col1" >Tasa de retraso previa del material</td>
+      <td id="T_c7440_row4_col2" class="data row4 col2" >0,102</td>
+      <td id="T_c7440_row4_col3" class="data row4 col3" >0,135</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row5_col0" class="data row5 col0" >dias_habiles_liberacion</td>
+      <td id="T_c7440_row5_col1" class="data row5 col1" >Días hábiles de liberación</td>
+      <td id="T_c7440_row5_col2" class="data row5 col2" >0,017</td>
+      <td id="T_c7440_row5_col3" class="data row5 col3" >0,131</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row6_col0" class="data row6 col0" >sp_prometida_menos_deseada</td>
+      <td id="T_c7440_row6_col1" class="data row6 col1" >Prometida menos deseada</td>
+      <td id="T_c7440_row6_col2" class="data row6 col2" >0,081</td>
+      <td id="T_c7440_row6_col3" class="data row6 col3" >0,080</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row7_col0" class="data row7 col0" >nace_vencida</td>
+      <td id="T_c7440_row7_col1" class="data row7 col1" >Nace vencida</td>
+      <td id="T_c7440_row7_col2" class="data row7 col2" >5,1e-05</td>
+      <td id="T_c7440_row7_col3" class="data row7 col3" >0,007</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row8_col0" class="data row8 col0" >plazo_al_crear_dias</td>
+      <td id="T_c7440_row8_col1" class="data row8 col1" >Plazo original al crear</td>
+      <td id="T_c7440_row8_col2" class="data row8 col2" >0,107</td>
+      <td id="T_c7440_row8_col3" class="data row8 col3" >0,057</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row9_col0" class="data row9 col0" >sol_tasa_tarde_previa</td>
+      <td id="T_c7440_row9_col1" class="data row9 col1" >Tasa de retraso previa del solicitante</td>
+      <td id="T_c7440_row9_col2" class="data row9 col2" >0,196</td>
+      <td id="T_c7440_row9_col3" class="data row9 col3" >0,245</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row10_col0" class="data row10 col0" >cmp_tasa_tarde_previa</td>
+      <td id="T_c7440_row10_col1" class="data row10 col1" >Tasa de retraso previa del comprador</td>
+      <td id="T_c7440_row10_col2" class="data row10 col2" >1,019</td>
+      <td id="T_c7440_row10_col3" class="data row10 col3" >0,811</td>
+    </tr>
+    <tr>
+      <td id="T_c7440_row11_col0" class="data row11 col0" >prov_centro_oc_previas</td>
+      <td id="T_c7440_row11_col1" class="data row11 col1" >Órdenes previas proveedor-centro</td>
+      <td id="T_c7440_row11_col2" class="data row11 col2" >0,037</td>
+      <td id="T_c7440_row11_col3" class="data row11 col3" >0,108</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>La mayoría de las variables principales cambia poco o moderadamente (PSI de 0,02 a 0,15). Dos se mueven más:</p>
+<ul class="simple">
+<li><p>la <strong>tasa previa del solicitante</strong> (0,20 en 2025 y 0,25 en 2026), en el límite del cambio fuerte;</p></li>
+<li><p>la <strong>tasa previa del comprador</strong> (1,02 y 0,81), con un cambio fuerte: su distribución en 2025-2026 no se parece a la
+del entrenamiento. Es un historial acumulado, y un comprador con años de historia arrastra el nivel de retraso alto
+de 2021; además, el equipo de compras cambia.</p></li>
+</ul>
+<p>Es <strong>deriva de covariables</strong>: un modelo que se apoye mucho en esas dos variables puede perder desempeño fuera del
+entrenamiento. La validación 2025 lo va a mostrar; la prueba 2026 lo confirma una sola vez al final. La deriva del
+concepto (que la misma variable se relacione distinto con el retraso) no se mide aquí, porque exigiría el objetivo
+de 2025 y 2026.</p>
+</section>
+<section id="validacion-adversaria">
+<h3><span class="section-number">4.1.5. </span>Validación adversaria<a class="headerlink" href="#validacion-adversaria" title="Permalink to this heading">#</a></h3>
+<p>El PSI mira las variables una por una. La <strong>validación adversaria</strong> las mira todas juntas: se juntan dos conjuntos,
+se etiqueta de cuál viene cada posición y se entrena un clasificador (XGBoost, validación cruzada de 5 pliegues
+agrupada por orden) para distinguirlos. Si su AUC es 0,5, los conjuntos son intercambiables; cuanto más sube, más
+distinto es lo que el modelo tendrá que predecir de lo que vio. Se comparan tres particiones, con las numéricas y
+las categóricas (las entidades quedan fuera porque su codificación usa el objetivo) y sin tocar la prueba 2026:</p>
+<ul class="simple">
+<li><p><strong>cronológica</strong>: 2021-2024 contra 2025, la que usa el proyecto;</p></li>
+<li><p><strong>cronológica sin variables de reloj</strong>: la misma, sin las 16 predictoras que fechan la fila por sí solas (conteos
+acumulados de historia, antigüedades, tasa de cambio y mes);</p></li>
+<li><p><strong>aleatoria</strong>: dentro de 2021-2025, órdenes al azar del mismo tamaño que 2025 contra el resto, que es lo que haría
+una partición 80/20 sin mirar la fecha.</p></li>
+</ul>
+<p>El cálculo lo hace <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.similitud</span></code> (unos 30 minutos) y el capítulo lee sus tablas.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">SIM</span> <span class="o">=</span> <span class="n">datos</span><span class="o">.</span><span class="n">RAIZ</span> <span class="o">/</span> <span class="s2">&quot;resultados&quot;</span> <span class="o">/</span> <span class="s2">&quot;similitud&quot;</span>
+<span class="n">auc_adv</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">SIM</span> <span class="o">/</span> <span class="s2">&quot;auc.csv&quot;</span><span class="p">)</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">auc_adv</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;particion&quot;</span><span class="p">:</span> <span class="s2">&quot;partición&quot;</span><span class="p">,</span> <span class="s2">&quot;filas_a&quot;</span><span class="p">:</span> <span class="s2">&quot;filas del conjunto A&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;filas_b&quot;</span><span class="p">:</span> <span class="s2">&quot;filas del conjunto B&quot;</span><span class="p">}),</span> <span class="n">dec</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">enteros</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;filas del conjunto A&quot;</span><span class="p">,</span>
+                                                                                     <span class="s2">&quot;filas del conjunto B&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_56d46">
+  <thead>
+    <tr>
+      <th id="T_56d46_level0_col0" class="col_heading level0 col0" >partición</th>
+      <th id="T_56d46_level0_col1" class="col_heading level0 col1" >filas del conjunto A</th>
+      <th id="T_56d46_level0_col2" class="col_heading level0 col2" >filas del conjunto B</th>
+      <th id="T_56d46_level0_col3" class="col_heading level0 col3" >AUC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_56d46_row0_col0" class="data row0 col0" >cronológica: 2021-2024 contra 2025</td>
+      <td id="T_56d46_row0_col1" class="data row0 col1" >271.391</td>
+      <td id="T_56d46_row0_col2" class="data row0 col2" >82.794</td>
+      <td id="T_56d46_row0_col3" class="data row0 col3" >1,000</td>
+    </tr>
+    <tr>
+      <td id="T_56d46_row1_col0" class="data row1 col0" >cronológica, sin variables de reloj</td>
+      <td id="T_56d46_row1_col1" class="data row1 col1" >271.391</td>
+      <td id="T_56d46_row1_col2" class="data row1 col2" >82.794</td>
+      <td id="T_56d46_row1_col3" class="data row1 col3" >0,999</td>
+    </tr>
+    <tr>
+      <td id="T_56d46_row2_col0" class="data row2 col0" >aleatoria por orden, mismo tamaño</td>
+      <td id="T_56d46_row2_col1" class="data row2 col1" >270.289</td>
+      <td id="T_56d46_row2_col2" class="data row2 col2" >83.896</td>
+      <td id="T_56d46_row2_col3" class="data row2 col3" >0,504</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imp_adv</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">SIM</span> <span class="o">/</span> <span class="s2">&quot;importancia.csv&quot;</span><span class="p">)</span>
+<span class="n">imp_adv</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imp_adv</span><span class="o">.</span><span class="n">columna</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">imp_adv</span><span class="o">.</span><span class="n">particion</span><span class="o">.</span><span class="n">unique</span><span class="p">()[:</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">imp_adv</span><span class="p">[</span><span class="n">imp_adv</span><span class="o">.</span><span class="n">particion</span> <span class="o">==</span> <span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="n">N</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">N</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">N</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot; = </span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">variable</span><span class="p">])</span>
+    <span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">barras_horizontales</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s2">&quot;importancia&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Lo que separa los conjuntos (</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;importancia&quot;</span><span class="p">,</span>
+                                      <span class="s2">&quot;.3f&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>                            <div id="2e0753d7-b97c-4041-a531-3a8ae288e715" class="plotly-graph-div" style="height:380px; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("2e0753d7-b97c-4041-a531-3a8ae288e715")) {                    Plotly.newPlot(                        "2e0753d7-b97c-4041-a531-3a8ae288e715",                        [{"hovertemplate":"%{y}: %{x:.3f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#3F6F8F"},"orientation":"h","x":[0.028465137,0.02858591,0.03482781,0.03508848,0.040130474,0.042119805,0.043093074,0.04510391,0.05163346,0.28319985],"y":["Regi\u00f3n del centro = 20","Mes de creaci\u00f3n = 1","Tasa del euro","Volatilidad del d\u00f3lar a 30 d\u00edas","Tasa del d\u00f3lar","Mes de creaci\u00f3n = 11","Mes de creaci\u00f3n = 8","Variaci\u00f3n del d\u00f3lar a 90 d\u00edas","\u00d3rdenes previas proveedor-centro","Antig\u00fcedad del proveedor"],"type":"bar"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"margin":{"l":220},"title":{"text":"Lo que separa los conjuntos (cronol\u00f3gica: 2021-2024 contra 2025)"},"xaxis":{"title":{"text":"importancia"}},"height":380},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div><div class="output text_html"><div>                            <div id="138e27fd-cffb-4f84-b40f-1cf92ff6ff33" class="plotly-graph-div" style="height:380px; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("138e27fd-cffb-4f84-b40f-1cf92ff6ff33")) {                    Plotly.newPlot(                        "138e27fd-cffb-4f84-b40f-1cf92ff6ff33",                        [{"hovertemplate":"%{y}: %{x:.3f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#3F6F8F"},"orientation":"h","x":[0.015055348,0.016388629,0.01728432,0.018319288,0.018744465,0.018808853,0.021160418,0.021997618,0.02579086,0.03296388],"y":["\u00d3rdenes del comprador en 7 d\u00edas","\u00d3rdenes del centro en 7 d\u00edas","L\u00ednea de negocio = industrial","D\u00edas de liberaci\u00f3n de solicitud a orden","Tolerancia de sobreentrega","Tasa de retraso previa del comprador","Tipo de material = ZDOT","L\u00ednea de negocio = banano","Regi\u00f3n del centro = 20","Indicador de IVA = W1"],"type":"bar"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"margin":{"l":220},"title":{"text":"Lo que separa los conjuntos (cronol\u00f3gica, sin variables de reloj)"},"xaxis":{"title":{"text":"importancia"}},"height":380},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div></div>
+</div>
+<p><strong>La partición aleatoria no separa nada (AUC 0,504)</strong>: órdenes al azar de 2021-2025 son intercambiables con el
+resto, y un modelo evaluado así se mediría contra datos idénticos a los que vio. <strong>La cronológica separa del todo
+(AUC 1,000)</strong>, y casi toda la separación la hacen las variables de reloj: la antigüedad del proveedor sola pesa
+0,28, y le siguen los conteos de historia, la tasa de cambio y el mes. Son variables que crecen con el calendario y
+fechan la fila por sí solas; que separen no dice nada del problema.</p>
+<p>Lo que sí dice algo es la tercera fila: <strong>sin las variables de reloj el AUC sigue en 0,999</strong>. Ya no hay una variable
+dominante (la que más pesa no llega a 0,04), sino muchas que se mueven poco a la vez: el indicador de IVA W1 baja de
+13,5 % de las posiciones en 2021-2024 a 6,4 % en 2025, las del centro en la región 20 suben de 4,4 % a 11,3 %, cambia la mezcla de
+líneas de negocio y de tipos de material, la tasa previa del comprador (la misma que el PSI marcaba con cambio
+fuerte), la tolerancia de sobreentrega y la carga reciente de los centros y los compradores. Con 350.000 posiciones y un
+clasificador flexible, la suma de cambios pequeños basta para reconocer el año. Es la misma deriva de covariables del
+PSI, ahora vista en conjunto.</p>
+<p>Consecuencias para el resto del proyecto:</p>
+<ul class="simple">
+<li><p><strong>una partición aleatoria sobreestimaría el desempeño</strong>: evaluaría con datos de la misma distribución del
+entrenamiento, que no es lo que el modelo encuentra al usarse. Por eso la partición es cronológica y la validación
+cruzada de los modelos usa ventanas crecientes por semestre;</p></li>
+<li><p><strong>la caída de 2024 a 2025 es esperable</strong> y no es por sí sola señal de sobreajuste; la prueba 2026 viene de una
+distribución aún más lejana;</p></li>
+<li><p><strong>antes de medir la prueba se reentrena con 2021-2025</strong>, para que el modelo vea el año más parecido al que va a
+predecir.</p></li>
+</ul>
+<p>La validación adversaria solo mira las predictoras: un AUC alto dice que el año se reconoce, no que la relación
+entre las variables y el retraso haya cambiado (eso sería deriva del concepto, y necesita el objetivo).</p>
+</section>
+</section>
+<section id="componente-espacial">
+<h2><span class="section-number">4.2. </span>Componente espacial<a class="headerlink" href="#componente-espacial" title="Permalink to this heading">#</a></h2>
+<p><strong>No aplica.</strong> El dataset no trae coordenadas: los centros y las sociedades van anonimizados y la región del
+proveedor es un código de departamento, que entra como categórica. Sin latitud y longitud no hay autocorrelación
+espacial que medir ni bloques espaciales que respetar.</p>
+</section>
+<section id="auditoria-de-fuga">
+<h2><span class="section-number">4.3. </span>Auditoría de fuga<a class="headerlink" href="#auditoria-de-fuga" title="Permalink to this heading">#</a></h2>
+<p><strong>Disponibilidad al liberar.</strong> Cada grupo de variables se revisó contra el momento de la predicción:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>grupo</p></th>
+<th class="head"><p>disponible el día de la liberación porque</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>orden, posición, plazo, calendario</p></td>
+<td><p>se fijan al crear la orden; la fecha prometida es la vigente ese día</p></td>
+</tr>
+<tr class="row-odd"><td><p>liberación</p></td>
+<td><p>ocurre antes o en el momento de la predicción, que es la última liberación</p></td>
+</tr>
+<tr class="row-even"><td><p>historiales (proveedor, material, comprador, solicitante), pagos, stock</p></td>
+<td><p>se cortan en la fecha de creación de la orden y cuentan solo posiciones con entrada anterior</p></td>
+</tr>
+<tr class="row-odd"><td><p>maestros</p></td>
+<td><p>foto actual del ERP; <strong>se retiraron</strong> los que el planificador ajusta después de ver retrasos (plazo del maestro, precio medio móvil, stock de seguridad, punto de pedido, lote mínimo, estado del material)</p></td>
+</tr>
+<tr class="row-even"><td><p>tasa de cambio</p></td>
+<td><p>la del día de creación y sus variaciones hacia atrás</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Retiradas del dataset</strong> por ser el desenlace o posteriores a la predicción: <code class="docutils literal notranslate"><span class="pre">y_otif_falla</span></code> y <code class="docutils literal notranslate"><span class="pre">dias_retraso</span></code> (son
+el objetivo con otra regla), las fechas de entrada y de factura, y los cambios de fecha posteriores a la liberación.</p>
+<p><strong>AUC univariado.</strong> Una variable que separa sola casi a la perfección es sospechosa. Ninguna pasa de 0,75:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aso</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">datos</span><span class="o">.</span><span class="n">RAIZ</span> <span class="o">/</span> <span class="s2">&quot;resultados&quot;</span> <span class="o">/</span> <span class="s2">&quot;eda&quot;</span> <span class="o">/</span> <span class="s2">&quot;asociacion.csv&quot;</span><span class="p">)</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">plots</span><span class="o">.</span><span class="n">barras_horizontales</span><span class="p">(</span><span class="n">aso</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">aso</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span> <span class="s2">&quot;AUC&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;Las 15 variables que más separan solas (AUC univariado)&quot;</span><span class="p">,</span> <span class="s2">&quot;AUC&quot;</span><span class="p">,</span> <span class="s2">&quot;.3f&quot;</span><span class="p">,</span>
+                                  <span class="n">referencia</span><span class="o">=</span><span class="mf">0.75</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>                            <div id="e0f0f580-ad68-418a-a724-95d836f49c45" class="plotly-graph-div" style="height:510px; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("e0f0f580-ad68-418a-a724-95d836f49c45")) {                    Plotly.newPlot(                        "e0f0f580-ad68-418a-a724-95d836f49c45",                        [{"hovertemplate":"%{y}: %{x:.3f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#3F6F8F"},"orientation":"h","x":[0.6112540801834009,0.6117845437096178,0.6141543238790816,0.6227266208390829,0.6241702699810731,0.6280876745390236,0.6300657662816086,0.6315897423196735,0.637944020252731,0.6381377582409693,0.6400424084878692,0.6603814931821456,0.6605844479957506,0.6953963435352865,0.7315172895886942],"y":["Nace vencida","Cuenta contable","Grupo de art\u00edculos","Estrategia de liberaci\u00f3n","Material","Prometida menos deseada","Comprador (creador de la orden)","D\u00edas h\u00e1biles de liberaci\u00f3n","Tasa de retraso previa del material","Plazo prometido","Creador de la solicitud","Tasa de retraso previa del proveedor","Retraso medio previo del proveedor","Proveedor","Plazo h\u00e1bil al liberar"],"type":"bar"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"shapes":[{"line":{"color":"#6B6B6B","dash":"dot"},"type":"line","x0":0.75,"x1":0.75,"xref":"x","y0":0,"y1":1,"yref":"y domain"}],"margin":{"l":220},"title":{"text":"Las 15 variables que m\u00e1s separan solas (AUC univariado)"},"xaxis":{"title":{"text":"AUC"}},"height":510},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div></div>
+</div>
+<p>La que más separa, el plazo hábil al liberar (0,732), se calcula con la fecha prometida vigente el día de la liberación
+y con ese mismo día: las dos se conocen en el momento de la predicción. Separa porque es la causa más directa del
+retraso (sin plazo no hay forma de llegar a tiempo), no porque contenga el desenlace. Las entidades (proveedor,
+solicitante, comprador) se miden con su tasa fuera de pliegue: si se calculara con todo el entrenamiento, cada fila
+se vería a sí misma y el AUC del proveedor subiría de forma artificial.</p>
+<p><strong>Entidades repetidas entre particiones.</strong> Ninguna orden cruza particiones (capítulo <a class="reference internal" href="02a_datos.html"><span class="doc">Los datos</span></a>), pero
+proveedores, materiales y personas sí se repiten, como en el uso real. La tabla dice qué parte de cada partición trae
+un valor que el entrenamiento no vio:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tabla</span><span class="p">(</span><span class="n">guardar</span><span class="p">(</span><span class="n">eda</span><span class="o">.</span><span class="n">entidades_nuevas</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="s2">&quot;entidades_nuevas&quot;</span><span class="p">),</span> <span class="n">dec</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_40d7b">
+  <thead>
+    <tr>
+      <th id="T_40d7b_level0_col0" class="col_heading level0 col0" >variable</th>
+      <th id="T_40d7b_level0_col1" class="col_heading level0 col1" >nombre</th>
+      <th id="T_40d7b_level0_col2" class="col_heading level0 col2" >nuevo en validacion (%)</th>
+      <th id="T_40d7b_level0_col3" class="col_heading level0 col3" >nuevo en prueba (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_40d7b_row0_col0" class="data row0 col0" >proveedor</td>
+      <td id="T_40d7b_row0_col1" class="data row0 col1" >Proveedor</td>
+      <td id="T_40d7b_row0_col2" class="data row0 col2" >6,6</td>
+      <td id="T_40d7b_row0_col3" class="data row0 col3" >11,1</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row1_col0" class="data row1 col0" >material</td>
+      <td id="T_40d7b_row1_col1" class="data row1 col1" >Material</td>
+      <td id="T_40d7b_row1_col2" class="data row1 col2" >8,3</td>
+      <td id="T_40d7b_row1_col3" class="data row1 col3" >9,7</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row2_col0" class="data row2 col0" >ultimo_liberador</td>
+      <td id="T_40d7b_row2_col1" class="data row2 col1" >Último liberador</td>
+      <td id="T_40d7b_row2_col2" class="data row2 col2" >2,3</td>
+      <td id="T_40d7b_row2_col3" class="data row2 col3" >6,0</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row3_col0" class="data row3 col0" >imp_ceco</td>
+      <td id="T_40d7b_row3_col1" class="data row3 col1" >Centro de costo</td>
+      <td id="T_40d7b_row3_col2" class="data row3 col2" >1,2</td>
+      <td id="T_40d7b_row3_col3" class="data row3 col3" >4,2</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row4_col0" class="data row4 col0" >creador_oc</td>
+      <td id="T_40d7b_row4_col1" class="data row4 col1" >Comprador (creador de la orden)</td>
+      <td id="T_40d7b_row4_col2" class="data row4 col2" >2,1</td>
+      <td id="T_40d7b_row4_col3" class="data row4 col3" >3,1</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row5_col0" class="data row5 col0" >estrategia_lib</td>
+      <td id="T_40d7b_row5_col1" class="data row5 col1" >Estrategia de liberación</td>
+      <td id="T_40d7b_row5_col2" class="data row5 col2" >1,1</td>
+      <td id="T_40d7b_row5_col3" class="data row5 col3" >2,7</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row6_col0" class="data row6 col0" >sp_creador</td>
+      <td id="T_40d7b_row6_col1" class="data row6 col1" >Creador de la solicitud</td>
+      <td id="T_40d7b_row6_col2" class="data row6 col2" >1,2</td>
+      <td id="T_40d7b_row6_col3" class="data row6 col3" >2,3</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row7_col0" class="data row7 col0" >imp_cuenta</td>
+      <td id="T_40d7b_row7_col1" class="data row7 col1" >Cuenta contable</td>
+      <td id="T_40d7b_row7_col2" class="data row7 col2" >2,8</td>
+      <td id="T_40d7b_row7_col3" class="data row7 col3" >0,9</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row8_col0" class="data row8 col0" >sociedad</td>
+      <td id="T_40d7b_row8_col1" class="data row8 col1" >Sociedad</td>
+      <td id="T_40d7b_row8_col2" class="data row8 col2" >0,0</td>
+      <td id="T_40d7b_row8_col3" class="data row8 col3" >0,0</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row9_col0" class="data row9 col0" >grupo_compras</td>
+      <td id="T_40d7b_row9_col1" class="data row9 col1" >Grupo de compras</td>
+      <td id="T_40d7b_row9_col2" class="data row9 col2" >0,0</td>
+      <td id="T_40d7b_row9_col3" class="data row9 col3" >0,0</td>
+    </tr>
+    <tr>
+      <td id="T_40d7b_row10_col0" class="data row10 col0" >centro</td>
+      <td id="T_40d7b_row10_col1" class="data row10 col1" >Centro</td>
+      <td id="T_40d7b_row10_col2" class="data row10 col2" >0,1</td>
+      <td id="T_40d7b_row10_col3" class="data row10 col3" >0,0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Una de cada nueve posiciones de 2026 trae un proveedor que no estaba en 2021-2024 (11,1 %), y una de cada diez, un
+material nuevo (9,7 %). Es el <strong>arranque en frío</strong>: para ellos no hay historial. La codificación jerárquica les da la
+tasa de su nivel superior (región del proveedor, grupo de artículos), y el desempeño en esas filas se reporta aparte
+en la evaluación. Al reentrenar con 2021-2025 antes de medir la prueba, la fracción de valores nuevos baja.</p>
+</section>
+<section id="preprocesamiento-dentro-del-pipeline">
+<h2><span class="section-number">4.4. </span>Preprocesamiento dentro del pipeline<a class="headerlink" href="#preprocesamiento-dentro-del-pipeline" title="Permalink to this heading">#</a></h2>
+<p>Todo lo que aprende de los datos (medianas, medias, categorías, tasas por entidad) se ajusta <strong>solo con el
+entrenamiento</strong>, dentro de un <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> de scikit-learn, para que la validación cruzada lo reajuste en cada pliegue:</p>
+<ul class="simple">
+<li><p><strong>numéricas</strong> (83): <span class="math notranslate nohighlight">\(\mathrm{signo}(x)\log(1+|x|)\)</span> para comprimir las colas largas, mediana en los vacíos y
+estandarización. La transformación es monótona: a los árboles no les cambia nada y a los modelos lineales les quita
+el peso de los montos extremos;</p></li>
+<li><p><strong>categóricas de pocos valores</strong> (42): <em>one-hot</em>, con las categorías de menos de 30 filas juntas y las no vistas en
+ceros;</p></li>
+<li><p><strong>entidades</strong> (11: proveedor, material, comprador, creador de la solicitud, liberador, centro de costo, cuenta,
+centro, sociedad, estrategia, grupo de compras): <strong>codificación jerárquica por objetivo</strong>. Cada valor recibe su tasa
+de retraso suavizada hacia la de su nivel superior,</p></li>
+</ul>
+<div class="math notranslate nohighlight" id="equation-eq-te">
+<span class="eqno">(4.1)<a class="headerlink" href="#equation-eq-te" title="Enlace permanente a esta ecuación">#</a></span>\[
+\hat p(v) = \frac{\text{tardías}(v) + M\,\hat p(\text{padre}(v))}{n(v) + M}, \qquad M = 20,
+\]</div>
+<p>y un valor nuevo recibe la tasa de su padre (el material, la de su grupo de artículos; el proveedor, la de su
+región). En el ajuste se calcula <strong>fuera de pliegue y agrupada por orden</strong>, para que una posición no vea su propio
+objetivo ni el de las otras posiciones de su orden. Esa es la fuga más fácil de cometer en este problema.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">set_config</span>
+<span class="n">set_config</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">)</span>
+<span class="n">pre</span> <span class="o">=</span> <span class="n">datos</span><span class="o">.</span><span class="n">preprocesador</span><span class="p">()</span>
+<span class="n">Xt</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="n">datos</span><span class="o">.</span><span class="n">ENTRADA</span><span class="p">],</span> <span class="n">ent</span><span class="o">.</span><span class="n">y_tarde</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">trans</span><span class="p">,</span> <span class="n">cols</span> <span class="ow">in</span> <span class="n">pre</span><span class="o">.</span><span class="n">transformers_</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">nombre</span> <span class="o">!=</span> <span class="s2">&quot;remainder&quot;</span><span class="p">:</span>
+        <span class="n">pasos</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">trans</span><span class="o">.</span><span class="n">steps</span><span class="p">]</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">trans</span><span class="p">,</span> <span class="s2">&quot;steps&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nombre</span><span class="si">:</span><span class="s2">4s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="s2"> columnas de entrada -&gt; </span><span class="si">{</span><span class="s1">&#39; -&gt; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pasos</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;matriz del entrenamiento después del preprocesamiento:&quot;</span><span class="p">,</span> <span class="n">Xt</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>num   83 columnas de entrada -&gt; log -&gt; imputar -&gt; escalar
+cat   42 columnas de entrada -&gt; objeto -&gt; imputar -&gt; onehot
+ent   16 columnas de entrada -&gt; CodificadorJerarquico
+matriz del entrenamiento después del preprocesamiento: (271391, 591)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Las 136 predictoras pasan a 591 columnas, casi todas del <em>one-hot</em> de las categóricas. El bloque de entidades recibe
+16 columnas porque lleva también los niveles superiores (de donde sale la tasa de un valor nuevo) y el número de orden
+(que solo agrupa los pliegues y no entra al modelo); devuelve una columna por entidad. El mismo objeto se ajusta
+con el entrenamiento y solo transforma la validación y la prueba; dentro de la validación cruzada se reajusta en cada
+pliegue. Los modelos de árboles del Entregable 2 usan este mismo preprocesamiento para que la comparación sea justa;
+el balanceo (SMOTE, ADASYN) va después de él y antes del modelo, también dentro del <em>pipeline</em>.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="02b_eda.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Análisis exploratorio</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03a_modelo_base.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>Modelo base: regresión logística</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#componente-temporal">4.1. Componente temporal</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#la-variable-de-tiempo">4.1.1. La variable de tiempo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#serie-tendencia-y-estacionalidad">4.1.2. Serie, tendencia y estacionalidad</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estacionariedad-y-dependencia">4.1.3. Estacionariedad y dependencia</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deriva-entre-periodos">4.1.4. Deriva entre periodos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#validacion-adversaria">4.1.5. Validación adversaria</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#componente-espacial">4.2. Componente espacial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#auditoria-de-fuga">4.3. Auditoría de fuga</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocesamiento-dentro-del-pipeline">4.4. Preprocesamiento dentro del pipeline</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por Daniel Carbonó y Luis Pérez
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,612 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>14. Conclusiones &#8212; Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="_static/translations.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '08_conclusiones';</script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="15. Reproducibilidad" href="09_reproducibilidad.html" />
+    <link rel="prev" title="13. El tablero y su despliegue" href="07_tablero.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Trazabilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_correcciones.html">1. Correcciones del Entregable 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datos y análisis exploratorio</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a_datos.html">2. Los datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b_eda.html">3. Análisis exploratorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c_tiempo_y_fuga.html">4. Tiempo, fuga y preprocesamiento</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelos de referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03a_modelo_base.html">5. Modelo base: regresión logística</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b_112_combinaciones.html">6. Las 112 combinaciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03d_mejor_modelo.html">7. El mejor modelo en la prueba 2026</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03c_fundamentos.html">8. Fundamentos: XGBoost y el costo de cada modelo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Literatura y novedad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="literatura.html">9. Literatura</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_novedad.html">10. Literatura y novedad del modelo original</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelo original</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="05_modelo_original.html">11. Modelo original: efectos por entidad, plazo log-normal y plazo real</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_validacion.html">12. Validación estadística</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tablero, conclusiones y reproducibilidad</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_tablero.html">13. El tablero y su despliegue</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">14. Conclusiones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_reproducibilidad.html">15. Reproducibilidad</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="glosario.html">16. Glosario</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/08_conclusiones.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Conclusiones</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hallazgos">14.1. Hallazgos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#veredicto-sobre-r1-r2-y-r3">14.2. Veredicto sobre R1, R2 y R3</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitaciones">14.3. Limitaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trabajo-futuro">14.4. Trabajo futuro</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#declaracion-de-autoria-y-de-uso-de-herramientas-de-inteligencia-artificial">14.5. Declaración de autoría y de uso de herramientas de inteligencia artificial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autoria">14.6. Autoría</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uso-de-inteligencia-artificial">14.7. Uso de inteligencia artificial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#firmas">14.8. Firmas</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="conclusiones">
+<h1><span class="section-number">14. </span>Conclusiones<a class="headerlink" href="#conclusiones" title="Permalink to this heading">#</a></h1>
+<section id="hallazgos">
+<h2><span class="section-number">14.1. </span>Hallazgos<a class="headerlink" href="#hallazgos" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>El problema se puede predecir el día en que la orden se libera.</strong> Con 136 variables conocidas ese día, el XGBoost
+elegido entre 112 combinaciones en una validación anidada por semestres da en la prueba 2026 un ROC-AUC de 0,848
+[0,835; 0,860] y F1 0,675, contra 0,825 de la regresión logística y 0,670 de la regla del proveedor
+(<a class="reference internal" href="03d_mejor_modelo.html"><span class="doc">El mejor modelo en la prueba 2026</span></a>). No cae de la validación a la prueba.</p></li>
+<li><p><strong>Lo que pesa</strong> es el plazo que le queda al proveedor al liberar y quién provee; después, la promesa en días, la
+experiencia del proveedor con el centro y el proceso interno de liberación (SHAP; LIME coincide en el signo de lo
+principal, pero cambia con la semilla).</p></li>
+<li><p><strong>El modelo original, BOREAL, es el mejor medido en 2026</strong>: ROC-AUC 0,860 [0,847; 0,871], F1 0,690 y ECE 0,014,
+contra 0,848, 0,675 y 0,022 del XGBoost de las 112. La diferencia de AUC es 0,011 [0,003; 0,017] con intervalos que
+remuestrean órdenes (<a class="reference internal" href="05_modelo_original.html"><span class="doc">Modelo original: efectos por entidad, plazo log-normal y plazo real</span></a>).</p></li>
+<li><p><strong>Modelo e información son dos caminos a la misma ganancia.</strong> Con las mismas 136 variables, la estructura de BOREAL
+le suma 0,009 de AUC a XGBoost; las 32 variables de plazo real le suman 0,010 a XGBoost; juntas, 0,011, porque se
+sustituyen entre sí. El plazo log-normal suma 0,003. En las órdenes con alguna entidad nueva ningún modelo le gana a
+otro: el arranque en frío sigue abierto.</p></li>
+<li><p><strong>Fuera de OTIF</strong>, la pieza central de BOREAL, el boosting mixto, gana en tres de siete conjuntos públicos (diabetes,
+citas no asistidas y buses de Nueva York), empata en cuatro y no pierde en ninguno. Gana donde las entidades tienen
+historia propia en el tiempo (<a class="reference internal" href="06_validacion.html"><span class="doc">Validación estadística</span></a>).</p></li>
+</ul>
+</section>
+<section id="veredicto-sobre-r1-r2-y-r3">
+<h2><span class="section-number">14.2. </span>Veredicto sobre R1, R2 y R3<a class="headerlink" href="#veredicto-sobre-r1-r2-y-r3" title="Permalink to this heading">#</a></h2>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>requisito</p></th>
+<th class="head"><p>veredicto</p></th>
+<th class="head"><p>evidencia</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>R1, novedad en la aplicación</strong></p></td>
+<td><p><strong>sí</strong></p></td>
+<td><p>Búsqueda en OpenAlex, Scopus y Web of Science con 26 cadenas en inglés y 5 en español, con fecha (7.331 artículos); seis leídos completos. Ningún estudio de retraso de compras usa efectos aleatorios por entidad, la reducción ordinal de los días de retraso ni efectos ordenados en el tiempo, y ningún método publicado combina los seis rasgos de BOREAL. Cada pieza tiene antecedente y se cita; lo nuevo es la combinación y su aplicación (<a class="reference internal" href="04_novedad.html"><span class="doc">Literatura y novedad del modelo original</span></a>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>R2, implementación algorítmica propia</strong></p></td>
+<td><p><strong>sí</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Boreal</span></code> hereda de <code class="docutils literal notranslate"><span class="pre">BaseEstimator</span></code> y <code class="docutils literal notranslate"><span class="pre">ClassifierMixin</span></code>, y todo el algoritmo (árboles de histograma, efectos cruzados por Newton y EM, reducción ordinal con monotonía, efectos ordenados, TreeSHAP) está escrito con numpy y scipy, sin paquetes de modelos. Tiene formulación, pseudocódigo, complejidad teórica contrastada con la medida, 11 pruebas <code class="docutils literal notranslate"><span class="pre">pytest</span></code> (aprendizaje sintético, reproducibilidad, entradas inválidas, <code class="docutils literal notranslate"><span class="pre">clone</span></code>, <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> con <code class="docutils literal notranslate"><span class="pre">cross_val_score</span></code>, solo numpy y scipy, TreeSHAP igual a Shapley), ablación (la 2 × 2 y el modelo sin el log-normal) y SHAP comparado con el de XGBoost (<a class="reference internal" href="05_modelo_original.html"><span class="doc">Modelo original: efectos por entidad, plazo log-normal y plazo real</span></a>).</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>R3, superioridad estadística</strong></p></td>
+<td><p><strong>parcial</strong></p></td>
+<td><p>En OTIF 2026, BOREAL le gana al ganador de las 112 en AUC por 0,011 [0,003; 0,017] (BCa por órdenes) y DeLong lo confirma después de Holm (p &lt; 0,001); el F1 sube 0,015 [0,004; 0,026]. Las dos pruebas que respetan el tiempo no alcanzan significancia después de Holm sobre las seis pruebas: Diebold-Mariano semanal sobre la pérdida log (p = 0,47) y Wilcoxon sobre el AUC mensual (p = 0,13; delta de Cliff 0,21, pequeño; gana en 7 de 9 meses). En siete conjuntos públicos: gana 3, empata 4, pierde 0; Wilcoxon sobre los siete, p = 0,69 (<a class="reference internal" href="05_modelo_original.html"><span class="doc">Modelo original: efectos por entidad, plazo log-normal y plazo real</span></a>, <a class="reference internal" href="06_validacion.html"><span class="doc">Validación estadística</span></a>).</p></td>
+</tr>
+</tbody>
+</table>
+<p>La superioridad de BOREAL en OTIF es estadísticamente sólida en el AUC del año, que es la medida que decide el
+proyecto, y su intervalo no toca el cero aun remuestreando órdenes completas. No lo es cuando la prueba se parte en
+semanas o meses: la ganancia de 0,011 es del orden de lo que el AUC varía de un mes a otro, y con nueve meses Wilcoxon
+tiene poca potencia. Fuera de OTIF no hay superioridad general, sino un dominio donde sirve. Además, 2026 se miró
+cuatro veces a lo largo del proyecto, así que estas cifras se leen como exploratorias. Por eso el veredicto es parcial:
+BOREAL es mejor que el ganador de las 112 en esta prueba, pero no hay evidencia de que lo sea en cada tramo del tiempo
+ni en cualquier conjunto de datos.</p>
+</section>
+<section id="limitaciones">
+<h2><span class="section-number">14.3. </span>Limitaciones<a class="headerlink" href="#limitaciones" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Una sola empresa y un solo periodo de prueba.</strong> Los datos son de un grupo agroindustrial; la prueba 2026 va de
+enero a septiembre, con septiembre incompleto. Las cifras no se trasladan sin más a otra empresa ni a otro ERP.</p></li>
+<li><p><strong>La prueba 2026 se miró más de una vez.</strong> La primera mirada fue la del modelo de efectos sin ordenar; después se
+eligió el ordenamiento y se volvió a medir. Cada configuración se congeló en la validación 2025 antes de medirla,
+pero la secuencia de miradas hace que las cifras de 2026 del modelo original se lean como exploratorias
+(<a class="reference internal" href="05_modelo_original.html"><span class="doc">Modelo original: efectos por entidad, plazo log-normal y plazo real</span></a>).</p></li>
+<li><p><strong>Los hiperparámetros del aprendiz de BOREAL</strong> salen de una búsqueda con Optuna en la validación, hecha durante la
+exploración con LightGBM como aprendiz. Con la implementación propia no se repitió la búsqueda dentro de la validación
+anidada de ocho bloques: cada celda cuesta horas en un servidor de 32 núcleos. Los efectos y el número de árboles sí
+se fijaron en la validación 2025 con el aprendiz propio.</p></li>
+<li><p><strong>Las entidades nuevas siguen sin resolverse.</strong> En las órdenes con un proveedor o material que no estaba en el
+entrenamiento, ninguna de las cuatro vías probadas mejoró a XGBoost.</p></li>
+<li><p><strong>Fuera de OTIF solo se probó la pieza central.</strong> El modelo log-normal y las variables de plazo real necesitan una
+promesa de entrega y la historia de entregas, que los conjuntos públicos no traen.</p></li>
+</ul>
+</section>
+<section id="trabajo-futuro">
+<h2><span class="section-number">14.4. </span>Trabajo futuro<a class="headerlink" href="#trabajo-futuro" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Comparar BOREAL con GPBoost en los mismos datos, la alternativa publicada más cercana (<a class="reference internal" href="04_novedad.html"><span class="doc">Literatura y novedad del modelo original</span></a>).</p></li>
+<li><p>Una tercera ronda de conjuntos públicos con el criterio fijado de antemano (entidades con historia propia en el
+tiempo), para confirmar o descartar la hipótesis de <a class="reference internal" href="06_validacion.html"><span class="doc">Validación estadística</span></a>.</p></li>
+<li><p>Atacar el arranque en frío con atributos del proveedor y del material que existan antes de su primera orden.</p></li>
+<li><p>Medir el valor operativo: cuántos retrasos se evitan siguiendo las alertas con el presupuesto real de seguimiento.</p></li>
+</ul>
+</section>
+<section id="declaracion-de-autoria-y-de-uso-de-herramientas-de-inteligencia-artificial">
+<h2><span class="section-number">14.5. </span>Declaración de autoría y de uso de herramientas de inteligencia artificial<a class="headerlink" href="#declaracion-de-autoria-y-de-uso-de-herramientas-de-inteligencia-artificial" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="autoria">
+<h2><span class="section-number">14.6. </span>Autoría<a class="headerlink" href="#autoria" title="Permalink to this heading">#</a></h2>
+<p>Declaramos que este trabajo es nuestro: definimos el problema y la pregunta de investigación, obtuvimos y depuramos los
+datos de la empresa con su autorización para uso académico, decidimos el diseño de la evaluación (partición
+cronológica, validación anidada por semestres, métricas y pruebas), elegimos y formulamos el modelo original y
+revisamos cada resultado antes de incluirlo. Respondemos por todo lo que dicen el libro, el tablero y el código.</p>
+<p>Las ideas, métodos y cifras de otros autores se citan en el libro con su referencia (<code class="docutils literal notranslate"><span class="pre">book/references.bib</span></code>). Ninguna
+parte del código se copió de un repositorio ajeno; las bibliotecas usadas son las que lista <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>, y el
+modelo original (<code class="docutils literal notranslate"><span class="pre">original/</span></code>) usa solo numpy y scipy, más <code class="docutils literal notranslate"><span class="pre">BaseEstimator</span></code> y <code class="docutils literal notranslate"><span class="pre">ClassifierMixin</span></code> de scikit-learn.</p>
+</section>
+<section id="uso-de-inteligencia-artificial">
+<h2><span class="section-number">14.7. </span>Uso de inteligencia artificial<a class="headerlink" href="#uso-de-inteligencia-artificial" title="Permalink to this heading">#</a></h2>
+<p>Usamos un asistente de IA generativa, <strong>Claude (Anthropic), a través de Claude Code</strong>, entre septiembre y octubre de
+2026, en estas tareas:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>tarea</p></th>
+<th class="head"><p>qué hizo el asistente</p></th>
+<th class="head"><p>qué hicimos nosotros</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Código</p></td>
+<td><p>escribió borradores de los guiones de extracción, preprocesamiento, experimentos, pruebas, tablero y del modelo original, y los ejecutó a pedido</p></td>
+<td><p>definimos qué debía hacer cada guion, revisamos el código, corrimos y verificamos los resultados contra los datos</p></td>
+</tr>
+<tr class="row-odd"><td><p>Revisión de literatura</p></td>
+<td><p>armó las cadenas de búsqueda a partir de los temas que fijamos, las corrió en OpenAlex y, con nuestra sesión de la biblioteca, en Scopus y Web of Science; tamizó títulos y resúmenes por lotes, resumió en fichas los artículos leídos completos y recomendó familias de métodos</p></td>
+<td><p>fijamos los temas y los criterios del modelo original, revisamos las fichas y decidimos qué método proponer</p></td>
+</tr>
+<tr class="row-even"><td><p>Redacción</p></td>
+<td><p>redactó borradores de capítulos, textos del tablero y diapositivas</p></td>
+<td><p>revisamos, corregimos y aprobamos cada texto; las conclusiones son nuestras</p></td>
+</tr>
+<tr class="row-odd"><td><p>Análisis</p></td>
+<td><p>propuso pruebas estadísticas y diagnósticos, y señaló errores (por ejemplo, fuga de información y comparaciones injustas)</p></td>
+<td><p>decidimos qué pruebas usar y cómo leerlas</p></td>
+</tr>
+</tbody>
+</table>
+<p>El asistente no tuvo acceso a datos fuera de los que le dimos y no aparece como autor. Cada configuración se congeló
+en la validación 2025, con un commit, antes de medirla en 2026; las veces que se miró la prueba 2026 están declaradas
+en el libro. Los datos de entidades (proveedores, materiales, personas) no se publican.</p>
+<p>Nos comprometemos a explicar y a modificar en vivo, en la sustentación, cualquier parte del código, en particular el
+algoritmo del modelo original.</p>
+</section>
+<section id="firmas">
+<h2><span class="section-number">14.8. </span>Firmas<a class="headerlink" href="#firmas" title="Permalink to this heading">#</a></h2>
+<p>Daniel Carbonó Domínguez y Luis Pérez, 25 de octubre de 2026.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="07_tablero.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title"><span class="section-number">13. </span>El tablero y su despliegue</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="09_reproducibilidad.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">15. </span>Reproducibilidad</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hallazgos">14.1. Hallazgos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#veredicto-sobre-r1-r2-y-r3">14.2. Veredicto sobre R1, R2 y R3</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitaciones">14.3. Limitaciones</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trabajo-futuro">14.4. Trabajo futuro</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#declaracion-de-autoria-y-de-uso-de-herramientas-de-inteligencia-artificial">14.5. Declaración de autoría y de uso de herramientas de inteligencia artificial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autoria">14.6. Autoría</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uso-de-inteligencia-artificial">14.7. Uso de inteligencia artificial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#firmas">14.8. Firmas</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por Daniel Carbonó y Luis Pérez
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

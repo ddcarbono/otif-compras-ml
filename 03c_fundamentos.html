@@ -1,0 +1,846 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>8. Fundamentos: XGBoost y el costo de cada modelo &#8212; Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="_static/translations.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '03c_fundamentos';</script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="9. Literatura" href="literatura.html" />
+    <link rel="prev" title="7. El mejor modelo en la prueba 2026" href="03d_mejor_modelo.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Trazabilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_correcciones.html">1. Correcciones del Entregable 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datos y análisis exploratorio</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a_datos.html">2. Los datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b_eda.html">3. Análisis exploratorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c_tiempo_y_fuga.html">4. Tiempo, fuga y preprocesamiento</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelos de referencia</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03a_modelo_base.html">5. Modelo base: regresión logística</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b_112_combinaciones.html">6. Las 112 combinaciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03d_mejor_modelo.html">7. El mejor modelo en la prueba 2026</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">8. Fundamentos: XGBoost y el costo de cada modelo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Literatura y novedad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="literatura.html">9. Literatura</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_novedad.html">10. Literatura y novedad del modelo original</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelo original</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="05_modelo_original.html">11. Modelo original: efectos por entidad, plazo log-normal y plazo real</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_validacion.html">12. La propuesta en otros datos</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tablero, conclusiones y reproducibilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_tablero.html">13. El tablero y su despliegue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">14. Conclusiones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_reproducibilidad.html">15. Reproducibilidad</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="glosario.html">16. Glosario</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/03c_fundamentos.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Fundamentos: XGBoost y el costo de cada modelo</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#el-modelo-una-suma-de-arboles">8.1. El modelo: una suma de árboles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#la-funcion-objetivo">8.2. La función objetivo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-controla-cada-hiperparametro">8.3. Qué controla cada hiperparámetro</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complejidad-teoria-y-medicion">8.4. Complejidad: teoría y medición</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="fundamentos-xgboost-y-el-costo-de-cada-modelo">
+<h1><span class="section-number">8. </span>Fundamentos: XGBoost y el costo de cada modelo<a class="headerlink" href="#fundamentos-xgboost-y-el-costo-de-cada-modelo" title="Permalink to this heading">#</a></h1>
+<p>El capítulo anterior dejó a XGBoost primero en los ocho bloques. Aquí se explica cómo funciona: qué función optimiza,
+cómo elige cada corte y qué controla cada hiperparámetro. Después se compara la complejidad teórica de los siete modelos
+con lo que tardan de verdad, medido con <code class="docutils literal notranslate"><span class="pre">src/complejidad.py</span></code> sobre el bloque más grande (311.865 filas y 593 columnas
+después del preprocesamiento, un hilo, los hiperparámetros que eligió Optuna sin balanceo).</p>
+<section id="el-modelo-una-suma-de-arboles">
+<h2><span class="section-number">8.1. </span>El modelo: una suma de árboles<a class="headerlink" href="#el-modelo-una-suma-de-arboles" title="Permalink to this heading">#</a></h2>
+<p>XGBoost predice el logaritmo de la razón de odds de llegar tarde como una suma de <span class="math notranslate nohighlight">\(M\)</span> árboles de regresión,</p>
+<div class="math notranslate nohighlight">
+\[
+F(x) = \sum_{m=1}^{M} f_m(x), \qquad \hat p(x) = \sigma\big(F(x)\big) = \frac{1}{1 + e^{-F(x)}},
+\]</div>
+<p>donde cada árbol <span class="math notranslate nohighlight">\(f_m\)</span> reparte el espacio de las predictoras en <span class="math notranslate nohighlight">\(T\)</span> hojas y asigna a cada hoja <span class="math notranslate nohighlight">\(j\)</span> un peso <span class="math notranslate nohighlight">\(w_j\)</span>. Los
+árboles se construyen uno tras otro: el árbol <span class="math notranslate nohighlight">\(m\)</span> corrige lo que los <span class="math notranslate nohighlight">\(m-1\)</span> anteriores todavía predicen mal. Es
+<em>boosting</em>, al contrario del bosque aleatorio, que promedia árboles independientes.</p>
+</section>
+<section id="la-funcion-objetivo">
+<h2><span class="section-number">8.2. </span>La función objetivo<a class="headerlink" href="#la-funcion-objetivo" title="Permalink to this heading">#</a></h2>
+<p>En la iteración <span class="math notranslate nohighlight">\(m\)</span> se busca el árbol <span class="math notranslate nohighlight">\(f\)</span> que minimiza la pérdida de entrenamiento más una penalización de su
+complejidad:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{L}^{(m)} = \sum_{i=1}^{n} \ell\big(y_i,\; F_{m-1}(x_i) + f(x_i)\big) + \Omega(f), \qquad
+\Omega(f) = \gamma T + \tfrac{1}{2}\lambda \sum_{j=1}^{T} w_j^2 .
+\]</div>
+<p>La pérdida es la log-pérdida (la entropía cruzada binaria), <span class="math notranslate nohighlight">\(\ell(y, F) = -y \log \sigma(F) - (1-y) \log(1-\sigma(F))\)</span>.
+<span class="math notranslate nohighlight">\(\gamma\)</span> cobra por cada hoja y <span class="math notranslate nohighlight">\(\lambda\)</span> encoge los pesos hacia cero, como la penalización L2 de la regresión logística.</p>
+<p><strong>Aproximación de segundo orden.</strong> XGBoost expande la pérdida en serie de Taylor alrededor de la predicción actual.
+Para la log-pérdida, la primera y la segunda derivada respecto de <span class="math notranslate nohighlight">\(F\)</span> son</p>
+<div class="math notranslate nohighlight">
+\[
+g_i = \frac{\partial \ell}{\partial F} = \hat p_i - y_i, \qquad
+h_i = \frac{\partial^2 \ell}{\partial F^2} = \hat p_i\,(1 - \hat p_i),
+\]</div>
+<p>así que, sin los términos constantes,</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{L}^{(m)} \approx \sum_{i=1}^{n} \Big[g_i f(x_i) + \tfrac{1}{2} h_i f(x_i)^2\Big] + \gamma T +
+\tfrac{1}{2}\lambda \sum_{j} w_j^2 .
+\]</div>
+<p>El gradiente <span class="math notranslate nohighlight">\(g_i\)</span> es el residuo con signo: positivo si el modelo sobreestima el riesgo de una posición que llegó a
+tiempo. El hessiano <span class="math notranslate nohighlight">\(h_i\)</span> es la varianza de Bernoulli: grande cerca de <span class="math notranslate nohighlight">\(\hat p = 0{,}5\)</span>, donde el modelo duda, y
+pequeño cuando ya está seguro.</p>
+<p><strong>Peso óptimo de cada hoja.</strong> Si <span class="math notranslate nohighlight">\(I_j\)</span> son las posiciones que caen en la hoja <span class="math notranslate nohighlight">\(j\)</span>, con <span class="math notranslate nohighlight">\(G_j = \sum_{i \in I_j} g_i\)</span> y
+<span class="math notranslate nohighlight">\(H_j = \sum_{i \in I_j} h_i\)</span>, la expresión es una parábola en cada <span class="math notranslate nohighlight">\(w_j\)</span>, y su mínimo es</p>
+<div class="math notranslate nohighlight">
+\[
+w_j^{*} = -\frac{G_j}{H_j + \lambda}, \qquad
+\mathcal{L}^{*} = -\frac{1}{2}\sum_{j=1}^{T} \frac{G_j^2}{H_j + \lambda} + \gamma T .
+\]</div>
+<p>Es un paso de Newton por hoja: el gradiente dividido por la curvatura, encogido por <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
+<p><strong>Ganancia de un corte.</strong> Partir una hoja en izquierda (L) y derecha (R) cambia la pérdida en</p>
+<div class="math notranslate nohighlight">
+\[
+\text{ganancia} = \frac{1}{2}\left[\frac{G_L^2}{H_L+\lambda} + \frac{G_R^2}{H_R+\lambda} -
+\frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right] - \gamma ,
+\]</div>
+<p>y el árbol solo corta si la ganancia es positiva. Con el método <code class="docutils literal notranslate"><span class="pre">hist</span></code>, cada predictora se discretiza en a lo sumo 256
+tramos y la ganancia se evalúa solo en los bordes de esos tramos. Así, buscar el mejor corte cuesta un recorrido del
+histograma y no ordenar las filas.</p>
+</section>
+<section id="que-controla-cada-hiperparametro">
+<h2><span class="section-number">8.3. </span>Qué controla cada hiperparámetro<a class="headerlink" href="#que-controla-cada-hiperparametro" title="Permalink to this heading">#</a></h2>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>hiperparámetro</p></th>
+<th class="head"><p>en las fórmulas</p></th>
+<th class="head"><p>efecto</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">n_estimators</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(M\)</span></p></td>
+<td><p>más árboles, más capacidad y más costo</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">learning_rate</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\eta\)</span>: se suma <span class="math notranslate nohighlight">\(\eta f\)</span> y no <span class="math notranslate nohighlight">\(f\)</span></p></td>
+<td><p>pasos cortos que necesitan más árboles y generalizan mejor</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_depth</span></code></p></td>
+<td><p>limita <span class="math notranslate nohighlight">\(T \le 2^{D}\)</span></p></td>
+<td><p>profundidad <span class="math notranslate nohighlight">\(D\)</span>: interacciones de hasta <span class="math notranslate nohighlight">\(D\)</span> predictoras</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">min_child_weight</span></code></p></td>
+<td><p>exige <span class="math notranslate nohighlight">\(H_j \ge\)</span> ese valor</p></td>
+<td><p>como <span class="math notranslate nohighlight">\(h_i \le 0{,}25\)</span>, un valor de 8 obliga a unas 32 posiciones dudosas por hoja como mínimo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">subsample</span></code>, <code class="docutils literal notranslate"><span class="pre">colsample_bytree</span></code></p></td>
+<td><p>cada árbol ve una fracción de filas y de columnas</p></td>
+<td><p>azar que decorrelaciona los árboles, como en el bosque</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reg_lambda</span></code>, <code class="docutils literal notranslate"><span class="pre">gamma</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\lambda\)</span> y <span class="math notranslate nohighlight">\(\gamma\)</span></p></td>
+<td><p>se dejaron en sus valores por defecto (<span class="math notranslate nohighlight">\(\lambda = 1\)</span>, <span class="math notranslate nohighlight">\(\gamma = 0\)</span>): el espacio de búsqueda ya regula con la profundidad y el peso mínimo</p></td>
+</tr>
+</tbody>
+</table>
+<p>Lo que eligió Optuna, sin balanceo, en cada bloque:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filas</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;2022-S1&quot;</span><span class="p">,</span> <span class="s2">&quot;2022-S2&quot;</span><span class="p">,</span> <span class="s2">&quot;2023-S1&quot;</span><span class="p">,</span> <span class="s2">&quot;2023-S2&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-S1&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-S2&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-S1&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-S2&quot;</span><span class="p">]:</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">R</span> <span class="o">/</span> <span class="s2">&quot;experimentos&quot;</span> <span class="o">/</span> <span class="s2">&quot;trabajos&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;xgboost__ninguno__optuna__</span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+    <span class="n">filas</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;bloque&quot;</span><span class="p">:</span> <span class="n">b</span><span class="p">,</span> <span class="o">**</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">],</span> <span class="s2">&quot;AUC interno&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;AUC_interno&quot;</span><span class="p">],</span> <span class="s2">&quot;AUC del bloque&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;AUC&quot;</span><span class="p">]})</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">filas</span><span class="p">),</span> <span class="n">dec</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_e9804">
+  <thead>
+    <tr>
+      <th id="T_e9804_level0_col0" class="col_heading level0 col0" >bloque</th>
+      <th id="T_e9804_level0_col1" class="col_heading level0 col1" >n_estimators</th>
+      <th id="T_e9804_level0_col2" class="col_heading level0 col2" >learning_rate</th>
+      <th id="T_e9804_level0_col3" class="col_heading level0 col3" >max_depth</th>
+      <th id="T_e9804_level0_col4" class="col_heading level0 col4" >subsample</th>
+      <th id="T_e9804_level0_col5" class="col_heading level0 col5" >colsample_bytree</th>
+      <th id="T_e9804_level0_col6" class="col_heading level0 col6" >min_child_weight</th>
+      <th id="T_e9804_level0_col7" class="col_heading level0 col7" >AUC interno</th>
+      <th id="T_e9804_level0_col8" class="col_heading level0 col8" >AUC del bloque</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_e9804_row0_col0" class="data row0 col0" >2022-S1</td>
+      <td id="T_e9804_row0_col1" class="data row0 col1" >587</td>
+      <td id="T_e9804_row0_col2" class="data row0 col2" >0,020</td>
+      <td id="T_e9804_row0_col3" class="data row0 col3" >4</td>
+      <td id="T_e9804_row0_col4" class="data row0 col4" >0,944</td>
+      <td id="T_e9804_row0_col5" class="data row0 col5" >0,506</td>
+      <td id="T_e9804_row0_col6" class="data row0 col6" >16,392</td>
+      <td id="T_e9804_row0_col7" class="data row0 col7" >0,835</td>
+      <td id="T_e9804_row0_col8" class="data row0 col8" >0,857</td>
+    </tr>
+    <tr>
+      <td id="T_e9804_row1_col0" class="data row1 col0" >2022-S2</td>
+      <td id="T_e9804_row1_col1" class="data row1 col1" >455</td>
+      <td id="T_e9804_row1_col2" class="data row1 col2" >0,022</td>
+      <td id="T_e9804_row1_col3" class="data row1 col3" >8</td>
+      <td id="T_e9804_row1_col4" class="data row1 col4" >0,908</td>
+      <td id="T_e9804_row1_col5" class="data row1 col5" >0,305</td>
+      <td id="T_e9804_row1_col6" class="data row1 col6" >12,702</td>
+      <td id="T_e9804_row1_col7" class="data row1 col7" >0,861</td>
+      <td id="T_e9804_row1_col8" class="data row1 col8" >0,830</td>
+    </tr>
+    <tr>
+      <td id="T_e9804_row2_col0" class="data row2 col0" >2023-S1</td>
+      <td id="T_e9804_row2_col1" class="data row2 col1" >559</td>
+      <td id="T_e9804_row2_col2" class="data row2 col2" >0,119</td>
+      <td id="T_e9804_row2_col3" class="data row2 col3" >8</td>
+      <td id="T_e9804_row2_col4" class="data row2 col4" >0,693</td>
+      <td id="T_e9804_row2_col5" class="data row2 col5" >0,619</td>
+      <td id="T_e9804_row2_col6" class="data row2 col6" >28,077</td>
+      <td id="T_e9804_row2_col7" class="data row2 col7" >0,833</td>
+      <td id="T_e9804_row2_col8" class="data row2 col8" >0,841</td>
+    </tr>
+    <tr>
+      <td id="T_e9804_row3_col0" class="data row3 col0" >2023-S2</td>
+      <td id="T_e9804_row3_col1" class="data row3 col1" >266</td>
+      <td id="T_e9804_row3_col2" class="data row3 col2" >0,049</td>
+      <td id="T_e9804_row3_col3" class="data row3 col3" >10</td>
+      <td id="T_e9804_row3_col4" class="data row3 col4" >0,535</td>
+      <td id="T_e9804_row3_col5" class="data row3 col5" >0,707</td>
+      <td id="T_e9804_row3_col6" class="data row3 col6" >32,217</td>
+      <td id="T_e9804_row3_col7" class="data row3 col7" >0,845</td>
+      <td id="T_e9804_row3_col8" class="data row3 col8" >0,840</td>
+    </tr>
+    <tr>
+      <td id="T_e9804_row4_col0" class="data row4 col0" >2024-S1</td>
+      <td id="T_e9804_row4_col1" class="data row4 col1" >393</td>
+      <td id="T_e9804_row4_col2" class="data row4 col2" >0,036</td>
+      <td id="T_e9804_row4_col3" class="data row4 col3" >8</td>
+      <td id="T_e9804_row4_col4" class="data row4 col4" >0,693</td>
+      <td id="T_e9804_row4_col5" class="data row4 col5" >0,711</td>
+      <td id="T_e9804_row4_col6" class="data row4 col6" >38,191</td>
+      <td id="T_e9804_row4_col7" class="data row4 col7" >0,843</td>
+      <td id="T_e9804_row4_col8" class="data row4 col8" >0,867</td>
+    </tr>
+    <tr>
+      <td id="T_e9804_row5_col0" class="data row5 col0" >2024-S2</td>
+      <td id="T_e9804_row5_col1" class="data row5 col1" >396</td>
+      <td id="T_e9804_row5_col2" class="data row5 col2" >0,068</td>
+      <td id="T_e9804_row5_col3" class="data row5 col3" >10</td>
+      <td id="T_e9804_row5_col4" class="data row5 col4" >0,631</td>
+      <td id="T_e9804_row5_col5" class="data row5 col5" >0,415</td>
+      <td id="T_e9804_row5_col6" class="data row5 col6" >9,172</td>
+      <td id="T_e9804_row5_col7" class="data row5 col7" >0,874</td>
+      <td id="T_e9804_row5_col8" class="data row5 col8" >0,892</td>
+    </tr>
+    <tr>
+      <td id="T_e9804_row6_col0" class="data row6 col0" >2025-S1</td>
+      <td id="T_e9804_row6_col1" class="data row6 col1" >540</td>
+      <td id="T_e9804_row6_col2" class="data row6 col2" >0,102</td>
+      <td id="T_e9804_row6_col3" class="data row6 col3" >7</td>
+      <td id="T_e9804_row6_col4" class="data row6 col4" >0,734</td>
+      <td id="T_e9804_row6_col5" class="data row6 col5" >0,480</td>
+      <td id="T_e9804_row6_col6" class="data row6 col6" >10,377</td>
+      <td id="T_e9804_row6_col7" class="data row6 col7" >0,894</td>
+      <td id="T_e9804_row6_col8" class="data row6 col8" >0,846</td>
+    </tr>
+    <tr>
+      <td id="T_e9804_row7_col0" class="data row7 col0" >2025-S2</td>
+      <td id="T_e9804_row7_col1" class="data row7 col1" >344</td>
+      <td id="T_e9804_row7_col2" class="data row7 col2" >0,024</td>
+      <td id="T_e9804_row7_col3" class="data row7 col3" >10</td>
+      <td id="T_e9804_row7_col4" class="data row7 col4" >0,522</td>
+      <td id="T_e9804_row7_col5" class="data row7 col5" >0,856</td>
+      <td id="T_e9804_row7_col6" class="data row7 col6" >8,907</td>
+      <td id="T_e9804_row7_col7" class="data row7 col7" >0,850</td>
+      <td id="T_e9804_row7_col8" class="data row7 col8" >0,840</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Con un solo semestre de entrenamiento (2022-S1) gana un modelo de muchos árboles poco profundos: 587 de profundidad
+4, con tasa 0,02. Desde 2022-S2 la profundidad sube a 7-10, porque con más datos caben más interacciones, y en los
+cuatro últimos bloques el submuestreo de filas baja a 0,52-0,73. Los AUC internos de las configuraciones cercanas difieren en milésimas: la superficie es plana cerca del
+óptimo, y por eso los cuatro optimizadores terminaron tan cerca.</p>
+</section>
+<section id="complejidad-teoria-y-medicion">
+<h2><span class="section-number">8.4. </span>Complejidad: teoría y medición<a class="headerlink" href="#complejidad-teoria-y-medicion" title="Permalink to this heading">#</a></h2>
+<p>Notación: <span class="math notranslate nohighlight">\(n\)</span> filas de entrenamiento, <span class="math notranslate nohighlight">\(d = 593\)</span> columnas, <span class="math notranslate nohighlight">\(k = 30\)</span> componentes principales en KNN, <span class="math notranslate nohighlight">\(E\)</span> épocas de SGD,
+<span class="math notranslate nohighlight">\(B\)</span> árboles del bosque con <span class="math notranslate nohighlight">\(m\)</span> columnas por corte, <span class="math notranslate nohighlight">\(M\)</span> árboles de XGBoost de profundidad <span class="math notranslate nohighlight">\(D\)</span>.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>modelo</p></th>
+<th class="head"><p>ajuste</p></th>
+<th class="head"><p>predicción de una fila</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>KNN (PCA 30)</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(n\,d\,k)\)</span> (la PCA); los vecinos no se calculan al ajustar</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(n\,k)\)</span>: compara contra todo el entrenamiento</p></td>
+</tr>
+<tr class="row-odd"><td><p>Naive Bayes</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(n\,d)\)</span>: una media y una varianza por clase y columna</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(d)\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Logística y SVM (SGD)</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(E\,n\,d)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(d)\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Árbol</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(d\,n \log n)\)</span> por nivel de profundidad</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(D)\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Random Forest</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(B\,m\,n \log n)\)</span> por nivel</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(B\,D)\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>XGBoost (<code class="docutils literal notranslate"><span class="pre">hist</span></code>)</p></td>
+<td><p><span class="math notranslate nohighlight">\(O(M\,D\,n\,d')\)</span> para los histogramas, con <span class="math notranslate nohighlight">\(d' = d\cdot\)</span><code class="docutils literal notranslate"><span class="pre">colsample</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(M\,D)\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">R</span> <span class="o">/</span> <span class="s2">&quot;complejidad.csv&quot;</span><span class="p">)</span>
+<span class="n">expo</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;modelo&quot;</span><span class="p">):</span>
+    <span class="n">expo</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;modelo&quot;</span><span class="p">:</span> <span class="n">plots</span><span class="o">.</span><span class="n">MODELO</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+                 <span class="s2">&quot;exponente del ajuste&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">filas</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">segundos_ajuste</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="s2">&quot;exponente de la inferencia&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">filas</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">ms_inferencia_por_1000</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="s2">&quot;s de ajuste con 311.865 filas&quot;</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">segundos_ajuste</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                 <span class="s2">&quot;ms por 1.000 predicciones&quot;</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">ms_inferencia_por_1000</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]})</span>
+<span class="n">expo</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">expo</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;s de ajuste con 311.865 filas&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">expo</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_5058a">
+  <thead>
+    <tr>
+      <th id="T_5058a_level0_col0" class="col_heading level0 col0" >modelo</th>
+      <th id="T_5058a_level0_col1" class="col_heading level0 col1" >exponente del ajuste</th>
+      <th id="T_5058a_level0_col2" class="col_heading level0 col2" >exponente de la inferencia</th>
+      <th id="T_5058a_level0_col3" class="col_heading level0 col3" >s de ajuste con 311.865 filas</th>
+      <th id="T_5058a_level0_col4" class="col_heading level0 col4" >ms por 1.000 predicciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_5058a_row0_col0" class="data row0 col0" >XGBoost</td>
+      <td id="T_5058a_row0_col1" class="data row0 col1" >0,91</td>
+      <td id="T_5058a_row0_col2" class="data row0 col2" >0,03</td>
+      <td id="T_5058a_row0_col3" class="data row0 col3" >161,52</td>
+      <td id="T_5058a_row0_col4" class="data row0 col4" >16,78</td>
+    </tr>
+    <tr>
+      <td id="T_5058a_row1_col0" class="data row1 col0" >Random Forest</td>
+      <td id="T_5058a_row1_col1" class="data row1 col1" >1,03</td>
+      <td id="T_5058a_row1_col2" class="data row1 col2" >0,08</td>
+      <td id="T_5058a_row1_col3" class="data row1 col3" >128,93</td>
+      <td id="T_5058a_row1_col4" class="data row1 col4" >26,91</td>
+    </tr>
+    <tr>
+      <td id="T_5058a_row2_col0" class="data row2 col0" >Árbol</td>
+      <td id="T_5058a_row2_col1" class="data row2 col1" >1,22</td>
+      <td id="T_5058a_row2_col2" class="data row2 col2" >-0,12</td>
+      <td id="T_5058a_row2_col3" class="data row2 col3" >22,10</td>
+      <td id="T_5058a_row2_col4" class="data row2 col4" >0,38</td>
+    </tr>
+    <tr>
+      <td id="T_5058a_row3_col0" class="data row3 col0" >SVM lineal (SGD)</td>
+      <td id="T_5058a_row3_col1" class="data row3 col1" >0,79</td>
+      <td id="T_5058a_row3_col2" class="data row3 col2" >-0,13</td>
+      <td id="T_5058a_row3_col3" class="data row3 col3" >13,10</td>
+      <td id="T_5058a_row3_col4" class="data row3 col4" >0,46</td>
+    </tr>
+    <tr>
+      <td id="T_5058a_row4_col0" class="data row4 col0" >Logística (SGD)</td>
+      <td id="T_5058a_row4_col1" class="data row4 col1" >0,70</td>
+      <td id="T_5058a_row4_col2" class="data row4 col2" >-0,10</td>
+      <td id="T_5058a_row4_col3" class="data row4 col3" >7,12</td>
+      <td id="T_5058a_row4_col4" class="data row4 col4" >0,54</td>
+    </tr>
+    <tr>
+      <td id="T_5058a_row5_col0" class="data row5 col0" >KNN (PCA 30)</td>
+      <td id="T_5058a_row5_col1" class="data row5 col1" >0,98</td>
+      <td id="T_5058a_row5_col2" class="data row5 col2" >0,71</td>
+      <td id="T_5058a_row5_col3" class="data row5 col3" >6,38</td>
+      <td id="T_5058a_row5_col4" class="data row5 col4" >1.564,44</td>
+    </tr>
+    <tr>
+      <td id="T_5058a_row6_col0" class="data row6 col0" >Naive Bayes</td>
+      <td id="T_5058a_row6_col1" class="data row6 col1" >0,97</td>
+      <td id="T_5058a_row6_col2" class="data row6 col2" >-0,02</td>
+      <td id="T_5058a_row6_col3" class="data row6 col3" >1,51</td>
+      <td id="T_5058a_row6_col4" class="data row6 col4" >9,82</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>  <span class="c1"># noqa: E402</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;modelo&quot;</span><span class="p">):</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">filas</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">segundos_ajuste</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines+markers&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">plots</span><span class="o">.</span><span class="n">MODELO</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+                             <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">plots</span><span class="o">.</span><span class="n">COLOR_MOD</span><span class="p">[</span><span class="n">m</span><span class="p">]),</span>
+                             <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;%</span><span class="si">{x:,}</span><span class="s2"> filas: %</span><span class="si">{y:.1f}</span><span class="s2"> s&lt;extra&gt;&quot;</span> <span class="o">+</span> <span class="n">plots</span><span class="o">.</span><span class="n">MODELO</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&lt;/extra&gt;&quot;</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Tiempo de ajuste contra filas de entrenamiento (escala log-log; la pendiente es el exponente)&quot;</span><span class="p">,</span>
+                  <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;filas de entrenamiento&quot;</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;segundos (un hilo)&quot;</span><span class="p">,</span> <span class="n">xaxis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
+                  <span class="n">yaxis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">mostrar</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>                            <div id="8ef90d74-5aba-446d-b463-673b66dceb66" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("8ef90d74-5aba-446d-b463-673b66dceb66")) {                    Plotly.newPlot(                        "8ef90d74-5aba-446d-b463-673b66dceb66",                        [{"hovertemplate":"%{x:,} filas: %{y:.1f} s\u003cextra\u003e\u00c1rbol\u003c\u002fextra\u003e","line":{"color":"#7A5526"},"mode":"lines+markers","name":"\u00c1rbol","x":[38983,77966,155932,311865],"y":[1.7682037770282475,4.11028369795531,9.6864994650241,22.10103711206466],"type":"scatter"},{"hovertemplate":"%{x:,} filas: %{y:.1f} s\u003cextra\u003eKNN (PCA 30)\u003c\u002fextra\u003e","line":{"color":"#6B6B6B"},"mode":"lines+markers","name":"KNN (PCA 30)","x":[38983,77966,155932,311865],"y":[0.8260863670147955,1.5807926850393414,3.111958867870271,6.381151475943625],"type":"scatter"},{"hovertemplate":"%{x:,} filas: %{y:.1f} s\u003cextra\u003eLog\u00edstica (SGD)\u003c\u002fextra\u003e","line":{"color":"#3F6F8F"},"mode":"lines+markers","name":"Log\u00edstica (SGD)","x":[38983,77966,155932,311865],"y":[1.5536630630958823,2.8319240759592503,3.901457299012691,7.1182850080076605],"type":"scatter"},{"hovertemplate":"%{x:,} filas: %{y:.1f} s\u003cextra\u003eNaive Bayes\u003c\u002fextra\u003e","line":{"color":"#BBBBBB"},"mode":"lines+markers","name":"Naive Bayes","x":[38983,77966,155932,311865],"y":[0.2038813929539173,0.387053410988301,0.7632558809127659,1.514654970029369],"type":"scatter"},{"hovertemplate":"%{x:,} filas: %{y:.1f} s\u003cextra\u003eRandom Forest\u003c\u002fextra\u003e","line":{"color":"#405731"},"mode":"lines+markers","name":"Random Forest","x":[38983,77966,155932,311865],"y":[15.332118611084296,31.091667618835345,63.70096711581573,128.93239154410549],"type":"scatter"},{"hovertemplate":"%{x:,} filas: %{y:.1f} s\u003cextra\u003eSVM lineal (SGD)\u003c\u002fextra\u003e","line":{"color":"#8FB3CC"},"mode":"lines+markers","name":"SVM lineal (SGD)","x":[38983,77966,155932,311865],"y":[2.4718411578796804,4.419350498123094,7.1640712230000645,13.099357379833236],"type":"scatter"},{"hovertemplate":"%{x:,} filas: %{y:.1f} s\u003cextra\u003eXGBoost\u003c\u002fextra\u003e","line":{"color":"#B08A2D"},"mode":"lines+markers","name":"XGBoost","x":[38983,77966,155932,311865],"y":[24.53981576790102,45.52605819515884,84.88206826499663,161.52404980710708],"type":"scatter"}],                        {"template":{"layout":{"colorway":["#405731","#B08A2D","#3F6F8F","#6B6B6B","#7A5526"],"font":{"color":"#333333","family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif","size":13},"hoverlabel":{"font":{"family":"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"}},"legend":{"orientation":"h","x":0,"y":-0.18},"margin":{"b":50,"l":60,"r":20,"t":60},"paper_bgcolor":"white","plot_bgcolor":"white","separators":",.","title":{"font":{"size":15},"x":0,"xanchor":"left"},"xaxis":{"linecolor":"#BBBBBB","showgrid":false,"ticks":"outside"},"yaxis":{"gridcolor":"#EEEEEE","linecolor":"#BBBBBB","zeroline":false}}},"xaxis":{"title":{"text":"filas de entrenamiento"},"type":"log"},"yaxis":{"title":{"text":"segundos (un hilo)"},"type":"log"},"title":{"text":"Tiempo de ajuste contra filas de entrenamiento (escala log-log; la pendiente es el exponente)"}},                        {"displaylogo": false, "responsive": true}                    )                };                            </script>        </div></div></div>
+</div>
+<p>El exponente es la pendiente de la recta en escala log-log: 1 quiere decir que el doble de filas cuesta el doble de
+tiempo.</p>
+<ul class="simple">
+<li><p><strong>El ajuste crece casi linealmente en todos</strong> (exponentes entre 0,7 y 1,2), como predice la teoría para <span class="math notranslate nohighlight">\(n\)</span> grande.
+El árbol es el más alto (1,2): el factor <span class="math notranslate nohighlight">\(\log n\)</span> y que, con el mismo mínimo de filas por hoja, más datos permiten
+árboles más llenos. La logística y el SVM quedan por debajo de 1 porque SGD se detiene antes con más datos (cada
+época ya da suficientes pasos).</p></li>
+<li><p><strong>XGBoost y el bosque son los caros</strong> (162 y 129 segundos con todas las filas), uno por los 344 árboles secuenciales
+de profundidad 10 y el otro por los 100 árboles completos.</p></li>
+<li><p><strong>En inferencia la teoría se ve clara.</strong> KNN es el único cuyo costo de predecir crece con el entrenamiento: 1,6
+segundos por cada mil posiciones con todas las filas, porque compara cada posición con todas las del entrenamiento.
+Los demás predicen en tiempo constante: XGBoost recorre 344 caminos de profundidad 10 (17 ms por mil) y los lineales
+hacen un producto punto (menos de 1 ms). Para un tablero que predice una orden al vuelo, cualquiera sirve menos KNN.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03d_mejor_modelo.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title"><span class="section-number">7. </span>El mejor modelo en la prueba 2026</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="literatura.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">9. </span>Literatura</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#el-modelo-una-suma-de-arboles">8.1. El modelo: una suma de árboles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#la-funcion-objetivo">8.2. La función objetivo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-controla-cada-hiperparametro">8.3. Qué controla cada hiperparámetro</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complejidad-teoria-y-medicion">8.4. Complejidad: teoría y medición</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por Daniel Carbonó y Luis Pérez
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

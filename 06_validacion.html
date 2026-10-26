@@ -1,0 +1,790 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>12. Validación estadística &#8212; Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="_static/translations.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '06_validacion';</script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="13. El tablero y su despliegue" href="07_tablero.html" />
+    <link rel="prev" title="11. Modelo original: efectos por entidad, plazo log-normal y plazo real" href="05_modelo_original.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Trazabilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_correcciones.html">1. Correcciones del Entregable 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datos y análisis exploratorio</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a_datos.html">2. Los datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b_eda.html">3. Análisis exploratorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c_tiempo_y_fuga.html">4. Tiempo, fuga y preprocesamiento</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelos de referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03a_modelo_base.html">5. Modelo base: regresión logística</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b_112_combinaciones.html">6. Las 112 combinaciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03d_mejor_modelo.html">7. El mejor modelo en la prueba 2026</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03c_fundamentos.html">8. Fundamentos: XGBoost y el costo de cada modelo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Literatura y novedad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="literatura.html">9. Literatura</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_novedad.html">10. Literatura y novedad del modelo original</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelo original</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="05_modelo_original.html">11. Modelo original: efectos por entidad, plazo log-normal y plazo real</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">12. Validación estadística</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tablero, conclusiones y reproducibilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_tablero.html">13. El tablero y su despliegue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">14. Conclusiones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_reproducibilidad.html">15. Reproducibilidad</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="glosario.html">16. Glosario</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/06_validacion.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Validación estadística</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas-en-el-tiempo-dentro-de-2026">12.1. Pruebas en el tiempo dentro de 2026</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#siete-conjuntos-publicos">12.2. Siete conjuntos públicos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#protocolo">12.2.1. Protocolo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resultados">12.2.2. Resultados</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">12.2.3. Lectura</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-deja-este-capitulo">12.3. Qué deja este capítulo</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="validacion-estadistica">
+<h1><span class="section-number">12. </span>Validación estadística<a class="headerlink" href="#validacion-estadistica" title="Permalink to this heading">#</a></h1>
+<p>El capítulo anterior midió BOREAL contra el XGBoost de las 112 en la prueba 2026 con DeLong e intervalos BCa por
+órdenes. Este agrega dos cosas que pide una afirmación de superioridad: <strong>pruebas que respetan el orden en el tiempo</strong>
+dentro de 2026, con ajuste por comparaciones múltiples y tamaño del efecto, y <strong>siete conjuntos públicos</strong> de OpenML
+donde se mide la pieza central de BOREAL, el boosting mixto, con el mismo protocolo. El código está en
+<code class="docutils literal notranslate"><span class="pre">src/validacion_original.py</span></code>, <code class="docutils literal notranslate"><span class="pre">original/publicos_otif.py</span></code> y <code class="docutils literal notranslate"><span class="pre">original/resumir_publicos_otif.py</span></code>; los conjuntos
+públicos se descargan aparte y no viajan con el repositorio.</p>
+<section id="pruebas-en-el-tiempo-dentro-de-2026">
+<h2><span class="section-number">12.1. </span>Pruebas en el tiempo dentro de 2026<a class="headerlink" href="#pruebas-en-el-tiempo-dentro-de-2026" title="Permalink to this heading">#</a></h2>
+<p>DeLong compara el AUC de todo 2026 y supone posiciones independientes; las de una misma orden no lo son, y por eso el
+capítulo anterior acompaña cada diferencia con un intervalo BCa que remuestrea órdenes. Además, la prueba 2026 tiene
+orden en el tiempo: una ventaja que solo aparece en unas semanas no es la misma que una que se sostiene. Se agregan:</p>
+<ul class="simple">
+<li><p><strong>Diebold-Mariano con la corrección de Harvey, Leybourne y Newbold</strong> sobre la serie semanal de la diferencia de
+pérdida logarítmica media (XGBoost − BOREAL; positiva si BOREAL se equivoca menos), con varianza de Newey-West;</p></li>
+<li><p><strong>Wilcoxon de rangos con signo</strong> sobre las diferencias de AUC mes a mes, y el <strong>delta de Cliff</strong> entre los AUC
+mensuales como tamaño del efecto (no despreciable desde |δ| ≥ 0,147).</p></li>
+</ul>
+<p>Las seis pruebas (tres por contraste: la propuesta completa y el modelo con las mismas 136 variables) se ajustan
+juntas por Holm. Como sensibilidad, fuera de Holm, Diebold-Mariano se repite solo con las semanas de 200 posiciones o
+más: en la media semanal una semana de 10 posiciones pesa lo mismo que una de 2.000.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vo</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">P26</span> <span class="o">/</span> <span class="s2">&quot;validacion_original.csv&quot;</span><span class="p">)</span>
+<span class="n">vo</span><span class="p">[</span><span class="s2">&quot;p (Holm)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;fuera de Holm&quot;</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vo</span><span class="p">[</span><span class="s2">&quot;p (Holm)&quot;</span><span class="p">]]</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">vo</span><span class="p">[[</span><span class="s2">&quot;contraste&quot;</span><span class="p">,</span> <span class="s2">&quot;prueba&quot;</span><span class="p">,</span> <span class="s2">&quot;unidades&quot;</span><span class="p">,</span> <span class="s2">&quot;medida del efecto&quot;</span><span class="p">,</span> <span class="s2">&quot;efecto&quot;</span><span class="p">,</span> <span class="s2">&quot;estadístico&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;p (Holm)&quot;</span><span class="p">]],</span> <span class="n">dec</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+      <span class="n">enteros</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;unidades&quot;</span><span class="p">])</span>
+<span class="n">vm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">P26</span> <span class="o">/</span> <span class="s2">&quot;validacion_original_mensual.csv&quot;</span><span class="p">)</span>
+<span class="n">vm</span> <span class="o">=</span> <span class="n">vm</span><span class="p">[</span><span class="n">vm</span><span class="o">.</span><span class="n">contraste</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="s2">&quot;propuesta completa contra el ganador de las 112&quot;</span><span class="p">)]</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">vm</span><span class="p">[[</span><span class="s2">&quot;mes&quot;</span><span class="p">,</span> <span class="s2">&quot;posiciones&quot;</span><span class="p">,</span> <span class="s2">&quot;AUC BOREAL 136 + nuevas&quot;</span><span class="p">,</span> <span class="s2">&quot;AUC XGBoost 136&quot;</span><span class="p">]],</span> <span class="n">dec</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">enteros</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;posiciones&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_f3dc9">
+  <thead>
+    <tr>
+      <th id="T_f3dc9_level0_col0" class="col_heading level0 col0" >mes</th>
+      <th id="T_f3dc9_level0_col1" class="col_heading level0 col1" >posiciones</th>
+      <th id="T_f3dc9_level0_col2" class="col_heading level0 col2" >AUC BOREAL 136 + nuevas</th>
+      <th id="T_f3dc9_level0_col3" class="col_heading level0 col3" >AUC XGBoost 136</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_f3dc9_row0_col0" class="data row0 col0" >2026-01</td>
+      <td id="T_f3dc9_row0_col1" class="data row0 col1" >3.963</td>
+      <td id="T_f3dc9_row0_col2" class="data row0 col2" >0,833</td>
+      <td id="T_f3dc9_row0_col3" class="data row0 col3" >0,828</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row1_col0" class="data row1 col0" >2026-02</td>
+      <td id="T_f3dc9_row1_col1" class="data row1 col1" >8.215</td>
+      <td id="T_f3dc9_row1_col2" class="data row1 col2" >0,870</td>
+      <td id="T_f3dc9_row1_col3" class="data row1 col3" >0,859</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row2_col0" class="data row2 col0" >2026-03</td>
+      <td id="T_f3dc9_row2_col1" class="data row2 col1" >6.996</td>
+      <td id="T_f3dc9_row2_col2" class="data row2 col2" >0,832</td>
+      <td id="T_f3dc9_row2_col3" class="data row2 col3" >0,811</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row3_col0" class="data row3 col0" >2026-04</td>
+      <td id="T_f3dc9_row3_col1" class="data row3 col1" >6.751</td>
+      <td id="T_f3dc9_row3_col2" class="data row3 col2" >0,866</td>
+      <td id="T_f3dc9_row3_col3" class="data row3 col3" >0,855</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row4_col0" class="data row4 col0" >2026-05</td>
+      <td id="T_f3dc9_row4_col1" class="data row4 col1" >6.652</td>
+      <td id="T_f3dc9_row4_col2" class="data row4 col2" >0,875</td>
+      <td id="T_f3dc9_row4_col3" class="data row4 col3" >0,879</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row5_col0" class="data row5 col0" >2026-06</td>
+      <td id="T_f3dc9_row5_col1" class="data row5 col1" >6.604</td>
+      <td id="T_f3dc9_row5_col2" class="data row5 col2" >0,845</td>
+      <td id="T_f3dc9_row5_col3" class="data row5 col3" >0,805</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row6_col0" class="data row6 col0" >2026-07</td>
+      <td id="T_f3dc9_row6_col1" class="data row6 col1" >7.055</td>
+      <td id="T_f3dc9_row6_col2" class="data row6 col2" >0,864</td>
+      <td id="T_f3dc9_row6_col3" class="data row6 col3" >0,858</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row7_col0" class="data row7 col0" >2026-08</td>
+      <td id="T_f3dc9_row7_col1" class="data row7 col1" >4.648</td>
+      <td id="T_f3dc9_row7_col2" class="data row7 col2" >0,853</td>
+      <td id="T_f3dc9_row7_col3" class="data row7 col3" >0,847</td>
+    </tr>
+    <tr>
+      <td id="T_f3dc9_row8_col0" class="data row8 col0" >2026-09</td>
+      <td id="T_f3dc9_row8_col1" class="data row8 col1" >1.016</td>
+      <td id="T_f3dc9_row8_col2" class="data row8 col2" >0,884</td>
+      <td id="T_f3dc9_row8_col3" class="data row8 col3" >0,917</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<ul class="simple">
+<li><p><strong>DeLong</strong> confirma la diferencia de AUC de todo 2026 en los dos contrastes (p &lt; 0,001 después de Holm). Su z de 12,6
+está inflado por suponer posiciones independientes; el intervalo BCa por órdenes del capítulo anterior, [0,003;
+0,017], es la medida honesta de la incertidumbre, y tampoco toca el cero.</p></li>
+<li><p><strong>Mes a mes</strong>, BOREAL tiene el AUC más alto en siete de los nueve meses; pierde en mayo y en septiembre, que tiene
+1.016 posiciones. Wilcoxon no alcanza significancia (p = 0,13; 0,52 con Holm) y el delta de Cliff es 0,21, pequeño.
+Con nueve meses la prueba tiene poca potencia: para p &lt; 0,05 haría falta ganar en casi todos con diferencias grandes.</p></li>
+<li><p><strong>En la pérdida logarítmica semanal</strong>, Diebold-Mariano no encuentra diferencia (p = 0,47). La media semanal es
+negativa por las últimas semanas de la prueba, de 10 a 183 posiciones, donde las pocas órdenes ya resueltas son
+atípicas y BOREAL, con probabilidades más extremas, pierde mucho en pocas filas. Con las 36 semanas de 200
+posiciones o más, BOREAL se equivoca menos (0,013 por posición, p = 0,007; con las 136, p = 0,014). Esta
+sensibilidad se decidió después de ver la serie, así que no entra en Holm ni en el veredicto: muestra de dónde sale
+el resultado nulo, no lo reemplaza.</p></li>
+</ul>
+<p>En conjunto, la ventaja de BOREAL en el AUC de todo 2026 está bien establecida, pero es del orden de la variación entre
+meses: las dos pruebas que respetan el tiempo no la confirman después de Holm.</p>
+</section>
+<section id="siete-conjuntos-publicos">
+<h2><span class="section-number">12.2. </span>Siete conjuntos públicos<a class="headerlink" href="#siete-conjuntos-publicos" title="Permalink to this heading">#</a></h2>
+<section id="protocolo">
+<h3><span class="section-number">12.2.1. </span>Protocolo<a class="headerlink" href="#protocolo" title="Permalink to this heading">#</a></h3>
+<p>El mismo para los dos modelos y los siete conjuntos:</p>
+<ul class="simple">
+<li><p><strong>Preprocesamiento común.</strong> Las columnas con muchos valores van con codificación por objetivo suavizada, fuera de
+pliegue en el entrenamiento; las numéricas, tal cual. El boosting mixto cambia la codificación de sus entidades por efectos
+aleatorios, como en OTIF.</p></li>
+<li><p><strong>Mismo presupuesto.</strong> Optuna con 20 evaluaciones sobre el AUC de validación y la misma semilla. XGBoost busca en
+el espacio de las 112; el boosting mixto, en el suyo.</p></li>
+<li><p><strong>Una sola medida.</strong> Se reajusta con entrenamiento y validación y se mide una vez en la prueba: AUC con DeLong
+pareado, intervalo de la diferencia por <em>bootstrap</em> y F1 al umbral de máximo F1 de la validación.</p></li>
+<li><p><strong>Partición.</strong> Temporal donde el conjunto trae fecha; si no la trae, estratificada 60/20/20.</p></li>
+</ul>
+<p>El modelo log-normal y las variables nuevas no se pueden llevar a estos conjuntos: necesitan un plazo prometido y la
+historia de entregas, que solo trae OTIF. Lo que se mide aquí es el boosting mixto solo.</p>
+<p><strong>Dos rondas.</strong> La primera tomó tres conjuntos conocidos: retrasos de vuelos (Airlines), acceso de empleados (Amazon) y
+clics en publicidad (Click). Sus resultados dieron una hipótesis: el boosting mixto necesita rasgos que OTIF tiene. Con ella se fijó,
+antes de correr, el criterio de la segunda ronda: conjuntos con al menos dos de tres rasgos (entidades que se repiten,
+orden en el tiempo, desenlace continuo u ordinal). Entraron los retrasos de buses escolares de Nueva York, los del
+transporte público de Zúrich, los reingresos hospitalarios de Diabetes130US y las citas médicas no asistidas. Se
+reportan todos.</p>
+</section>
+<section id="resultados">
+<h3><span class="section-number">12.2.2. </span>Resultados<a class="headerlink" href="#resultados" title="Permalink to this heading">#</a></h3>
+<p>El p de DeLong se ajusta por Holm sobre los siete conjuntos. «Gana» o «pierde» es con p ajustado menor que 0,05.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NOMBRE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;airlines&quot;</span><span class="p">:</span> <span class="s2">&quot;Airlines (vuelos)&quot;</span><span class="p">,</span> <span class="s2">&quot;amazon&quot;</span><span class="p">:</span> <span class="s2">&quot;Amazon (acceso)&quot;</span><span class="p">,</span> <span class="s2">&quot;click&quot;</span><span class="p">:</span> <span class="s2">&quot;Click (publicidad)&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;nyc_bus&quot;</span><span class="p">:</span> <span class="s2">&quot;Buses de Nueva York&quot;</span><span class="p">,</span> <span class="s2">&quot;zurich&quot;</span><span class="p">:</span> <span class="s2">&quot;Transporte de Zúrich&quot;</span><span class="p">,</span> <span class="s2">&quot;diabetes&quot;</span><span class="p">:</span> <span class="s2">&quot;Diabetes130US (reingreso)&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;noshow&quot;</span><span class="p">:</span> <span class="s2">&quot;Citas no asistidas&quot;</span><span class="p">}</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">conjunto</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">conjunto</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">NOMBRE</span><span class="p">),</span> <span class="n">IC</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">a</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">; </span><span class="si">{</span><span class="n">b</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">ic_lo</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">ic_hi</span><span class="p">)])</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">t</span><span class="p">[[</span><span class="s2">&quot;ronda&quot;</span><span class="p">,</span> <span class="s2">&quot;conjunto&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;tasa&quot;</span><span class="p">,</span> <span class="s2">&quot;auc_xgb&quot;</span><span class="p">,</span> <span class="s2">&quot;auc_k3&quot;</span><span class="p">,</span> <span class="s2">&quot;dif&quot;</span><span class="p">,</span> <span class="s2">&quot;IC&quot;</span><span class="p">,</span> <span class="s2">&quot;p_holm&quot;</span><span class="p">,</span> <span class="s2">&quot;veredicto&quot;</span><span class="p">,</span> <span class="s2">&quot;f1_xgb&quot;</span><span class="p">,</span> <span class="s2">&quot;f1_k3&quot;</span><span class="p">]]</span>
+      <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tasa&quot;</span><span class="p">:</span> <span class="s2">&quot;positivos&quot;</span><span class="p">,</span> <span class="s2">&quot;auc_xgb&quot;</span><span class="p">:</span> <span class="s2">&quot;AUC XGBoost&quot;</span><span class="p">,</span> <span class="s2">&quot;auc_k3&quot;</span><span class="p">:</span> <span class="s2">&quot;AUC boosting mixto&quot;</span><span class="p">,</span> <span class="s2">&quot;dif&quot;</span><span class="p">:</span> <span class="s2">&quot;ΔAUC (mixto − XGB)&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;IC&quot;</span><span class="p">:</span> <span class="s2">&quot;IC 95 %&quot;</span><span class="p">,</span> <span class="s2">&quot;p_holm&quot;</span><span class="p">:</span> <span class="s2">&quot;p (Holm)&quot;</span><span class="p">,</span> <span class="s2">&quot;f1_xgb&quot;</span><span class="p">:</span> <span class="s2">&quot;F1 XGBoost&quot;</span><span class="p">,</span> <span class="s2">&quot;f1_k3&quot;</span><span class="p">:</span> <span class="s2">&quot;F1 boosting mixto&quot;</span><span class="p">}),</span>
+      <span class="n">dec</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">pct</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;positivos&quot;</span><span class="p">],</span> <span class="n">enteros</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;ronda&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_db3c3">
+  <thead>
+    <tr>
+      <th id="T_db3c3_level0_col0" class="col_heading level0 col0" >ronda</th>
+      <th id="T_db3c3_level0_col1" class="col_heading level0 col1" >conjunto</th>
+      <th id="T_db3c3_level0_col2" class="col_heading level0 col2" >n</th>
+      <th id="T_db3c3_level0_col3" class="col_heading level0 col3" >positivos</th>
+      <th id="T_db3c3_level0_col4" class="col_heading level0 col4" >AUC XGBoost</th>
+      <th id="T_db3c3_level0_col5" class="col_heading level0 col5" >AUC boosting mixto</th>
+      <th id="T_db3c3_level0_col6" class="col_heading level0 col6" >ΔAUC (mixto − XGB)</th>
+      <th id="T_db3c3_level0_col7" class="col_heading level0 col7" >IC 95 %</th>
+      <th id="T_db3c3_level0_col8" class="col_heading level0 col8" >p (Holm)</th>
+      <th id="T_db3c3_level0_col9" class="col_heading level0 col9" >veredicto</th>
+      <th id="T_db3c3_level0_col10" class="col_heading level0 col10" >F1 XGBoost</th>
+      <th id="T_db3c3_level0_col11" class="col_heading level0 col11" >F1 boosting mixto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_db3c3_row0_col0" class="data row0 col0" >1</td>
+      <td id="T_db3c3_row0_col1" class="data row0 col1" >Airlines (vuelos)</td>
+      <td id="T_db3c3_row0_col2" class="data row0 col2" >100.000</td>
+      <td id="T_db3c3_row0_col3" class="data row0 col3" >15,6 %</td>
+      <td id="T_db3c3_row0_col4" class="data row0 col4" >0,637</td>
+      <td id="T_db3c3_row0_col5" class="data row0 col5" >0,633</td>
+      <td id="T_db3c3_row0_col6" class="data row0 col6" >-0,004</td>
+      <td id="T_db3c3_row0_col7" class="data row0 col7" >[-0,009; 0,001]</td>
+      <td id="T_db3c3_row0_col8" class="data row0 col8" >0,217</td>
+      <td id="T_db3c3_row0_col9" class="data row0 col9" >empate</td>
+      <td id="T_db3c3_row0_col10" class="data row0 col10" >0,212</td>
+      <td id="T_db3c3_row0_col11" class="data row0 col11" >0,306</td>
+    </tr>
+    <tr>
+      <td id="T_db3c3_row1_col0" class="data row1 col0" >1</td>
+      <td id="T_db3c3_row1_col1" class="data row1 col1" >Amazon (acceso)</td>
+      <td id="T_db3c3_row1_col2" class="data row1 col2" >32.769</td>
+      <td id="T_db3c3_row1_col3" class="data row1 col3" >5,8 %</td>
+      <td id="T_db3c3_row1_col4" class="data row1 col4" >0,867</td>
+      <td id="T_db3c3_row1_col5" class="data row1 col5" >0,859</td>
+      <td id="T_db3c3_row1_col6" class="data row1 col6" >-0,008</td>
+      <td id="T_db3c3_row1_col7" class="data row1 col7" >[-0,017; 0,001]</td>
+      <td id="T_db3c3_row1_col8" class="data row1 col8" >0,217</td>
+      <td id="T_db3c3_row1_col9" class="data row1 col9" >empate</td>
+      <td id="T_db3c3_row1_col10" class="data row1 col10" >0,448</td>
+      <td id="T_db3c3_row1_col11" class="data row1 col11" >0,448</td>
+    </tr>
+    <tr>
+      <td id="T_db3c3_row2_col0" class="data row2 col0" >1</td>
+      <td id="T_db3c3_row2_col1" class="data row2 col1" >Click (publicidad)</td>
+      <td id="T_db3c3_row2_col2" class="data row2 col2" >39.948</td>
+      <td id="T_db3c3_row2_col3" class="data row2 col3" >16,8 %</td>
+      <td id="T_db3c3_row2_col4" class="data row2 col4" >0,707</td>
+      <td id="T_db3c3_row2_col5" class="data row2 col5" >0,699</td>
+      <td id="T_db3c3_row2_col6" class="data row2 col6" >-0,007</td>
+      <td id="T_db3c3_row2_col7" class="data row2 col7" >[-0,013; -0,002]</td>
+      <td id="T_db3c3_row2_col8" class="data row2 col8" >0,057</td>
+      <td id="T_db3c3_row2_col9" class="data row2 col9" >empate</td>
+      <td id="T_db3c3_row2_col10" class="data row2 col10" >0,384</td>
+      <td id="T_db3c3_row2_col11" class="data row2 col11" >0,379</td>
+    </tr>
+    <tr>
+      <td id="T_db3c3_row3_col0" class="data row3 col0" >2</td>
+      <td id="T_db3c3_row3_col1" class="data row3 col1" >Diabetes130US (reingreso)</td>
+      <td id="T_db3c3_row3_col2" class="data row3 col2" >101.766</td>
+      <td id="T_db3c3_row3_col3" class="data row3 col3" >11,2 %</td>
+      <td id="T_db3c3_row3_col4" class="data row3 col4" >0,659</td>
+      <td id="T_db3c3_row3_col5" class="data row3 col5" >0,676</td>
+      <td id="T_db3c3_row3_col6" class="data row3 col6" >0,017</td>
+      <td id="T_db3c3_row3_col7" class="data row3 col7" >[0,009; 0,025]</td>
+      <td id="T_db3c3_row3_col8" class="data row3 col8" >7,0e-04</td>
+      <td id="T_db3c3_row3_col9" class="data row3 col9" >boosting mixto gana</td>
+      <td id="T_db3c3_row3_col10" class="data row3 col10" >0,256</td>
+      <td id="T_db3c3_row3_col11" class="data row3 col11" >0,277</td>
+    </tr>
+    <tr>
+      <td id="T_db3c3_row4_col0" class="data row4 col0" >2</td>
+      <td id="T_db3c3_row4_col1" class="data row4 col1" >Citas no asistidas</td>
+      <td id="T_db3c3_row4_col2" class="data row4 col2" >110.522</td>
+      <td id="T_db3c3_row4_col3" class="data row4 col3" >20,2 %</td>
+      <td id="T_db3c3_row4_col4" class="data row4 col4" >0,730</td>
+      <td id="T_db3c3_row4_col5" class="data row4 col5" >0,735</td>
+      <td id="T_db3c3_row4_col6" class="data row4 col6" >0,005</td>
+      <td id="T_db3c3_row4_col7" class="data row4 col7" >[0,002; 0,007]</td>
+      <td id="T_db3c3_row4_col8" class="data row4 col8" >0,002</td>
+      <td id="T_db3c3_row4_col9" class="data row4 col9" >boosting mixto gana</td>
+      <td id="T_db3c3_row4_col10" class="data row4 col10" >0,419</td>
+      <td id="T_db3c3_row4_col11" class="data row4 col11" >0,427</td>
+    </tr>
+    <tr>
+      <td id="T_db3c3_row5_col0" class="data row5 col0" >2</td>
+      <td id="T_db3c3_row5_col1" class="data row5 col1" >Buses de Nueva York</td>
+      <td id="T_db3c3_row5_col2" class="data row5 col2" >125.706</td>
+      <td id="T_db3c3_row5_col3" class="data row5 col3" >18,3 %</td>
+      <td id="T_db3c3_row5_col4" class="data row5 col4" >0,844</td>
+      <td id="T_db3c3_row5_col5" class="data row5 col5" >0,852</td>
+      <td id="T_db3c3_row5_col6" class="data row5 col6" >0,008</td>
+      <td id="T_db3c3_row5_col7" class="data row5 col7" >[0,005; 0,010]</td>
+      <td id="T_db3c3_row5_col8" class="data row5 col8" >0,000</td>
+      <td id="T_db3c3_row5_col9" class="data row5 col9" >boosting mixto gana</td>
+      <td id="T_db3c3_row5_col10" class="data row5 col10" >0,565</td>
+      <td id="T_db3c3_row5_col11" class="data row5 col11" >0,575</td>
+    </tr>
+    <tr>
+      <td id="T_db3c3_row6_col0" class="data row6 col0" >2</td>
+      <td id="T_db3c3_row6_col1" class="data row6 col1" >Transporte de Zúrich</td>
+      <td id="T_db3c3_row6_col2" class="data row6 col2" >27.327</td>
+      <td id="T_db3c3_row6_col3" class="data row6 col3" >7,3 %</td>
+      <td id="T_db3c3_row6_col4" class="data row6 col4" >0,830</td>
+      <td id="T_db3c3_row6_col5" class="data row6 col5" >0,836</td>
+      <td id="T_db3c3_row6_col6" class="data row6 col6" >0,006</td>
+      <td id="T_db3c3_row6_col7" class="data row6 col7" >[-0,004; 0,018]</td>
+      <td id="T_db3c3_row6_col8" class="data row6 col8" >0,217</td>
+      <td id="T_db3c3_row6_col9" class="data row6 col9" >empate</td>
+      <td id="T_db3c3_row6_col10" class="data row6 col10" >0,390</td>
+      <td id="T_db3c3_row6_col11" class="data row6 col11" >0,390</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>El boosting mixto gana en tres conjuntos, empata en cuatro y no pierde en ninguno. El F1 es mayor con él en seis de
+los siete. La prueba de Wilcoxon sobre las siete diferencias de AUC da p = 0,69: <strong>no hay una superioridad general</strong>
+del boosting mixto sobre XGBoost, pero tampoco una inferioridad en ninguno.</p>
+</section>
+<section id="lectura">
+<h3><span class="section-number">12.2.3. </span>Lectura<a class="headerlink" href="#lectura" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Gana donde una entidad tiene historia propia repetida en el tiempo.</strong> En Diabetes130US (+0,017 [0,009; 0,025]) y
+en las citas no asistidas (+0,005 [0,002; 0,008]) el paciente vuelve, como el proveedor y el material en OTIF; en
+los buses escolares de Nueva York (+0,008 [0,005; 0,010]) se repiten el bus, la ruta y la empresa, con el retraso
+en minutos como desenlace continuo.</p></li>
+<li><p><strong>Empata en los otros cuatro.</strong> En vuelos y en Zúrich las entidades son pocas y estables (aerolínea, línea), y la
+codificación por objetivo de XGBoost ya las aprovecha. En Amazon y Click, sin tiempo ni desenlace continuo, el
+boosting mixto queda por debajo en AUC (−0,008 y −0,007), pero la diferencia no sobrevive al ajuste por Holm.</p></li>
+</ul>
+<p><strong>Cuidado.</strong> El criterio de la segunda ronda se fijó antes de correrla, y en ella el boosting mixto gana en tres de
+cuatro; pero los conjuntos se eligieron por parecerse a OTIF, así que esto es evidencia de dónde sirve el método, no
+de que sea mejor en general.</p>
+<p>Dos limitaciones más. Airlines no trae el año, así que su partición es por mes del año (estacional, no estrictamente
+temporal). Y en OTIF la ganancia de la propuesta viene también del plazo log-normal y de las variables nuevas, que
+aquí no se pueden probar.</p>
+</section>
+</section>
+<section id="que-deja-este-capitulo">
+<h2><span class="section-number">12.3. </span>Qué deja este capítulo<a class="headerlink" href="#que-deja-este-capitulo" title="Permalink to this heading">#</a></h2>
+<p>BOREAL le gana al ganador de las 112 en el AUC de 2026 con un intervalo por órdenes que no toca el cero, y DeLong lo
+confirma después de Holm. Las pruebas que respetan el tiempo, Diebold-Mariano semanal y Wilcoxon mensual, no alcanzan
+significancia: la ganancia de 0,011 es real en el año, pero pequeña frente a lo que varía de un mes a otro. Fuera de
+OTIF, la pieza central de BOREAL gana en tres de siete conjuntos públicos, empata en cuatro y no pierde en ninguno,
+sin superioridad general (Wilcoxon p = 0,69). El veredicto sobre R3 está en <a class="reference internal" href="08_conclusiones.html"><span class="doc">Conclusiones</span></a>.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="05_modelo_original.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title"><span class="section-number">11. </span>Modelo original: efectos por entidad, plazo log-normal y plazo real</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="07_tablero.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">13. </span>El tablero y su despliegue</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pruebas-en-el-tiempo-dentro-de-2026">12.1. Pruebas en el tiempo dentro de 2026</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#siete-conjuntos-publicos">12.2. Siete conjuntos públicos</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#protocolo">12.2.1. Protocolo</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resultados">12.2.2. Resultados</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lectura">12.2.3. Lectura</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-deja-este-capitulo">12.3. Qué deja este capítulo</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por Daniel Carbonó y Luis Pérez
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

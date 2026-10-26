@@ -1,0 +1,572 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>15. Reproducibilidad &#8212; Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="_static/translations.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '09_reproducibilidad';</script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="16. Glosario" href="glosario.html" />
+    <link rel="prev" title="14. Conclusiones" href="08_conclusiones.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Trazabilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_correcciones.html">1. Correcciones del Entregable 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datos y análisis exploratorio</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a_datos.html">2. Los datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b_eda.html">3. Análisis exploratorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c_tiempo_y_fuga.html">4. Tiempo, fuga y preprocesamiento</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelos de referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03a_modelo_base.html">5. Modelo base: regresión logística</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b_112_combinaciones.html">6. Las 112 combinaciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03d_mejor_modelo.html">7. El mejor modelo en la prueba 2026</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03c_fundamentos.html">8. Fundamentos: XGBoost y el costo de cada modelo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Literatura y novedad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="literatura.html">9. Literatura</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_novedad.html">10. Literatura y novedad del modelo original</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelo original</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="05_modelo_original.html">11. Modelo original: efectos por entidad, plazo log-normal y plazo real</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_validacion.html">12. La propuesta en otros datos</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tablero, conclusiones y reproducibilidad</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_tablero.html">13. El tablero y su despliegue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">14. Conclusiones</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">15. Reproducibilidad</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="glosario.html">16. Glosario</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/09_reproducibilidad.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Reproducibilidad</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entorno">15.1. Entorno</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orden-de-ejecucion">15.2. Orden de ejecución</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-no-viaja">15.3. Qué no viaja</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-maestra">15.4. Tabla maestra</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bibliografia">15.5. Bibliografía</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="reproducibilidad">
+<h1><span class="section-number">15. </span>Reproducibilidad<a class="headerlink" href="#reproducibilidad" title="Permalink to this heading">#</a></h1>
+<p>Todo número de este libro sale de un archivo del repositorio que se puede volver a correr. Este capítulo dice con qué
+entorno, en qué orden y qué no viaja.</p>
+<section id="entorno">
+<h2><span class="section-number">15.1. </span>Entorno<a class="headerlink" href="#entorno" title="Permalink to this heading">#</a></h2>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>para qué</p></th>
+<th class="head"><p>Python</p></th>
+<th class="head"><p>dependencias</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>libro y cálculos</p></td>
+<td><p>3.9</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">book/requirements.txt</span></code> (versiones exactas)</p></td>
+</tr>
+<tr class="row-odd"><td><p>tablero y pruebas</p></td>
+<td><p>3.11.9 (el de Render)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> y <code class="docutils literal notranslate"><span class="pre">requirements-dev.txt</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>las 112 combinaciones, BOREAL y los conjuntos públicos</p></td>
+<td><p>3.12, en un servidor de 32 núcleos</p></td>
+<td><p>las mismas versiones de numpy, scipy, scikit-learn, pandas, XGBoost y Optuna; guiones en <code class="docutils literal notranslate"><span class="pre">srvgdai/</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>La semilla global es 2026 (<code class="docutils literal notranslate"><span class="pre">SEMILLA</span></code> en <code class="docutils literal notranslate"><span class="pre">src/datos.py</span></code>); todos los guiones la usan, también el boosting propio de
+BOREAL (<code class="docutils literal notranslate"><span class="pre">original/arboles_propios.py</span></code>), cuyo resultado es idéntico con la misma semilla (prueba
+<code class="docutils literal notranslate"><span class="pre">test_reproducible_con_la_misma_semilla</span></code>).</p>
+</section>
+<section id="orden-de-ejecucion">
+<h2><span class="section-number">15.2. </span>Orden de ejecución<a class="headerlink" href="#orden-de-ejecucion" title="Permalink to this heading">#</a></h2>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>paso</p></th>
+<th class="head"><p>comando</p></th>
+<th class="head"><p>deja</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1. Datos del tablero y EDA</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">book/compilar.py</span> <span class="pre">02a_datos</span> <span class="pre">02b_eda</span> <span class="pre">02c_tiempo_y_fuga</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.preparar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">resultados/eda/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>2. Modelo base</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.modelo_base</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">resultados/modelo_base/</span></code>, <code class="docutils literal notranslate"><span class="pre">artifacts/logistica.*</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>3. Las 112 combinaciones</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">srvgdai/subir.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">srvgdai/preparar.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">srvgdai/correr.sh</span></code>; luego <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.experimentos</span> <span class="pre">tabla</span></code> y <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.comparar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">resultados/experimentos/</span></code> (un JSON por trabajo) y <code class="docutils literal notranslate"><span class="pre">resultados/tabla_maestra.csv</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>4. Pruebas sobre las predicciones</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">srvgdai/puntajes.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.comparar_pruebas</span></code>, <code class="docutils literal notranslate"><span class="pre">srvgdai/estabilidad.sh</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.diagnostico_validacion</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">resultados/pruebas/</span></code>, <code class="docutils literal notranslate"><span class="pre">resultados/estabilidad/</span></code>, <code class="docutils literal notranslate"><span class="pre">resultados/diagnostico/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>5. Modelo original</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">srvgdai/subir_boreal.sh</span></code>; <code class="docutils literal notranslate"><span class="pre">srvgdai/boreal.sh</span> <span class="pre">validacion</span></code>, commit de <code class="docutils literal notranslate"><span class="pre">original/config_2x2/</span></code>, <code class="docutils literal notranslate"><span class="pre">srvgdai/boreal.sh</span> <span class="pre">prueba</span></code>; <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">original/evaluar_2x2_otif.py</span> <span class="pre">&lt;datos&gt;</span> <span class="pre">--fase</span> <span class="pre">comparar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">original/config_2x2/</span></code>, las predicciones de 2026 y <code class="docutils literal notranslate"><span class="pre">original/evaluar_2x2_otif_comparar.txt</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>6. Prueba 2026 y modelo servido</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.modelo_final</span> <span class="pre">&lt;pred&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.prueba_2026</span> <span class="pre">&lt;pred&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.xgb_vs_logistica</span> <span class="pre">&lt;pred&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.lime_xgb</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">original/servir_original.py</span> <span class="pre">&lt;datos&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.prediccion</span> <span class="pre">--modelo</span> <span class="pre">xgboost</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.tabla_completa</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">resultados/prueba_2026/</span></code>, <code class="docutils literal notranslate"><span class="pre">artifacts/</span></code>, <code class="docutils literal notranslate"><span class="pre">resultados/tabla_maestra_completa.csv</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>7. Conjuntos públicos</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">srvgdai/boreal.sh</span> <span class="pre">publicos</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">original/resumir_publicos_otif.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">original/publicos_otif_resumen.*</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>8. Libro y pruebas</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">book/compilar.py</span></code>, <code class="docutils literal notranslate"><span class="pre">jupyter-book</span> <span class="pre">build</span> <span class="pre">book/</span></code>, <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">-q</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">book/_build/html</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>El paso 5 fija Platt y el umbral en la validación 2025 y los guarda en <code class="docutils literal notranslate"><span class="pre">original/config_2x2/</span></code> <strong>antes</strong> de medir 2026:
+ese commit es la constancia de que la prueba no eligió nada.</p>
+</section>
+<section id="que-no-viaja">
+<h2><span class="section-number">15.3. </span>Qué no viaja<a class="headerlink" href="#que-no-viaja" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>El dataset completo</strong> (<code class="docutils literal notranslate"><span class="pre">otif_depurado.csv</span></code>, 342 MB) es de uso académico autorizado y no se redistribuye; se entrega
+aparte al docente. Los guiones lo leen de la variable de entorno <code class="docutils literal notranslate"><span class="pre">OTIF_CSV</span></code>.</p></li>
+<li><p><strong>Las tablas de entidades.</strong> El <em>pipeline</em> entrenado de XGBoost (<code class="docutils literal notranslate"><span class="pre">artifacts/xgboost.joblib</span></code>) y las piezas de BOREAL
+guardan la tasa o el efecto de cada código de proveedor, material o comprador; no se publican. Lo publicado
+(<code class="docutils literal notranslate"><span class="pre">artifacts/servido.joblib</span></code>, <code class="docutils literal notranslate"><span class="pre">artifacts/original_servido.joblib</span></code>) recibe esas entidades ya convertidas en números.</p></li>
+<li><p><strong>Los conjuntos públicos</strong> se descargan de OpenML con sus identificadores (capítulo <a class="reference internal" href="06_validacion.html"><span class="doc">La propuesta en otros datos</span></a>).</p></li>
+</ul>
+</section>
+<section id="tabla-maestra">
+<h2><span class="section-number">15.4. </span>Tabla maestra<a class="headerlink" href="#tabla-maestra" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">resultados/tabla_maestra.csv</span></code> tiene una fila por cada una de las 112 combinaciones (modelo, balanceo, optimizador)
+con las métricas del bucle externo (media y desviación de los ocho bloques), el tiempo de cómputo, la memoria, las
+evaluaciones del optimizador, los hiperparámetros finales (los elegidos en el bloque más reciente, 2025-S2) y la
+semilla. <code class="docutils literal notranslate"><span class="pre">resultados/tabla_maestra_completa.csv</span></code> (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.tabla_completa</span></code>) le agrega la fila del modelo
+original, medida en la validación 2025 y no en los ocho bloques: la columna <code class="docutils literal notranslate"><span class="pre">medida</span></code> lo dice. El detalle de cada uno de
+los 896 trabajos está en <code class="docutils literal notranslate"><span class="pre">resultados/experimentos/trabajos/</span></code>.</p>
+</section>
+<section id="bibliografia">
+<h2><span class="section-number">15.5. </span>Bibliografía<a class="headerlink" href="#bibliografia" title="Permalink to this heading">#</a></h2>
+<p>Las referencias del libro están en <code class="docutils literal notranslate"><span class="pre">book/references.bib</span></code> (BibTeX) y se citan con <code class="docutils literal notranslate"><span class="pre">{cite}</span></code>; la lista completa se arma en
+la introducción.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="08_conclusiones.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title"><span class="section-number">14. </span>Conclusiones</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="glosario.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">16. </span>Glosario</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entorno">15.1. Entorno</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orden-de-ejecucion">15.2. Orden de ejecución</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-no-viaja">15.3. Qué no viaja</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-maestra">15.4. Tabla maestra</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bibliografia">15.5. Bibliografía</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por Daniel Carbonó y Luis Pérez
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

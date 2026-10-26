@@ -1,0 +1,1121 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>10. Literatura y novedad del modelo original &#8212; Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/identidad.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="_static/translations.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '04_novedad';</script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="11. Modelo original: efectos por entidad, plazo log-normal y plazo real" href="05_modelo_original.html" />
+    <link rel="prev" title="9. Literatura" href="literatura.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">Clasificador binario para la predicción del incumplimiento de órdenes de compra en la agroindustria de la palma de aceite</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Trazabilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_correcciones.html">1. Correcciones del Entregable 2</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Datos y análisis exploratorio</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a_datos.html">2. Los datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b_eda.html">3. Análisis exploratorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c_tiempo_y_fuga.html">4. Tiempo, fuga y preprocesamiento</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelos de referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03a_modelo_base.html">5. Modelo base: regresión logística</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b_112_combinaciones.html">6. Las 112 combinaciones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03d_mejor_modelo.html">7. El mejor modelo en la prueba 2026</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03c_fundamentos.html">8. Fundamentos: XGBoost y el costo de cada modelo</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Literatura y novedad</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="literatura.html">9. Literatura</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">10. Literatura y novedad del modelo original</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modelo original</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="05_modelo_original.html">11. Modelo original: efectos por entidad, plazo log-normal y plazo real</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_validacion.html">12. Validación estadística</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tablero, conclusiones y reproducibilidad</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_tablero.html">13. El tablero y su despliegue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">14. Conclusiones</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_reproducibilidad.html">15. Reproducibilidad</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Referencia</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="glosario.html">16. Glosario</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/04_novedad.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="claro/oscuro" aria-label="claro/oscuro" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Literatura y novedad del modelo original</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#como-se-busco">10.1. Cómo se buscó</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-se-encontro">10.2. Qué se encontró</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-novedad">10.3. Matriz de novedad</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#declaracion-de-novedad">10.4. Declaración de novedad</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metodos-relacionados-en-una-frase">10.5. Métodos relacionados en una frase</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="literatura-y-novedad-del-modelo-original">
+<h1><span class="section-number">10. </span>Literatura y novedad del modelo original<a class="headerlink" href="#literatura-y-novedad-del-modelo-original" title="Permalink to this heading">#</a></h1>
+<p>El capítulo <a class="reference internal" href="literatura.html"><span class="doc">Literatura</span></a> situó el problema: qué se ha publicado sobre predecir el retraso de un proveedor. Este
+responde otra pregunta, la primera de las tres que debe contestar el modelo original (R1): <strong>¿alguien propuso ya un
+método como BOREAL, para este problema o para otro?</strong> Para contestarla se buscó en tres bases, con cadenas en inglés y
+en español, se tamizaron los resultados, se leyeron completos los artículos más cercanos y se armó una matriz que
+compara, rasgo por rasgo, lo que cada método hace con lo que hace BOREAL.</p>
+<section id="como-se-busco">
+<h2><span class="section-number">10.1. </span>Cómo se buscó<a class="headerlink" href="#como-se-busco" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Bases.</strong> OpenAlex por su API (los 50 primeros resultados por relevancia de cada cadena); Scopus y Web of Science
+por el acceso de la biblioteca de la Universidad del Norte (los 200 primeros por relevancia, exportados con resumen).
+Las cadenas en inglés se corrieron en las tres bases el 22 de octubre de 2026; las cinco en español, en OpenAlex el
+25 de octubre de 2026 (Scopus y Web of Science indexan sobre todo títulos y resúmenes en inglés).</p></li>
+<li><p><strong>Dos grupos de cadenas.</strong> Las de <em>contexto</em> (D01 a D06, E01, E02 y E05) buscan quién predijo el retraso de compras o
+de entregas de proveedores y con qué. Las de <em>métodos</em> (C01 a C20, E03 y E04) buscan, sin restringir el dominio, los
+métodos que atacan cada rasgo del problema: entidades de muchos niveles, efectos aleatorios con árboles, categorías
+nuevas, deriva, la variable continua detrás de la etiqueta, calibración, monotonía, observaciones agrupadas.</p></li>
+<li><p><strong>Unión y tamizaje.</strong> Los registros se unieron por DOI y por título normalizado (<code class="docutils literal notranslate"><span class="pre">unir_bases.py</span></code>). El tamizaje leyó
+título y resumen de cada artículo, por lotes, y marcó los candidatos; los seis más cercanos se leyeron completos y
+tienen ficha técnica (<code class="docutils literal notranslate"><span class="pre">revision_literatura/fichas_otif/</span></code>). Los guiones y las cadenas están en
+<code class="docutils literal notranslate"><span class="pre">revision_literatura/</span></code> del repositorio de estudio; la tabla de abajo sale de <code class="docutils literal notranslate"><span class="pre">cadenas_otif.py</span></code>.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;idioma&quot;</span><span class="p">)[[</span><span class="s2">&quot;openalex_traidos&quot;</span><span class="p">,</span> <span class="s2">&quot;scopus_traidos&quot;</span><span class="p">,</span> <span class="s2">&quot;wos_traidos&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">n</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;OpenAlex&quot;</span><span class="p">,</span> <span class="s2">&quot;Scopus&quot;</span><span class="p">,</span> <span class="s2">&quot;Web of Science&quot;</span><span class="p">]</span>
+<span class="n">n</span><span class="p">[</span><span class="s2">&quot;registros&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">n</span><span class="p">[</span><span class="s2">&quot;artículos sin duplicados&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="s2">&quot;inglés&quot;</span><span class="p">:</span> <span class="mi">7299</span><span class="p">,</span> <span class="s2">&quot;español&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">})</span>   <span class="c1"># union.csv y buscar_openalex_otif_es.txt</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;idioma&quot;</span><span class="p">:</span> <span class="s2">&quot;cadenas en&quot;</span><span class="p">}),</span> <span class="n">enteros</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_4ebfa">
+  <thead>
+    <tr>
+      <th id="T_4ebfa_level0_col0" class="col_heading level0 col0" >cadenas en</th>
+      <th id="T_4ebfa_level0_col1" class="col_heading level0 col1" >OpenAlex</th>
+      <th id="T_4ebfa_level0_col2" class="col_heading level0 col2" >Scopus</th>
+      <th id="T_4ebfa_level0_col3" class="col_heading level0 col3" >Web of Science</th>
+      <th id="T_4ebfa_level0_col4" class="col_heading level0 col4" >registros</th>
+      <th id="T_4ebfa_level0_col5" class="col_heading level0 col5" >artículos sin duplicados</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_4ebfa_row0_col0" class="data row0 col0" >español</td>
+      <td id="T_4ebfa_row0_col1" class="data row0 col1" >32</td>
+      <td id="T_4ebfa_row0_col2" class="data row0 col2" >0</td>
+      <td id="T_4ebfa_row0_col3" class="data row0 col3" >0</td>
+      <td id="T_4ebfa_row0_col4" class="data row0 col4" >32</td>
+      <td id="T_4ebfa_row0_col5" class="data row0 col5" >32</td>
+    </tr>
+    <tr>
+      <td id="T_4ebfa_row1_col0" class="data row1 col0" >inglés</td>
+      <td id="T_4ebfa_row1_col1" class="data row1 col1" >1.300</td>
+      <td id="T_4ebfa_row1_col2" class="data row1 col2" >4.650</td>
+      <td id="T_4ebfa_row1_col3" class="data row1 col3" >4.135</td>
+      <td id="T_4ebfa_row1_col4" class="data row1 col4" >10.085</td>
+      <td id="T_4ebfa_row1_col5" class="data row1 col5" >7.299</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Las 31 cadenas, con su fecha y lo que trajo cada base («total» es cuántos resultados tenía OpenAlex para esa cadena;
+de ahí se trajeron los 50 primeros):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;openalex_total&quot;</span><span class="p">:</span> <span class="s2">&quot;OpenAlex total&quot;</span><span class="p">,</span> <span class="s2">&quot;openalex_traidos&quot;</span><span class="p">:</span> <span class="s2">&quot;OpenAlex&quot;</span><span class="p">,</span> <span class="s2">&quot;scopus_traidos&quot;</span><span class="p">:</span> <span class="s2">&quot;Scopus&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;wos_traidos&quot;</span><span class="p">:</span> <span class="s2">&quot;WoS&quot;</span><span class="p">})</span>
+<span class="n">tabla</span><span class="p">(</span><span class="n">t</span><span class="p">[[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;grupo&quot;</span><span class="p">,</span> <span class="s2">&quot;tema&quot;</span><span class="p">,</span> <span class="s2">&quot;cadena&quot;</span><span class="p">,</span> <span class="s2">&quot;fecha&quot;</span><span class="p">,</span> <span class="s2">&quot;OpenAlex total&quot;</span><span class="p">,</span> <span class="s2">&quot;OpenAlex&quot;</span><span class="p">,</span> <span class="s2">&quot;Scopus&quot;</span><span class="p">,</span> <span class="s2">&quot;WoS&quot;</span><span class="p">]],</span>
+      <span class="n">enteros</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;OpenAlex total&quot;</span><span class="p">,</span> <span class="s2">&quot;OpenAlex&quot;</span><span class="p">,</span> <span class="s2">&quot;Scopus&quot;</span><span class="p">,</span> <span class="s2">&quot;WoS&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+</style>
+<table id="T_1a511">
+  <thead>
+    <tr>
+      <th id="T_1a511_level0_col0" class="col_heading level0 col0" >id</th>
+      <th id="T_1a511_level0_col1" class="col_heading level0 col1" >grupo</th>
+      <th id="T_1a511_level0_col2" class="col_heading level0 col2" >tema</th>
+      <th id="T_1a511_level0_col3" class="col_heading level0 col3" >cadena</th>
+      <th id="T_1a511_level0_col4" class="col_heading level0 col4" >fecha</th>
+      <th id="T_1a511_level0_col5" class="col_heading level0 col5" >OpenAlex total</th>
+      <th id="T_1a511_level0_col6" class="col_heading level0 col6" >OpenAlex</th>
+      <th id="T_1a511_level0_col7" class="col_heading level0 col7" >Scopus</th>
+      <th id="T_1a511_level0_col8" class="col_heading level0 col8" >WoS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_1a511_row0_col0" class="data row0 col0" >D01</td>
+      <td id="T_1a511_row0_col1" class="data row0 col1" >contexto</td>
+      <td id="T_1a511_row0_col2" class="data row0 col2" >prediccion de retraso de ordenes de compra</td>
+      <td id="T_1a511_row0_col3" class="data row0 col3" >("purchase order" OR "purchase orders" OR procurement) AND (delay OR late OR lateness OR tardiness) AND (prediction OR predicting OR "machine learning" OR classification)</td>
+      <td id="T_1a511_row0_col4" class="data row0 col4" >2026-10-22</td>
+      <td id="T_1a511_row0_col5" class="data row0 col5" >1.647</td>
+      <td id="T_1a511_row0_col6" class="data row0 col6" >50</td>
+      <td id="T_1a511_row0_col7" class="data row0 col7" >190</td>
+      <td id="T_1a511_row0_col8" class="data row0 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row1_col0" class="data row1 col0" >D02</td>
+      <td id="T_1a511_row1_col1" class="data row1 col1" >contexto</td>
+      <td id="T_1a511_row1_col2" class="data row1 col2" >entrega a tiempo de proveedores</td>
+      <td id="T_1a511_row1_col3" class="data row1 col3" >("on-time delivery" OR "on time delivery" OR OTIF OR "on-time in-full") AND (supplier OR suppliers OR procurement) AND (prediction OR "machine learning" OR model)</td>
+      <td id="T_1a511_row1_col4" class="data row1 col4" >2026-10-22</td>
+      <td id="T_1a511_row1_col5" class="data row1 col5" >348</td>
+      <td id="T_1a511_row1_col6" class="data row1 col6" >50</td>
+      <td id="T_1a511_row1_col7" class="data row1 col7" >141</td>
+      <td id="T_1a511_row1_col8" class="data row1 col8" >65</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row2_col0" class="data row2 col0" >D03</td>
+      <td id="T_1a511_row2_col1" class="data row2 col1" >contexto</td>
+      <td id="T_1a511_row2_col2" class="data row2 col2" >riesgo de entrega del proveedor con aprendizaje automatico</td>
+      <td id="T_1a511_row2_col3" class="data row2 col3" >("supplier delivery" OR "delivery delay" OR "late delivery" OR "delivery performance") AND ("machine learning" OR "gradient boosting" OR "random forest" OR classification)</td>
+      <td id="T_1a511_row2_col4" class="data row2 col4" >2026-10-22</td>
+      <td id="T_1a511_row2_col5" class="data row2 col5" >522</td>
+      <td id="T_1a511_row2_col6" class="data row2 col6" >50</td>
+      <td id="T_1a511_row2_col7" class="data row2 col7" >200</td>
+      <td id="T_1a511_row2_col8" class="data row2 col8" >97</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row3_col0" class="data row3 col0" >D04</td>
+      <td id="T_1a511_row3_col1" class="data row3 col1" >contexto</td>
+      <td id="T_1a511_row3_col2" class="data row3 col2" >prediccion de tiempo de entrega en compras</td>
+      <td id="T_1a511_row3_col3" class="data row3 col3" >("lead time" OR "delivery time") AND (procurement OR supplier OR "purchase order") AND (prediction OR forecasting) AND ("machine learning" OR regression OR boosting)</td>
+      <td id="T_1a511_row3_col4" class="data row3 col4" >2026-10-22</td>
+      <td id="T_1a511_row3_col5" class="data row3 col5" >120</td>
+      <td id="T_1a511_row3_col6" class="data row3 col6" >50</td>
+      <td id="T_1a511_row3_col7" class="data row3 col7" >61</td>
+      <td id="T_1a511_row3_col8" class="data row3 col8" >23</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row4_col0" class="data row4 col0" >D05</td>
+      <td id="T_1a511_row4_col1" class="data row4 col1" >contexto</td>
+      <td id="T_1a511_row4_col2" class="data row4 col2" >retraso de entregas en cadena de suministro con metodo propuesto</td>
+      <td id="T_1a511_row4_col3" class="data row4 col3" >("supply chain") AND ("late delivery" OR "delivery delay" OR "delivery risk") AND (novel OR proposed OR framework OR hybrid) AND (classification OR prediction)</td>
+      <td id="T_1a511_row4_col4" class="data row4 col4" >2026-10-22</td>
+      <td id="T_1a511_row4_col5" class="data row4 col5" >83</td>
+      <td id="T_1a511_row4_col6" class="data row4 col6" >50</td>
+      <td id="T_1a511_row4_col7" class="data row4 col7" >58</td>
+      <td id="T_1a511_row4_col8" class="data row4 col8" >18</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row5_col0" class="data row5 col0" >D06</td>
+      <td id="T_1a511_row5_col1" class="data row5 col1" >contexto</td>
+      <td id="T_1a511_row5_col2" class="data row5 col2" >ERP y SAP con aprendizaje automatico</td>
+      <td id="T_1a511_row5_col3" class="data row5 col3" >(ERP OR SAP OR "enterprise resource planning") AND ("machine learning" OR classification OR prediction) AND (delay OR delivery OR procurement OR purchasing)</td>
+      <td id="T_1a511_row5_col4" class="data row5 col4" >2026-10-22</td>
+      <td id="T_1a511_row5_col5" class="data row5 col5" >935</td>
+      <td id="T_1a511_row5_col6" class="data row5 col6" >50</td>
+      <td id="T_1a511_row5_col7" class="data row5 col7" >200</td>
+      <td id="T_1a511_row5_col8" class="data row5 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row6_col0" class="data row6 col0" >C01</td>
+      <td id="T_1a511_row6_col1" class="data row6 col1" >métodos</td>
+      <td id="T_1a511_row6_col2" class="data row6 col2" >codificacion de categoricas de alta cardinalidad</td>
+      <td id="T_1a511_row6_col3" class="data row6 col3" >("high-cardinality" OR "high cardinality" OR "target encoding" OR "categorical encoding" OR "impact coding") AND (classification OR "machine learning") AND (novel OR proposed OR hierarchical OR Bayesian)</td>
+      <td id="T_1a511_row6_col4" class="data row6 col4" >2026-10-22</td>
+      <td id="T_1a511_row6_col5" class="data row6 col5" >444</td>
+      <td id="T_1a511_row6_col6" class="data row6 col6" >50</td>
+      <td id="T_1a511_row6_col7" class="data row6 col7" >200</td>
+      <td id="T_1a511_row6_col8" class="data row6 col8" >97</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row7_col0" class="data row7 col0" >C02</td>
+      <td id="T_1a511_row7_col1" class="data row7 col1" >métodos</td>
+      <td id="T_1a511_row7_col2" class="data row7 col2" >clasificacion binaria con efectos aleatorios y arboles</td>
+      <td id="T_1a511_row7_col3" class="data row7 col3" >("mixed effects" OR "random effects" OR "multilevel" OR GLMM) AND ("binary" OR classification OR logistic) AND (tree OR trees OR boosting OR forest) AND (proposed OR novel OR algorithm)</td>
+      <td id="T_1a511_row7_col4" class="data row7 col4" >2026-10-22</td>
+      <td id="T_1a511_row7_col5" class="data row7 col5" >759</td>
+      <td id="T_1a511_row7_col6" class="data row7 col6" >50</td>
+      <td id="T_1a511_row7_col7" class="data row7 col7" >200</td>
+      <td id="T_1a511_row7_col8" class="data row7 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row8_col0" class="data row8 col0" >C03</td>
+      <td id="T_1a511_row8_col1" class="data row8 col1" >métodos</td>
+      <td id="T_1a511_row8_col2" class="data row8 col2" >encogimiento jerarquico para clasificacion con grupos</td>
+      <td id="T_1a511_row8_col3" class="data row8 col3" >("partial pooling" OR "hierarchical shrinkage" OR "empirical Bayes" OR "credibility") AND (classification OR "binary outcome" OR "default prediction" OR "risk prediction")</td>
+      <td id="T_1a511_row8_col4" class="data row8 col4" >2026-10-22</td>
+      <td id="T_1a511_row8_col5" class="data row8 col5" >4.727</td>
+      <td id="T_1a511_row8_col6" class="data row8 col6" >50</td>
+      <td id="T_1a511_row8_col7" class="data row8 col7" >200</td>
+      <td id="T_1a511_row8_col8" class="data row8 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row9_col0" class="data row9 col0" >C04</td>
+      <td id="T_1a511_row9_col1" class="data row9 col1" >métodos</td>
+      <td id="T_1a511_row9_col2" class="data row9 col2" >categorias nuevas y arranque en frio en datos tabulares</td>
+      <td id="T_1a511_row9_col3" class="data row9 col3" >("cold start" OR "unseen categories" OR "new categories" OR "unseen levels") AND (classification OR tabular OR "gradient boosting" OR "random forest")</td>
+      <td id="T_1a511_row9_col4" class="data row9 col4" >2026-10-22</td>
+      <td id="T_1a511_row9_col5" class="data row9 col5" >2.982</td>
+      <td id="T_1a511_row9_col6" class="data row9 col6" >50</td>
+      <td id="T_1a511_row9_col7" class="data row9 col7" >200</td>
+      <td id="T_1a511_row9_col8" class="data row9 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row10_col0" class="data row10 col0" >C05</td>
+      <td id="T_1a511_row10_col1" class="data row10 col1" >métodos</td>
+      <td id="T_1a511_row10_col2" class="data row10 col2" >deriva y no estacionariedad en clasificacion tabular</td>
+      <td id="T_1a511_row10_col3" class="data row10 col3" >("concept drift" OR "temporal drift" OR nonstationary OR "non-stationary") AND classification AND (boosting OR ensemble OR "random forest" OR weighting) AND (proposed OR novel)</td>
+      <td id="T_1a511_row10_col4" class="data row10 col4" >2026-10-22</td>
+      <td id="T_1a511_row10_col5" class="data row10 col5" >1.057</td>
+      <td id="T_1a511_row10_col6" class="data row10 col6" >50</td>
+      <td id="T_1a511_row10_col7" class="data row10 col7" >200</td>
+      <td id="T_1a511_row10_col8" class="data row10 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row11_col0" class="data row11 col0" >C06</td>
+      <td id="T_1a511_row11_col1" class="data row11 col1" >métodos</td>
+      <td id="T_1a511_row11_col2" class="data row11 col2" >ponderacion temporal de observaciones</td>
+      <td id="T_1a511_row11_col3" class="data row11 col3" >("instance weighting" OR "sample weighting" OR "time-weighted" OR "exponential forgetting" OR "temporal weighting") AND (classification OR boosting OR "logistic regression")</td>
+      <td id="T_1a511_row11_col4" class="data row11 col4" >2026-10-22</td>
+      <td id="T_1a511_row11_col5" class="data row11 col5" >1.054</td>
+      <td id="T_1a511_row11_col6" class="data row11 col6" >50</td>
+      <td id="T_1a511_row11_col7" class="data row11 col7" >200</td>
+      <td id="T_1a511_row11_col8" class="data row11 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row12_col0" class="data row12 col0" >C07</td>
+      <td id="T_1a511_row12_col1" class="data row12 col1" >métodos</td>
+      <td id="T_1a511_row12_col2" class="data row12 col2" >perdida que optimiza F1 o costo en boosting</td>
+      <td id="T_1a511_row12_col3" class="data row12 col3" >("F1 score" OR "F-measure" OR "cost-sensitive" OR "asymmetric loss") AND (boosting OR "logistic regression" OR trees) AND ("novel loss" OR "surrogate loss" OR optimization OR proposed)</td>
+      <td id="T_1a511_row12_col4" class="data row12 col4" >2026-10-22</td>
+      <td id="T_1a511_row12_col5" class="data row12 col5" >19.673</td>
+      <td id="T_1a511_row12_col6" class="data row12 col6" >50</td>
+      <td id="T_1a511_row12_col7" class="data row12 col7" >200</td>
+      <td id="T_1a511_row12_col8" class="data row12 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row13_col0" class="data row13 col0" >C08</td>
+      <td id="T_1a511_row13_col1" class="data row13 col1" >métodos</td>
+      <td id="T_1a511_row13_col2" class="data row13 col2" >metodos de calibracion de probabilidades</td>
+      <td id="T_1a511_row13_col3" class="data row13 col3" >("probability calibration" OR "calibrated probabilities" OR "Venn-Abers" OR "beta calibration" OR "temperature scaling") AND (classifier OR classification) AND (proposed OR novel OR improved)</td>
+      <td id="T_1a511_row13_col4" class="data row13 col4" >2026-10-22</td>
+      <td id="T_1a511_row13_col5" class="data row13 col5" >989</td>
+      <td id="T_1a511_row13_col6" class="data row13 col6" >50</td>
+      <td id="T_1a511_row13_col7" class="data row13 col7" >200</td>
+      <td id="T_1a511_row13_col8" class="data row13 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row14_col0" class="data row14 col0" >C09</td>
+      <td id="T_1a511_row14_col1" class="data row14 col1" >métodos</td>
+      <td id="T_1a511_row14_col2" class="data row14 col2" >usar la variable continua para aprender la clasificacion</td>
+      <td id="T_1a511_row14_col3" class="data row14 col3" >("auxiliary task" OR "multi-task" OR "ordinal" OR "threshold" OR "privileged information") AND (classification) AND (regression OR "continuous outcome" OR "continuous target") AND (boosting OR trees OR "random forest")</td>
+      <td id="T_1a511_row14_col4" class="data row14 col4" >2026-10-22</td>
+      <td id="T_1a511_row14_col5" class="data row14 col5" >2.837</td>
+      <td id="T_1a511_row14_col6" class="data row14 col6" >50</td>
+      <td id="T_1a511_row14_col7" class="data row14 col7" >200</td>
+      <td id="T_1a511_row14_col8" class="data row14 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row15_col0" class="data row15 col0" >C10</td>
+      <td id="T_1a511_row15_col1" class="data row15 col1" >métodos</td>
+      <td id="T_1a511_row15_col2" class="data row15 col2" >riesgo en tiempo discreto y supervivencia para retrasos</td>
+      <td id="T_1a511_row15_col3" class="data row15 col3" >("discrete-time hazard" OR "discrete time survival" OR "survival trees" OR "survival forest" OR "time-to-event") AND (delay OR delivery OR lateness OR "due date")</td>
+      <td id="T_1a511_row15_col4" class="data row15 col4" >2026-10-22</td>
+      <td id="T_1a511_row15_col5" class="data row15 col5" >4.569</td>
+      <td id="T_1a511_row15_col6" class="data row15 col6" >50</td>
+      <td id="T_1a511_row15_col7" class="data row15 col7" >200</td>
+      <td id="T_1a511_row15_col8" class="data row15 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row16_col0" class="data row16 col0" >C11</td>
+      <td id="T_1a511_row16_col1" class="data row16 col1" >métodos</td>
+      <td id="T_1a511_row16_col2" class="data row16 col2" >reglas y modelos aditivos interpretables para clasificacion</td>
+      <td id="T_1a511_row16_col3" class="data row16 col3" >("rule ensemble" OR RuleFit OR "rule learning" OR "generalized additive" OR "additive model" OR "explainable boosting") AND classification AND (proposed OR novel OR algorithm)</td>
+      <td id="T_1a511_row16_col4" class="data row16 col4" >2026-10-22</td>
+      <td id="T_1a511_row16_col5" class="data row16 col5" >1.156</td>
+      <td id="T_1a511_row16_col6" class="data row16 col6" >50</td>
+      <td id="T_1a511_row16_col7" class="data row16 col7" >200</td>
+      <td id="T_1a511_row16_col8" class="data row16 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row17_col0" class="data row17 col0" >C12</td>
+      <td id="T_1a511_row17_col1" class="data row17 col1" >métodos</td>
+      <td id="T_1a511_row17_col2" class="data row17 col2" >variantes de arboles y bosques para clasificacion</td>
+      <td id="T_1a511_row17_col3" class="data row17 col3" >("oblique" OR "rotation forest" OR "soft decision tree" OR "probabilistic tree" OR "optimal decision tree") AND (classification) AND (proposed OR novel OR algorithm)</td>
+      <td id="T_1a511_row17_col4" class="data row17 col4" >2026-10-22</td>
+      <td id="T_1a511_row17_col5" class="data row17 col5" >1.769</td>
+      <td id="T_1a511_row17_col6" class="data row17 col6" >50</td>
+      <td id="T_1a511_row17_col7" class="data row17 col7" >200</td>
+      <td id="T_1a511_row17_col8" class="data row17 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row18_col0" class="data row18 col0" >C13</td>
+      <td id="T_1a511_row18_col1" class="data row18 col1" >métodos</td>
+      <td id="T_1a511_row18_col2" class="data row18 col2" >variantes del boosting para clasificacion binaria</td>
+      <td id="T_1a511_row18_col3" class="data row18 col3" >("gradient boosting" OR "tree boosting" OR AdaBoost OR LogitBoost) AND ("binary classification" OR classification) AND ("new algorithm" OR "novel algorithm" OR modification OR modified OR improved) AND (proposed OR propose)</td>
+      <td id="T_1a511_row18_col4" class="data row18 col4" >2026-10-22</td>
+      <td id="T_1a511_row18_col5" class="data row18 col5" >5.067</td>
+      <td id="T_1a511_row18_col6" class="data row18 col6" >50</td>
+      <td id="T_1a511_row18_col7" class="data row18 col7" >200</td>
+      <td id="T_1a511_row18_col8" class="data row18 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row19_col0" class="data row19 col0" >C14</td>
+      <td id="T_1a511_row19_col1" class="data row19 col1" >métodos</td>
+      <td id="T_1a511_row19_col2" class="data row19 col2" >modelos locales y mezcla de expertos</td>
+      <td id="T_1a511_row19_col3" class="data row19 col3" >("mixture of experts" OR "local models" OR "clusterwise" OR "cluster-then-predict" OR "model-based recursive partitioning" OR "logistic model tree") AND classification</td>
+      <td id="T_1a511_row19_col4" class="data row19 col4" >2026-10-22</td>
+      <td id="T_1a511_row19_col5" class="data row19 col5" >3.168</td>
+      <td id="T_1a511_row19_col6" class="data row19 col6" >50</td>
+      <td id="T_1a511_row19_col7" class="data row19 col7" >200</td>
+      <td id="T_1a511_row19_col8" class="data row19 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row20_col0" class="data row20 col0" >C15</td>
+      <td id="T_1a511_row20_col1" class="data row20 col1" >métodos</td>
+      <td id="T_1a511_row20_col2" class="data row20 col2" >etiquetas ruidosas en clasificacion con arboles</td>
+      <td id="T_1a511_row20_col3" class="data row20 col3" >("label noise" OR "noisy labels" OR "mislabeled") AND (boosting OR "random forest" OR trees) AND (robust OR proposed OR novel)</td>
+      <td id="T_1a511_row20_col4" class="data row20 col4" >2026-10-22</td>
+      <td id="T_1a511_row20_col5" class="data row20 col5" >671</td>
+      <td id="T_1a511_row20_col6" class="data row20 col6" >50</td>
+      <td id="T_1a511_row20_col7" class="data row20 col7" >200</td>
+      <td id="T_1a511_row20_col8" class="data row20 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row21_col0" class="data row21 col0" >C16</td>
+      <td id="T_1a511_row21_col1" class="data row21 col1" >métodos</td>
+      <td id="T_1a511_row21_col2" class="data row21 col2" >observaciones agrupadas y correlacionadas en aprendizaje</td>
+      <td id="T_1a511_row21_col3" class="data row21 col3" >("clustered data" OR "grouped data" OR "correlated observations" OR "longitudinal") AND (classification OR "binary outcome") AND (boosting OR "random forest" OR trees) AND (proposed OR novel)</td>
+      <td id="T_1a511_row21_col4" class="data row21 col4" >2026-10-22</td>
+      <td id="T_1a511_row21_col5" class="data row21 col5" >567</td>
+      <td id="T_1a511_row21_col6" class="data row21 col6" >50</td>
+      <td id="T_1a511_row21_col7" class="data row21 col7" >200</td>
+      <td id="T_1a511_row21_col8" class="data row21 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row22_col0" class="data row22 col0" >C17</td>
+      <td id="T_1a511_row22_col1" class="data row22 col1" >métodos</td>
+      <td id="T_1a511_row22_col2" class="data row22 col2" >arboles bayesianos para clasificacion</td>
+      <td id="T_1a511_row22_col3" class="data row22 col3" >(BART OR "Bayesian additive regression trees" OR "Bayesian trees" OR "Bayesian forest") AND (classification OR probit OR binary) AND (extension OR novel OR proposed)</td>
+      <td id="T_1a511_row22_col4" class="data row22 col4" >2026-10-22</td>
+      <td id="T_1a511_row22_col5" class="data row22 col5" >382</td>
+      <td id="T_1a511_row22_col6" class="data row22 col6" >50</td>
+      <td id="T_1a511_row22_col7" class="data row22 col7" >188</td>
+      <td id="T_1a511_row22_col8" class="data row22 col8" >110</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row23_col0" class="data row23 col0" >C18</td>
+      <td id="T_1a511_row23_col1" class="data row23 col1" >métodos</td>
+      <td id="T_1a511_row23_col2" class="data row23 col2" >restricciones de monotonia en clasificacion</td>
+      <td id="T_1a511_row23_col3" class="data row23 col3" >(monotonic OR monotonicity OR "monotone constraints" OR "shape constraints") AND classification AND (boosting OR trees OR "random forest" OR "logistic") AND (proposed OR novel)</td>
+      <td id="T_1a511_row23_col4" class="data row23 col4" >2026-10-22</td>
+      <td id="T_1a511_row23_col5" class="data row23 col5" >211</td>
+      <td id="T_1a511_row23_col6" class="data row23 col6" >50</td>
+      <td id="T_1a511_row23_col7" class="data row23 col7" >123</td>
+      <td id="T_1a511_row23_col8" class="data row23 col8" >90</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row24_col0" class="data row24 col0" >C19</td>
+      <td id="T_1a511_row24_col1" class="data row24 col1" >métodos</td>
+      <td id="T_1a511_row24_col2" class="data row24 col2" >apilamiento y ensambles para clasificacion</td>
+      <td id="T_1a511_row24_col3" class="data row24 col3" >(stacking OR "stacked generalization" OR "super learner" OR "dynamic ensemble selection") AND classification AND (novel OR proposed OR improved)</td>
+      <td id="T_1a511_row24_col4" class="data row24 col4" >2026-10-22</td>
+      <td id="T_1a511_row24_col5" class="data row24 col5" >12.700</td>
+      <td id="T_1a511_row24_col6" class="data row24 col6" >50</td>
+      <td id="T_1a511_row24_col7" class="data row24 col7" >200</td>
+      <td id="T_1a511_row24_col8" class="data row24 col8" >200</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row25_col0" class="data row25 col0" >C20</td>
+      <td id="T_1a511_row25_col1" class="data row25 col1" >métodos</td>
+      <td id="T_1a511_row25_col2" class="data row25 col2" >desbalance moderado y ajuste de umbral</td>
+      <td id="T_1a511_row25_col3" class="data row25 col3" >(imbalanced OR imbalance) AND classification AND ("threshold moving" OR "threshold optimization" OR "decision threshold") AND (boosting OR "random forest" OR "logistic")</td>
+      <td id="T_1a511_row25_col4" class="data row25 col4" >2026-10-22</td>
+      <td id="T_1a511_row25_col5" class="data row25 col5" >97</td>
+      <td id="T_1a511_row25_col6" class="data row25 col6" >50</td>
+      <td id="T_1a511_row25_col7" class="data row25 col7" >89</td>
+      <td id="T_1a511_row25_col8" class="data row25 col8" >35</td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row26_col0" class="data row26 col0" >E01</td>
+      <td id="T_1a511_row26_col1" class="data row26 col1" >contexto</td>
+      <td id="T_1a511_row26_col2" class="data row26 col2" >retraso de ordenes de compra en espanol</td>
+      <td id="T_1a511_row26_col3" class="data row26 col3" >("orden de compra" OR "ordenes de compra" OR compras OR abastecimiento) AND (retraso OR demora OR incumplimiento) AND (prediccion OR "aprendizaje automatico" OR clasificacion)</td>
+      <td id="T_1a511_row26_col4" class="data row26 col4" >2026-10-25</td>
+      <td id="T_1a511_row26_col5" class="data row26 col5" >7</td>
+      <td id="T_1a511_row26_col6" class="data row26 col6" >7</td>
+      <td id="T_1a511_row26_col7" class="data row26 col7" ></td>
+      <td id="T_1a511_row26_col8" class="data row26 col8" ></td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row27_col0" class="data row27 col0" >E02</td>
+      <td id="T_1a511_row27_col1" class="data row27 col1" >contexto</td>
+      <td id="T_1a511_row27_col2" class="data row27 col2" >entrega a tiempo de proveedores en espanol</td>
+      <td id="T_1a511_row27_col3" class="data row27 col3" >("entrega a tiempo" OR "cumplimiento de entregas" OR OTIF) AND (proveedor OR proveedores) AND (prediccion OR modelo OR "aprendizaje automatico")</td>
+      <td id="T_1a511_row27_col4" class="data row27 col4" >2026-10-25</td>
+      <td id="T_1a511_row27_col5" class="data row27 col5" >16</td>
+      <td id="T_1a511_row27_col6" class="data row27 col6" >16</td>
+      <td id="T_1a511_row27_col7" class="data row27 col7" ></td>
+      <td id="T_1a511_row27_col8" class="data row27 col8" ></td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row28_col0" class="data row28 col0" >E03</td>
+      <td id="T_1a511_row28_col1" class="data row28 col1" >métodos</td>
+      <td id="T_1a511_row28_col2" class="data row28 col2" >efectos aleatorios con arboles en espanol</td>
+      <td id="T_1a511_row28_col3" class="data row28 col3" >("efectos aleatorios" OR "efectos mixtos" OR multinivel) AND (arboles OR boosting OR "bosque aleatorio") AND (clasificacion OR logistica)</td>
+      <td id="T_1a511_row28_col4" class="data row28 col4" >2026-10-25</td>
+      <td id="T_1a511_row28_col5" class="data row28 col5" >3</td>
+      <td id="T_1a511_row28_col6" class="data row28 col6" >3</td>
+      <td id="T_1a511_row28_col7" class="data row28 col7" ></td>
+      <td id="T_1a511_row28_col8" class="data row28 col8" ></td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row29_col0" class="data row29 col0" >E04</td>
+      <td id="T_1a511_row29_col1" class="data row29 col1" >métodos</td>
+      <td id="T_1a511_row29_col2" class="data row29 col2" >regresion ordinal con arboles en espanol</td>
+      <td id="T_1a511_row29_col3" class="data row29 col3" >("regresion ordinal" OR "clasificacion ordinal" OR "variable ordinal") AND (arboles OR boosting OR "aprendizaje automatico")</td>
+      <td id="T_1a511_row29_col4" class="data row29 col4" >2026-10-25</td>
+      <td id="T_1a511_row29_col5" class="data row29 col5" >4</td>
+      <td id="T_1a511_row29_col6" class="data row29 col6" >4</td>
+      <td id="T_1a511_row29_col7" class="data row29 col7" ></td>
+      <td id="T_1a511_row29_col8" class="data row29 col8" ></td>
+    </tr>
+    <tr>
+      <td id="T_1a511_row30_col0" class="data row30 col0" >E05</td>
+      <td id="T_1a511_row30_col1" class="data row30 col1" >contexto</td>
+      <td id="T_1a511_row30_col2" class="data row30 col2" >cadena de suministro de palma de aceite y retrasos</td>
+      <td id="T_1a511_row30_col3" class="data row30 col3" >("palma de aceite" OR palmicultor OR "aceite de palma") AND (proveedores OR compras OR "cadena de suministro") AND (retraso OR entrega OR prediccion)</td>
+      <td id="T_1a511_row30_col4" class="data row30 col4" >2026-10-25</td>
+      <td id="T_1a511_row30_col5" class="data row30 col5" >2</td>
+      <td id="T_1a511_row30_col6" class="data row30 col6" >2</td>
+      <td id="T_1a511_row30_col7" class="data row30 col7" ></td>
+      <td id="T_1a511_row30_col8" class="data row30 col8" ></td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="que-se-encontro">
+<h2><span class="section-number">10.2. </span>Qué se encontró<a class="headerlink" href="#que-se-encontro" title="Permalink to this heading">#</a></h2>
+<p><strong>En el contexto</strong>, unos 90 estudios de retraso de compras, entregas de proveedores, plazos y ERP (los comparables
+están en <a class="reference internal" href="literatura.html"><span class="doc">Literatura</span></a>). Dominan el bosque aleatorio (unos 40), XGBoost (unos 30), la logística (unos 20), SVM,
+vecinos más cercanos y redes; LightGBM y CatBoost aparecen en 7 y 5. Ninguno usa efectos aleatorios por proveedor o
+material, umbrales ordinales sobre los días de retraso, efectos estimados en orden temporal ni validación agrupada por
+orden de compra con datos de empresa. Las 32 referencias de las cadenas en español tratan de gestión de inventarios,
+selección de proveedores por criterios múltiples (AHP, TOPSIS) o auditoría, y las de clasificación ordinal son
+revisiones generales: ninguna predice el retraso de una orden.</p>
+<p><strong>En los métodos</strong>, la familia más cercana a BOREAL es la de efectos aleatorios dentro de un <em>boosting</em> o un árbol; apareció en seis de
+los diez lotes de tamizaje. La reducción ordinal y el ordenamiento de los estadísticos por entidad vienen de otras
+dos líneas.</p>
+</section>
+<section id="matriz-de-novedad">
+<h2><span class="section-number">10.3. </span>Matriz de novedad<a class="headerlink" href="#matriz-de-novedad" title="Permalink to this heading">#</a></h2>
+<p>Los seis rasgos de BOREAL (<a class="reference internal" href="05_modelo_original.html"><span class="doc">Modelo original: efectos por entidad, plazo log-normal y plazo real</span></a>), contra los métodos publicados más cercanos. «Sí» quiere decir
+que el artículo lo propone o lo usa; «no», que no; las celdas de los artículos leídos solo por su resumen lo dicen.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>método</p></th>
+<th class="head"><p>(1) respuesta binaria</p></th>
+<th class="head"><p>(2) parte fija con árboles</p></th>
+<th class="head"><p>(3) efectos aleatorios cruzados de varias entidades</p></th>
+<th class="head"><p>(4) reducción ordinal de los días de retraso</p></th>
+<th class="head"><p>(5) efectos estimados en orden temporal</p></th>
+<th class="head"><p>(6) aplicado al retraso de compras</p></th>
+<th class="head"><p>leído</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Boosting para modelos mixtos lineales <span id="id1">[<a class="reference internal" href="intro.html#id12" title="Colin Griesbach, Benjamin Säfken, and Elisabeth Waldmann. Gradient boosting for linear mixed models. The International Journal of Biostatistics, 2021. doi:10.1515/ijb-2020-0136.">Griesbach <em>et al.</em>, 2021</a>]</span></p></td>
+<td><p>no (gaussiana)</p></td>
+<td><p>no (aprendices lineales)</p></td>
+<td><p>no (un factor)</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>completo</p></td>
+</tr>
+<tr class="row-odd"><td><p>Boosting para modelos mixtos aditivos <span id="id2">[<a class="reference internal" href="intro.html#id13" title="Lars Knieper, Torsten Hothorn, Elisabeth Bergherr, and Colin Griesbach. Gradient boosting for generalised additive mixed models. Statistics and Computing, 35:84, 2025. doi:10.1007/s11222-025-10612-y.">Knieper <em>et al.</em>, 2025</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>no (lineales y <em>splines</em>)</p></td>
+<td><p>no (un factor)</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>completo</p></td>
+</tr>
+<tr class="row-even"><td><p>GPBoost <span id="id3">[<a class="reference internal" href="intro.html#id16" title="Fabio Sigrist. Gaussian process boosting. Journal of Machine Learning Research, 23(232):1–46, 2022.">Sigrist, 2022</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>documentación</p></td>
+</tr>
+<tr class="row-odd"><td><p>MERF <span id="id4">[<a class="reference internal" href="intro.html#id17" title="Ahlem Hajjem, François Bellavance, and Denis Larocque. Mixed-effects random forest for clustered data. Journal of Statistical Computation and Simulation, 84(6):1313–1328, 2014. doi:10.1080/00949655.2012.741599.">Hajjem <em>et al.</em>, 2014</a>]</span></p></td>
+<td><p>no (continua)</p></td>
+<td><p>sí (bosque aleatorio)</p></td>
+<td><p>no (un factor)</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>resumen</p></td>
+</tr>
+<tr class="row-even"><td><p>Árboles GLMM <span id="id5">[<a class="reference internal" href="intro.html#id18" title="Marjolein Fokkema, Niels Smits, Achim Zeileis, Torsten Hothorn, and Henk Kelderman. Detecting treatment-subgroup interactions in clustered data with generalized linear mixed-effects model trees. Behavior Research Methods, 50(5):2016–2034, 2018. doi:10.3758/s13428-017-0971-x.">Fokkema <em>et al.</em>, 2018</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>un solo árbol</p></td>
+<td><p>admite los de <code class="docutils literal notranslate"><span class="pre">lme4</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>resumen</p></td>
+</tr>
+<tr class="row-odd"><td><p>M-CART <span id="id6">[<a class="reference internal" href="intro.html#id19" title="Shuqiong Lin and Wen Luo. A new multilevel CART algorithm for multilevel data with binary outcomes. Multivariate Behavioral Research, 54(4):578–592, 2019. doi:10.1080/00273171.2018.1552555.">Lin and Luo, 2019</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>un solo árbol</p></td>
+<td><p>no (dos niveles anidados)</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>resumen</p></td>
+</tr>
+<tr class="row-even"><td><p>GLMM–XGBoost <span id="id7">[<a class="reference internal" href="intro.html#id20" title="Sun-Joo Cho. An iterative GLMM–XGBoost algorithm with group-aware conditional permutation importance for explaining multilevel item response data. Psychometrika, 2026. doi:10.1017/psy.2026.10114.">Cho, 2026</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>sí (persona × ítem)</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>resumen</p></td>
+</tr>
+<tr class="row-odd"><td><p>Árboles aditivos con variable latente (IRGB) <span id="id8">[<a class="reference internal" href="intro.html#id21" title="Z. Wang, Y. Shi, and G. Gao. Additive tree latent variable models with applications to insurance loss prediction. Insurance: Mathematics and Economics, 125:103168, 2025. doi:10.1016/j.insmatheco.2025.103168.">Wang <em>et al.</em>, 2025</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>no (latente por observación, no por entidad)</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>completo</p></td>
+</tr>
+<tr class="row-even"><td><p>Regresión ordinal por clasificación binaria extendida <span id="id9">[<a class="reference internal" href="intro.html#id14" title="Ling Li and Hsuan-Tien Lin. Ordinal regression by extended binary classification. In Advances in Neural Information Processing Systems 19, 865–872. 2006.">Li and Lin, 2006</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>árboles C4.5 y tocones</p></td>
+<td><p>no</p></td>
+<td><p>sí</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>completo</p></td>
+</tr>
+<tr class="row-odd"><td><p>CatBoost <span id="id10">[<a class="reference internal" href="intro.html#id15" title="Liudmila Prokhorenkova, Gleb Gusev, Aleksandr Vorobev, Anna Veronika Dorogush, and Andrey Gulin. CatBoost: unbiased boosting with categorical features. In Advances in Neural Information Processing Systems 31, 6638–6648. 2018.">Prokhorenkova <em>et al.</em>, 2018</a>]</span></p></td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>no (codificación por objetivo, sin varianza)</p></td>
+<td><p>no</p></td>
+<td><p>sí (estadísticos ordenados)</p></td>
+<td><p>no</p></td>
+<td><p>completo</p></td>
+</tr>
+<tr class="row-even"><td><p>Estudios de retraso de compras (<a class="reference internal" href="literatura.html"><span class="doc">Literatura</span></a>)</p></td>
+<td><p>sí</p></td>
+<td><p>sí (bosque, XGBoost)</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>sí</p></td>
+<td><p>completo o resumen</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>BOREAL</strong></p></td>
+<td><p><strong>sí</strong></p></td>
+<td><p><strong>sí</strong></p></td>
+<td><p><strong>sí (proveedor, material, solicitante y comprador, más la orden al estimar)</strong></p></td>
+<td><p><strong>sí, con monotonía en el corte</strong></p></td>
+<td><p><strong>sí</strong></p></td>
+<td><p><strong>sí</strong></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="declaracion-de-novedad">
+<h2><span class="section-number">10.4. </span>Declaración de novedad<a class="headerlink" href="#declaracion-de-novedad" title="Permalink to this heading">#</a></h2>
+<p>Cada pieza de BOREAL tiene un antecedente publicado, y se cita: los efectos aleatorios dentro del <em>boosting</em>
+(Griesbach, Knieper), la reducción ordinal (Li y Lin) y el ordenamiento temporal de los estadísticos (CatBoost). Ningún
+artículo de los 7.331 revisados <strong>combina</strong> las seis cosas, y ninguno de los métodos con efectos aleatorios se ha
+aplicado al retraso de compras. Lo propio es:</p>
+<ol class="arabic simple">
+<li><p>pasar el <em>boosting</em> mixto de Knieper et al. (respuesta binaria, un factor, aprendices lineales) a <strong>efectos
+cruzados de cuatro entidades con árboles de histograma</strong>, a 400.000 posiciones;</p></li>
+<li><p>aplicar los efectos <strong>sobre la reducción ordinal</strong> de los días de retraso, con un mismo efecto en todos los cortes y
+una restricción monótona que impide que los umbrales se crucen;</p></li>
+<li><p><strong>estimar los efectos en orden temporal</strong> (cada semestre solo con los anteriores), la idea de CatBoost llevada de la
+codificación por objetivo a los efectos aleatorios, para que entrenar y predecir una entidad nueva se parezcan;</p></li>
+<li><p>un modelo log-normal del plazo y 32 variables de plazo real como información que el clasificador no tenía.</p></li>
+</ol>
+<p><strong>Lo que no se reclama.</strong> GPBoost y el GLMM–XGBoost de Cho ya combinan árboles con efectos cruzados en respuesta
+binaria; la diferencia de BOREAL con ellos está en los rasgos (4), (5) y (6) del cuadro, no en el (3). GPBoost no se
+comparó con BOREAL: el modelo original se implementa solo con numpy y scipy, sin paquetes de modelos. Una comparación con
+GPBoost en los mismos datos queda como trabajo pendiente (<a class="reference internal" href="08_conclusiones.html"><span class="doc">Conclusiones</span></a>).</p>
+</section>
+<section id="metodos-relacionados-en-una-frase">
+<h2><span class="section-number">10.5. </span>Métodos relacionados en una frase<a class="headerlink" href="#metodos-relacionados-en-una-frase" title="Permalink to this heading">#</a></h2>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>método</p></th>
+<th class="head"><p>qué hace</p></th>
+<th class="head"><p>por qué no basta aquí</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GPBoost <span id="id11">[<a class="reference internal" href="intro.html#id16" title="Fabio Sigrist. Gaussian process boosting. Journal of Machine Learning Research, 23(232):1–46, 2022.">Sigrist, 2022</a>]</span></p></td>
+<td><p><em>boosting</em> de árboles con efectos aleatorios agrupados o procesos gaussianos, estimados juntos por máxima verosimilitud</p></td>
+<td><p>no usa los días de retraso ni ordena los efectos en el tiempo; es un paquete</p></td>
+</tr>
+<tr class="row-odd"><td><p>MERF <span id="id12">[<a class="reference internal" href="intro.html#id17" title="Ahlem Hajjem, François Bellavance, and Denis Larocque. Mixed-effects random forest for clustered data. Journal of Statistical Computation and Simulation, 84(6):1313–1328, 2014. doi:10.1080/00949655.2012.741599.">Hajjem <em>et al.</em>, 2014</a>]</span></p></td>
+<td><p>alterna un bosque aleatorio para la parte fija con un modelo lineal mixto para los efectos</p></td>
+<td><p>respuesta continua y un factor</p></td>
+</tr>
+<tr class="row-even"><td><p>Árboles GLMM <span id="id13">[<a class="reference internal" href="intro.html#id18" title="Marjolein Fokkema, Niels Smits, Achim Zeileis, Torsten Hothorn, and Henk Kelderman. Detecting treatment-subgroup interactions in clustered data with generalized linear mixed-effects model trees. Behavior Research Methods, 50(5):2016–2034, 2018. doi:10.3758/s13428-017-0971-x.">Fokkema <em>et al.</em>, 2018</a>]</span></p></td>
+<td><p>partición recursiva basada en modelos con efectos aleatorios de un GLMM</p></td>
+<td><p>un árbol, pensado para hallar subgrupos, no para predecir a 400.000 filas</p></td>
+</tr>
+<tr class="row-odd"><td><p>M-CART <span id="id14">[<a class="reference internal" href="intro.html#id19" title="Shuqiong Lin and Wen Luo. A new multilevel CART algorithm for multilevel data with binary outcomes. Multivariate Behavioral Research, 54(4):578–592, 2019. doi:10.1080/00273171.2018.1552555.">Lin and Luo, 2019</a>]</span></p></td>
+<td><p>CART para datos de dos niveles con respuesta binaria</p></td>
+<td><p>anidado, no cruzado; un árbol</p></td>
+</tr>
+<tr class="row-even"><td><p>GLMM–XGBoost <span id="id15">[<a class="reference internal" href="intro.html#id20" title="Sun-Joo Cho. An iterative GLMM–XGBoost algorithm with group-aware conditional permutation importance for explaining multilevel item response data. Psychometrika, 2026. doi:10.1017/psy.2026.10114.">Cho, 2026</a>]</span></p></td>
+<td><p>alterna XGBoost y un GLMM para respuestas de ítems</p></td>
+<td><p>otro dominio; sin reducción ordinal ni orden temporal</p></td>
+</tr>
+<tr class="row-odd"><td><p>Boosting para modelos mixtos <span id="id16">[<a class="reference internal" href="intro.html#id12" title="Colin Griesbach, Benjamin Säfken, and Elisabeth Waldmann. Gradient boosting for linear mixed models. The International Journal of Biostatistics, 2021. doi:10.1515/ijb-2020-0136.">Griesbach <em>et al.</em>, 2021</a>, <a class="reference internal" href="intro.html#id13" title="Lars Knieper, Torsten Hothorn, Elisabeth Bergherr, and Colin Griesbach. Gradient boosting for generalised additive mixed models. Statistics and Computing, 35:84, 2025. doi:10.1007/s11222-025-10612-y.">Knieper <em>et al.</em>, 2025</a>]</span></p></td>
+<td><p><em>boosting</em> por componentes con efectos aleatorios, corrección de los efectos y parada por validación cruzada de grupos</p></td>
+<td><p>un factor y aprendices lineales; de aquí salen el esquema por bloques y la corrección C</p></td>
+</tr>
+<tr class="row-even"><td><p>Regresión ordinal por clasificación extendida <span id="id17">[<a class="reference internal" href="intro.html#id14" title="Ling Li and Hsuan-Tien Lin. Ordinal regression by extended binary classification. In Advances in Neural Information Processing Systems 19, 865–872. 2006.">Li and Lin, 2006</a>]</span></p></td>
+<td><p>copia cada caso una vez por umbral y aprende todos los umbrales con un clasificador binario</p></td>
+<td><p>sin entidades; de aquí sale la reducción ordinal</p></td>
+</tr>
+<tr class="row-odd"><td><p>CatBoost <span id="id18">[<a class="reference internal" href="intro.html#id15" title="Liudmila Prokhorenkova, Gleb Gusev, Aleksandr Vorobev, Anna Veronika Dorogush, and Andrey Gulin. CatBoost: unbiased boosting with categorical features. In Advances in Neural Information Processing Systems 31, 6638–6648. 2018.">Prokhorenkova <em>et al.</em>, 2018</a>]</span></p></td>
+<td><p>codifica cada categoría con los casos anteriores en una permutación, para no usar la propia etiqueta</p></td>
+<td><p>sin encogimiento con varianza estimada; de aquí sale el ordenamiento</p></td>
+</tr>
+<tr class="row-even"><td><p>Ponderación por antigüedad <span id="id19">[<a class="reference internal" href="intro.html#id22" title="Ralf Klinkenberg. Learning drifting concepts: example selection vs. example weighting. Intelligent Data Analysis, 8(3):281–300, 2004. doi:10.3233/IDA-2004-8305.">Klinkenberg, 2004</a>]</span></p></td>
+<td><p>pesa los ejemplos con un decaimiento exponencial por edad</p></td>
+<td><p>se probó como pieza y su propia fuente dice que la ventana rinde más; no quedó en BOREAL</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="literatura.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title"><span class="section-number">9. </span>Literatura</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="05_modelo_original.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title"><span class="section-number">11. </span>Modelo original: efectos por entidad, plazo log-normal y plazo real</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#como-se-busco">10.1. Cómo se buscó</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#que-se-encontro">10.2. Qué se encontró</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matriz-de-novedad">10.3. Matriz de novedad</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#declaracion-de-novedad">10.4. Declaración de novedad</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metodos-relacionados-en-una-frase">10.5. Métodos relacionados en una frase</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por Daniel Carbonó y Luis Pérez
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
